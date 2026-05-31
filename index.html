@@ -295,6 +295,38 @@
       <span class="quick-icon">😱</span>
       恐慌指数
     </div>
+    <div class="quick-btn" onclick="copyTip(this)" data-tip="资金流向">
+      <span class="quick-icon">💰</span>
+      资金流向
+    </div>
+    <div class="quick-btn" onclick="copyTip(this)" data-tip="公告事件">
+      <span class="quick-icon">📢</span>
+      公告事件
+    </div>
+    <div class="quick-btn" onclick="copyTip(this)" data-tip="估值对比">
+      <span class="quick-icon">⚖️</span>
+      估值对比
+    </div>
+    <div class="quick-btn" onclick="copyTip(this)" data-tip="异动提醒">
+      <span class="quick-icon">🔔</span>
+      异动提醒
+    </div>
+    <div class="quick-btn" onclick="copyTip(this)" data-tip="行业板块对比">
+      <span class="quick-icon">🏭</span>
+      板块对比
+    </div>
+    <div class="quick-btn" onclick="copyTip(this)" data-tip="分红查询">
+      <span class="quick-icon">💎</span>
+      分红查询
+    </div>
+    <div class="quick-btn" onclick="copyTip(this)" data-tip="新股日历">
+      <span class="quick-icon">📅</span>
+      新股日历
+    </div>
+    <div class="quick-btn" onclick="copyTip(this)" data-tip="热股热搜">
+      <span class="quick-icon">🌐</span>
+      热股热搜
+    </div>
     <div class="quick-btn" onclick="copyTip(this)" data-tip="查看我的记忆">
       <span class="quick-icon">🧠</span>
       我的记忆
@@ -466,6 +498,381 @@
       
       <div class="tip-box">
         💡 巴菲特名言："别人恐惧时我贪婪，别人贪婪时我恐惧。"——恐慌指数就是帮你判断这个时机的工具。
+      </div>
+    </div>
+  </div>
+  
+  <!-- 资金流向分析 -->
+  <div class="func-card" data-tags="资金流向,资金,主力资金,北向资金,外资,净流入,净流出,flow,money">
+    <div class="func-header" onclick="toggleCard(this)">
+      💰 资金流向分析
+      <span class="arrow">▶</span>
+    </div>
+    <div class="func-body">
+      <h3>功能介绍</h3>
+      <p>跟踪 <span class="highlight">主力资金和北向资金（外资）</span> 的实时动向，看清大资金在买什么、卖什么。</p>
+      
+      <h3>如何使用</h3>
+      <ul>
+        <li><span class="highlight">步骤1：</span>对我说"今天北向资金流向如何"</li>
+        <li><span class="highlight">步骤2：</span>我会查询当日净流入/流出数据</li>
+        <li><span class="highlight">步骤3：</span>分析主要买入/卖出板块和个股</li>
+        <li><span class="highlight">步骤4：</span>给出资金面参考建议</li>
+      </ul>
+      
+      <h3>分析内容包括</h3>
+      <ul>
+        <li>🌏 <span class="highlight">北向资金（陆股通）</span> — 外资每日净买入/卖出金额</li>
+        <li>💰 <span class="highlight">主力资金净流向</span> — 大单、超大单买卖数据</li>
+        <li>📊 <span class="highlight">板块资金流向</span> — 哪个板块资金在流入/流出</li>
+        <li>📈 <span class="highlight">个股资金排名</span> — 净流入/流出前10名</li>
+        <li>💹 <span class="highlight">融资融券余额</span> — 杠杆资金情绪</li>
+      </ul>
+      
+      <h3>为什么重要</h3>
+      <p>A股市场里，<span class="highlight">资金的动向往比消息更重要</span>。北向资金被称为"聪明钱"，其持续流入/流出往往预示着市场方向。</p>
+      
+      <h3>示例对话</h3>
+      <ul>
+        <li>💬 "今天北向资金买了哪些股票？"</li>
+        <li>💬 "最近一周主力资金流向分析"</li>
+        <li>💬 "科创板资金流向怎么样？"</li>
+        <li>💬 "融资余额变化，市场情绪如何？"</li>
+      </ul>
+      
+      <div class="tip-box">
+        💡 提示：持续3天以上北向资金净流入，通常意味着外资看好后市。
+      </div>
+    </div>
+  </div>
+  
+  <!-- 公告事件监控 -->
+  <div class="func-card" data-tags="公告,事件,业绩预告,增减持,质押,解禁,诉讼,风险,分红,news,announcement">
+    <div class="func-header" onclick="toggleCard(this)">
+      📢 公告事件监控
+      <span class="arrow">▶</span>
+    </div>
+    <div class="func-body">
+      <h3>功能介绍</h3>
+      <p>第一时间获取公司 <span class="highlight">重大公告和风险事件</span>，包括业绩预告、增减持、质押解禁等影响股价的关键信息。</p>
+      
+      <h3>如何使用</h3>
+      <ul>
+        <li><span class="highlight">步骤1：</span>对我说"XX公司最近有什么公告"</li>
+        <li><span class="highlight">步骤2：</span>我会查询最新公告列表</li>
+        <li><span class="highlight">步骤3：</span>标注重要事件和风险等级</li>
+        <li><span class="highlight">步骤4：</span>分析对股价的影响</li>
+      </ul>
+      
+      <h3>监控事件类型</h3>
+      <ul>
+        <li>📋 <span class="highlight">业绩预告/快报</span> — 赚了多少？超预期还是低于预期？</li>
+        <li>🤝 <span class="highlight">增减持公告</span> — 大股东在买还是卖？</li>
+        <li>🔒 <span class="highlight">股权质押</span> — 质押比例过高有爆仓风险</li>
+        <li>📅 <span class="highlight">限售解禁</span> — 大量解禁可能带来抛压</li>
+        <li>⚖️ <span class="highlight">诉讼仲裁</span> — 法律风险影响估值</li>
+        <li>⚠️ <span class="highlight">ST风险警示</span> — 退市风险警告</li>
+        <li>💸 <span class="highlight">增发配股</span> — 稀释股权影响股价</li>
+        <li>🎁 <span class="highlight">分红方案</span> — 分红比例和除权日期</li>
+      </ul>
+      
+      <h3>示例对话</h3>
+      <ul>
+        <li>💬 "澜起科技最近有什么重要公告？"</li>
+        <li>💬 "本周A股有哪些公司发了业绩预告？"</li>
+        <li>💬 "提醒我有解禁风险的股票"</li>
+        <li>💬 "XX公司大股东最近在减持吗？"</li>
+      </ul>
+      
+      <div class="tip-box">
+        ⚠️ 重要：大股东减持和限售解禁是最常见的利空信号，散户吃亏就吃亏在反应慢。
+      </div>
+    </div>
+  </div>
+  
+  <!-- 估值对比分析 -->
+  <div class="func-card" data-tags="估值,PE,PB,ROE,市盈率,市净率,估值对比,估值分位,valuation">
+    <div class="func-header" onclick="toggleCard(this)">
+      ⚖️ 估值对比分析
+      <span class="arrow">▶</span>
+    </div>
+    <div class="func-body">
+      <h3>功能介绍</h3>
+      <p>用 <span class="highlight">PE、PB、ROE 等核心估值指标</span> 判断股票贵不贵，值不值得买。包括历史估值分位数和同行业对比。</p>
+      
+      <h3>如何使用</h3>
+      <ul>
+        <li><span class="highlight">步骤1：</span>对我说"XX公司目前估值水平如何"</li>
+        <li><span class="highlight">步骤2：</span>我会查询 PE、PB、ROE 等数据</li>
+        <li><span class="highlight">步骤3：</span>对比历史分位和同行业水平</li>
+        <li><span class="highlight">步骤4：</span>给出估值高低判断</li>
+      </ul>
+      
+      <h3>核心估值指标</h3>
+      <ul>
+        <li>📊 <span class="highlight">PE（市盈率）</span> — 当前股价 ÷ 每股收益，越低越便宜</li>
+        <li>📊 <span class="highlight">PE 历史分位</span> — 当前 PE 比历史上多少时间贵</li>
+        <li>📊 <span class="highlight">PB（市净率）</span> — 当前股价 ÷ 每股净资产</li>
+        <li>📊 <span class="highlight">ROE（净资产收益率）</span> — 公司赚钱能力，越高越好</li>
+        <li>📊 <span class="highlight">PEG</span> — PE ÷ 盈利增速，< 1 表示估值合理</li>
+        <li>📊 <span class="highlight">同行业对比</span> — 同类公司估值排名</li>
+      </ul>
+      
+      <h3>估值判断参考</h3>
+      <ul>
+        <li>🟢 <span class="highlight">分位 < 30%：</span> 低估区域，适合关注</li>
+        <li>🟡 <span class="highlight">分位 30%-70%：</span> 合理区间，正常持有</li>
+        <li>🔴 <span class="highlight">分位 > 70%：</span> 高估区域，注意风险</li>
+      </ul>
+      
+      <h3>示例对话</h3>
+      <ul>
+        <li>💬 "贵州茅台现在估值贵不贵？"</li>
+        <li>💬 "对比宁德时代和比亚迪的估值"</li>
+        <li>💬 "科创板半导体板块平均PE是多少？"</li>
+        <li>💬 "澜起科技PE历史分位在什么位置？"</li>
+      </ul>
+      
+      <div class="tip-box">
+        💡 提示：不能只看PE，要结合行业增速和ROE综合判断。高增长行业PE高是正常的。
+      </div>
+    </div>
+  </div>
+  
+  <!-- 异动提醒 -->
+  <div class="func-card" data-tags="异动,提醒,涨跌幅,成交量,放量,拉升,砸盘,alert,异常">
+    <div class="func-header" onclick="toggleCard(this)">
+      🔔 异动提醒
+      <span class="arrow">▶</span>
+    </div>
+    <div class="func-body">
+      <h3>功能介绍</h3>
+      <p>监控 <span class="highlight">股价异常波动</span>，包括大涨大跌、成交量突然放大、盘中拉升砸盘等情况，不需要时刻盯盘。</p>
+      
+      <h3>如何使用</h3>
+      <ul>
+        <li><span class="highlight">步骤1：</span>对我说"今天有哪些异动股票"</li>
+        <li><span class="highlight">步骤2：</span>我会查询涨跌幅>5%或成交量异常的个股</li>
+        <li><span class="highlight">步骤3：</span>分析异动原因</li>
+        <li><span class="highlight">步骤4：</span>给出关注建议</li>
+      </ul>
+      
+      <h3>异动类型</h3>
+      <ul>
+        <li>📈 <span class="highlight">涨幅异动</span> — 涨超 5%、10%、20%（科创板）</li>
+        <li>📉 <span class="highlight">跌幅异动</span> — 跌超 5%、10%、20%</li>
+        <li>📊 <span class="highlight">量能异动</span> — 成交量放大2倍以上</li>
+        <li>⚡ <span class="highlight">盘中异动</span> — 突然拉升或砸盘</li>
+        <li>🔄 <span class="highlight">换手率异动</span> — 换手率超过10%</li>
+        <li>🏦 <span class="highlight">大宗交易</span> — 大额折价/溢价交易</li>
+      </ul>
+      
+      <h3>为什么需要（对视力的帮助）</h3>
+      <p>你不需要时刻盯着行情软件，<span class="highlight">我来帮你监控异动</span>，有重要变化时通知你。大字体呈现，一目了然。</p>
+      
+      <h3>示例对话</h3>
+      <ul>
+        <li>💬 "今天科创板有哪些股票异动？"</li>
+        <li>💬 "最近3天成交量放大的股票"</li>
+        <li>💬 "帮我设置股价异动提醒（涨跌超5%通知）"</li>
+        <li>💬 "XX股票今天为什么突然大跌？"</li>
+      </ul>
+      
+      <div class="tip-box">
+        🔔 提示：可以对我说"设置每天自动推送异动提醒"，我会创建定时任务帮你自动监控。
+      </div>
+    </div>
+  </div>
+  
+  <!-- 行业板块对比 -->
+  <div class="func-card" data-tags="板块,行业,概念,对比,排行,轮动,sector,申万,排名">
+    <div class="func-header" onclick="toggleCard(this)">
+      🏭 行业板块对比
+      <span class="arrow">▶</span>
+    </div>
+    <div class="func-body">
+      <h3>功能介绍</h3>
+      <p>对比 <span class="highlight">不同行业和概念板块</span> 的表现，找出谁更强、谁在轮动，选对板块比选对个股更重要。</p>
+      
+      <h3>如何使用</h3>
+      <ul>
+        <li><span class="highlight">步骤1：</span>对我说"今天什么板块涨得最好"</li>
+        <li><span class="highlight">步骤2：</span>我会查询申万行业和概念板块排行</li>
+        <li><span class="highlight">步骤3：</span>分析板块轮动趋势</li>
+        <li><span class="highlight">步骤4：</span>推荐关注的板块和龙头股</li>
+      </ul>
+      
+      <h3>分析内容</h3>
+      <ul>
+        <li>📊 <span class="highlight">申万行业排行</span> — 31个一级行业涨跌排名</li>
+        <li>💡 <span class="highlight">概念板块排行</span> — 热门概念涨跌排名</li>
+        <li>🔄 <span class="highlight">板块轮动分析</span> — 资金在板块间如何切换</li>
+        <li>🏆 <span class="highlight">龙头股筛选</span> — 板块内涨幅靠前的成分股</li>
+        <li>📈 <span class="highlight">多周期对比</span> — 今日/本周/本月涨幅排行</li>
+      </ul>
+      
+      <h3>常用分析</h3>
+      <ul>
+        <li>科创板、创业板 vs 主板热度对比</li>
+        <li>科技股 vs 消费股 vs 金融股轮动</li>
+        <li>AI、芯片、新能源概念对比</li>
+      </ul>
+      
+      <h3>示例对话</h3>
+      <ul>
+        <li>💬 "本周涨幅前5的板块是哪些？"</li>
+        <li>💬 "半导体和新能源哪个板块更强？"</li>
+        <li>💬 "科创板概念板块热度排行"</li>
+        <li>💬 "最近板块轮动规律是什么？"</li>
+      </ul>
+      
+      <div class="tip-box">
+        💡 提示：板块连续3天涨幅靠前，往往意味着资金在持续流入，可以重点关注。
+      </div>
+    </div>
+  </div>
+  
+  <!-- 分红查询 -->
+  <div class="func-card" data-tags="分红,股息,除权,除息,红利,配股,dividend,股息率">
+    <div class="func-header" onclick="toggleCard(this)">
+      💎 分红查询
+      <span class="arrow">▶</span>
+    </div>
+    <div class="func-body">
+      <h3>功能介绍</h3>
+      <p>查询 <span class="highlight">分红方案、除权除息日期和股息率</span>，帮助长线投资者选择稳定分红的优质标的。</p>
+      
+      <h3>如何使用</h3>
+      <ul>
+        <li><span class="highlight">步骤1：</span>对我说"XX公司什么时候分红"</li>
+        <li><span class="highlight">步骤2：</span>查询分红方案和除权日期</li>
+        <li><span class="highlight">步骤3：</span>计算股息率和分红收益</li>
+        <li><span class="highlight">步骤4：</span>对比同行业分红水平</li>
+      </ul>
+      
+      <h3>查询内容</h3>
+      <ul>
+        <li>🎁 <span class="highlight">分红方案</span> — 每10股派多少元</li>
+        <li>📅 <span class="highlight">除权除息日</span> — 哪天之前买入能享受分红</li>
+        <li>💵 <span class="highlight">股息率</span> — 分红金额 ÷ 股价，越高越好</li>
+        <li>📊 <span class="highlight">股息率排行</span> — A股股息率前20名</li>
+        <li>📜 <span class="highlight">历史分红记录</span> — 过去5年分红稳定性</li>
+      </ul>
+      
+      <h3>高股息策略</h3>
+      <ul>
+        <li>🥇 <span class="highlight">股息率 > 4%：</span> 高分红的优质标的</li>
+        <li>🥈 <span class="highlight">股息率 2%-4%：</span> 中等分红水平</li>
+        <li>🥉 <span class="highlight">红利再投资：</span> 用分红继续买入，复利增长</li>
+      </ul>
+      
+      <h3>示例对话</h3>
+      <ul>
+        <li>💬 "贵州茅台今年分红方案是什么？"</li>
+        <li>💬 "A股股息率最高的股票有哪些？"</li>
+        <li>💬 "银行股分红对比分析"</li>
+        <li>💬 "近期即将除权的股票提醒"</li>
+      </ul>
+      
+      <div class="tip-box">
+        💡 提示：连续5年股息率 > 3% 的公司，通常是现金流稳定的优质企业。
+      </div>
+    </div>
+  </div>
+  
+  <!-- 新股日历 -->
+  <div class="func-card" data-tags="新股,打新,申购,上市,IPO,中签,日历">
+    <div class="func-header" onclick="toggleCard(this)">
+      📅 新股日历
+      <span class="arrow">▶</span>
+    </div>
+    <div class="func-body">
+      <h3>功能介绍</h3>
+      <p>查看 <span class="highlight">新股申购、上市时间表</span>，不错过打新机会。A股打新是散户最稳定的低风险收益方式。</p>
+      
+      <h3>如何使用</h3>
+      <ul>
+        <li><span class="highlight">步骤1：</span>对我说"最近有什么新股可以申购"</li>
+        <li><span class="highlight">步骤2：</span>查询新股申购日历</li>
+        <li><span class="highlight">步骤3：</span>分析新股市盈率、行业、发行规模</li>
+        <li><span class="highlight">步骤4：</span>给出申购建议</li>
+      </ul>
+      
+      <h3>查询内容</h3>
+      <ul>
+        <li>🆕 <span class="highlight">即将申购</span> — 未来7天可申购的新股</li>
+        <li>📋 <span class="highlight">申购详情</span> — 申购代码、发行价、发行PE</li>
+        <li>🎯 <span class="highlight">中签率参考</span> — 历史中签率分析</li>
+        <li>🚀 <span class="highlight">即将上市</span> — 已完成申购即将上市的新股</li>
+        <li>📊 <span class="highlight">新股表现</span> — 近期上市新股首日涨跌幅</li>
+      </ul>
+      
+      <h3>打新建议</h3>
+      <ul>
+        <li>科创板/创业板新股：上市前5日不限涨跌幅</li>
+        <li>主板新股：首日涨跌幅44%限制</li>
+        <li>发行PE低于行业平均PE的，首日涨幅空间更大</li>
+      </ul>
+      
+      <h3>示例对话</h3>
+      <ul>
+        <li>💬 "这周有什么新股可以申购？"</li>
+        <li>💬 "明天上市的新股有哪些？"</li>
+        <li>💬 "最近新股中签率怎么样？"</li>
+        <li>💬 "科创板最近新股表现分析"</li>
+      </ul>
+      
+      <div class="tip-box">
+        💡 提示：打新不需要盯盘，申购后等中签结果即可，非常适合你。
+      </div>
+    </div>
+  </div>
+  
+  <!-- 热股热搜 -->
+  <div class="func-card" data-tags="热搜,热股,热门,人气,关注,情绪,hot,trending">
+    <div class="func-header" onclick="toggleCard(this)">
+      🌐 热股热搜
+      <span class="arrow">▶</span>
+    </div>
+    <div class="func-body">
+      <h3>功能介绍</h3>
+      <p>查看 <span class="highlight">市场热搜榜和热门股票</span>，了解大家都在关注什么，把握市场情绪和舆论方向。</p>
+      
+      <h3>如何使用</h3>
+      <ul>
+        <li><span class="highlight">步骤1：</span>对我说"今天A股热搜榜有哪些"</li>
+        <li><span class="highlight">步骤2：</span>查询热门股票和讨论热度</li>
+        <li><span class="highlight">步骤3：</span>分析市场情绪和资金偏好</li>
+        <li><span class="highlight">步骤4：</span>给出关注建议</li>
+      </ul>
+      
+      <h3>查询内容</h3>
+      <ul>
+        <li>🔥 <span class="highlight">A股热搜排行</span> — 搜索量最大的股票</li>
+        <li>💬 <span class="highlight">社区热度</span> — 讨论量最大的股票</li>
+        <li>👀 <span class="highlight">加自选排行</span> — 用户添加到自选最多的股票</li>
+        <li>📊 <span class="highlight">交易热度</span> — 成交量和换手率排行</li>
+        <li>🎯 <span class="highlight">热门概念</span> — 大家都在关注什么概念</li>
+      </ul>
+      
+      <h3>如何利用热搜</h3>
+      <ul>
+        <li>热搜股短期波动大，适合短线关注</li>
+        <li>持续热搜可能意味着趋势行情启动</li>
+        <li>热门概念代表了当前市场的主线方向</li>
+        <li>⚠️ 注意：热搜顶点往往是短期高点</li>
+      </ul>
+      
+      <h3>示例对话</h3>
+      <ul>
+        <li>💬 "今天A股热搜前10是哪些？"</li>
+        <li>💬 "最近大家都在讨论什么概念？"</li>
+        <li>💬 "分析一下当前市场情绪"</li>
+        <li>💬 "本周热搜榜和上周有什么变化？"</li>
+      </ul>
+      
+      <div class="tip-box">
+        ⚠️ 注意：热搜代表市场关注度，但不等于投资建议。追涨热搜股风险较大，建议结合基本面判断。
       </div>
     </div>
   </div>
@@ -707,6 +1114,14 @@
     "投资逻辑分析": "请根据以下数据/股票：[股票名称或代码]，帮我做投资逻辑分析，包括：1. 基本面分析（财务数据、行业地位）2. 技术面分析（趋势、支撑压力位）3. 风险提示 4. 投资建议（仅供参考）",
     "公司研报分析": "请帮我获取 [股票名称/代码] 的机构研报摘要分析，包括：\n1. 最近3个月主要券商评级和核心观点\n2. 财务数据摘要（营收、净利润、毛利率、ROE等核心指标）\n3. 行业地位与竞争优势分析\n4. 盈利预测与估值分析\n5. 投资逻辑与风险提示\n6. 综合投资建议（仅供参考）",
     "恐慌指数": "请帮我查询当前市场恐慌指数分析，包括：\n1. VIX恐慌指数（美股）当前数值和历史分位\n2. 恐惧贪婪指数（Fear & Greed Index）\n3. A股市场情绪指标（涨跌家数比、北向资金流向、融资余额）\n4. 当前市场情绪解读：贪婪/中性/恐慌\n5. 结合情绪指标给出操作建议（仅供参考）",
+    "资金流向": "请帮我分析当前资金流向：\n1. 北向资金（陆股通）今日净流入/流出金额\n2. 主要买入/卖出板块和个股（前5名）\n3. 主力资金净流向分析（大单/超大单）\n4. 融资融券余额变化\n5. 综合资金面判断和建议（仅供参考）",
+    "公告事件": "请帮我查询 [股票名称/代码] 的最新公告和事件：\n1. 最近30天重要公告列表\n2. 业绩预告/快报（如有）\n3. 大股东增减持情况\n4. 股权质押比例和风险\n5. 限售解禁计划\n6. 重大风险提示（诉讼、ST、增发等）",
+    "估值对比": "请帮我做 [股票名称/代码] 的估值分析：\n1. 当前PE（市盈率）和PE历史分位\n2. PB（市净率）及同行业对比\n3. ROE（净资产收益率）分析\n4. PEG（市盈率相对盈利增长比）\n5. 同行业估值排名对比\n6. 估值高低判断和投资建议（仅供参考）",
+    "异动提醒": "请帮我查询今日市场异动：\n1. 涨跌幅超过5%的个股（重点看科创板/创业板）\n2. 成交量放大2倍以上的个股\n3. 换手率异常的个股（换手率>10%）\n4. 盘中突然拉升或砸盘的个股\n5. 大宗交易记录\n6. 给出关注建议（仅供参考）",
+    "行业板块对比": "请帮我做行业板块对比分析：\n1. 今日申万行业涨跌幅排行（前5和后5）\n2. 热门概念板块涨跌排行\n3. 科创板/创业板板块热度\n4. 板块资金流向分析\n5. 板块轮动趋势分析\n6. 推荐关注板块及龙头股（仅供参考）",
+    "分红查询": "请帮我查询分红信息：\n1. [股票名称/代码] 最新分红方案\n2. 除权除息日期\n3. 股息率计算和排名\n4. A股股息率前10名\n5. 历史分红稳定性分析（过去5年）\n6. 高股息投资建议（仅供参考）",
+    "新股日历": "请帮我查询新股日历：\n1. 未来7天可申购的新股列表\n2. 每只新股的发行价、发行PE、行业\n3. 即将上市的新股\n4. 近期新股上市首日表现\n5. 申购建议（仅供参考）",
+    "热股热搜": "请帮我查询市场热搜：\n1. A股今日热搜榜前10\n2. 讨论热度最高的股票\n3. 加自选最多的股票\n4. 当前热门概念和话题\n5. 市场情绪分析\n6. 关注建议和风险提示（仅供参考）",
     "查看我的记忆": "请显示完整记忆，包括你目前记住的关于我的所有信息。"
   };
   
