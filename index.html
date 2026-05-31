@@ -9,7 +9,7 @@
 <title>WorkBuddy 功能速查</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  
+
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
     background: #0f0f1a;
@@ -18,7 +18,7 @@
     padding: 0;
     -webkit-tap-highlight-color: transparent;
   }
-  
+
   /* 顶部搜索区 */
   .header {
     position: sticky;
@@ -28,7 +28,7 @@
     z-index: 100;
     border-bottom: 2px solid #16213e;
   }
-  
+
   .search-box {
     width: 100%;
     padding: 16px 20px;
@@ -40,22 +40,40 @@
     outline: none;
     transition: border-color 0.3s;
   }
-  
+
   .search-box:focus {
     border-color: #e94560;
   }
-  
+
   .search-box::placeholder {
     color: #666;
     font-size: 18px;
   }
-  
+
+  /* 使用说明横幅 */
+  .guide-banner {
+    margin: 16px;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #0f3460, #16213e);
+    border: 2px solid #e94560;
+    border-radius: 16px;
+    font-size: 18px;
+    line-height: 1.8;
+    color: #ffd700;
+  }
+
+  .guide-banner .step {
+    font-size: 20px;
+    font-weight: bold;
+    margin-right: 4px;
+  }
+
   /* 快捷按钮区 */
   .quick-section {
     padding: 16px;
     background: #1a1a2e;
   }
-  
+
   .section-title {
     font-size: 22px;
     font-weight: bold;
@@ -63,13 +81,13 @@
     margin-bottom: 12px;
     padding-left: 4px;
   }
-  
+
   .quick-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
   }
-  
+
   .quick-btn {
     background: #16213e;
     border: 2px solid #0f3460;
@@ -82,29 +100,29 @@
     transition: all 0.3s;
     user-select: none;
   }
-  
+
   .quick-btn:active {
     background: #0f3460;
     transform: scale(0.95);
   }
-  
+
   .quick-btn:hover {
     border-color: #e94560;
     background: #1a1a4e;
   }
-  
+
   .quick-icon {
     font-size: 32px;
     display: block;
     margin-bottom: 8px;
   }
-  
+
   /* 功能列表区 */
   .content {
     padding: 16px;
     padding-bottom: 100px;
   }
-  
+
   .func-card {
     background: #16213e;
     border: 2px solid #0f3460;
@@ -113,11 +131,11 @@
     overflow: hidden;
     display: none;
   }
-  
+
   .func-card.show {
     display: block;
   }
-  
+
   .func-header {
     padding: 20px;
     font-size: 22px;
@@ -130,58 +148,58 @@
     justify-content: space-between;
     align-items: center;
   }
-  
+
   .func-header:active {
     background: #1a1a4e;
   }
-  
+
   .arrow {
     font-size: 18px;
     transition: transform 0.3s;
   }
-  
+
   .arrow.open {
     transform: rotate(90deg);
   }
-  
+
   .func-body {
     padding: 20px;
     font-size: 20px;
     line-height: 1.8;
     display: none;
   }
-  
+
   .func-body.open {
     display: block;
   }
-  
+
   .func-body h3 {
     color: #00d2ff;
     font-size: 20px;
     margin-top: 16px;
     margin-bottom: 8px;
   }
-  
+
   .func-body p {
     margin-bottom: 12px;
     color: #e0e0e0;
   }
-  
+
   .func-body ul {
     margin-left: 20px;
     margin-bottom: 12px;
   }
-  
+
   .func-body li {
     margin-bottom: 8px;
     color: #e0e0e0;
   }
-  
+
   .highlight {
     color: #ffd700;
     font-weight: bold;
   }
-  
+
   .tip-box {
     background: #0f3460;
     border-left: 6px solid #e94560;
@@ -190,7 +208,7 @@
     border-radius: 0 12px 12px 0;
     font-size: 18px;
   }
-  
+
   /* 空状态 */
   .empty-state {
     text-align: center;
@@ -199,11 +217,11 @@
     font-size: 20px;
     display: none;
   }
-  
+
   .empty-state.show {
     display: block;
   }
-  
+
   /* 底部提示 */
   .footer {
     position: fixed;
@@ -218,8 +236,8 @@
     color: #666;
     z-index: 100;
   }
-  
-  /* 复制到剪贴板提示 */
+
+  /* Toast 提示 */
   .toast {
     position: fixed;
     top: 50%;
@@ -234,15 +252,184 @@
     display: none;
     border: 2px solid #e94560;
   }
-  
+
   .toast.show {
     display: block;
     animation: fadeIn 0.3s;
   }
-  
+
   @keyframes fadeIn {
     from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
     to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  }
+
+  /* ==================== 弹窗样式 ==================== */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 500;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .modal-overlay.show {
+    display: flex;
+    animation: fadeIn 0.2s;
+  }
+
+  .modal-card {
+    background: #1a1a2e;
+    border: 3px solid #e94560;
+    border-radius: 20px;
+    padding: 28px 24px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+
+  .modal-card h2 {
+    font-size: 26px;
+    color: #e94560;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+
+  .modal-card .modal-desc {
+    font-size: 18px;
+    color: #999;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .modal-card label {
+    font-size: 18px;
+    color: #ffd700;
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+  }
+
+  .modal-card input {
+    width: 100%;
+    padding: 16px 18px;
+    font-size: 22px;
+    border: 3px solid #0f3460;
+    border-radius: 14px;
+    background: #16213e;
+    color: #ffffff;
+    outline: none;
+    margin-bottom: 20px;
+    transition: border-color 0.3s;
+  }
+
+  .modal-card input:focus {
+    border-color: #e94560;
+  }
+
+  .modal-card input::placeholder {
+    color: #5a5a7a;
+    font-size: 18px;
+  }
+
+  .modal-buttons {
+    display: flex;
+    gap: 12px;
+  }
+
+  .btn-generate {
+    flex: 2;
+    padding: 16px 12px;
+    font-size: 22px;
+    font-weight: bold;
+    background: #e94560;
+    color: #ffffff;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .btn-generate:active {
+    background: #c73a54;
+    transform: scale(0.96);
+  }
+
+  .btn-cancel {
+    flex: 1;
+    padding: 16px 12px;
+    font-size: 22px;
+    background: #16213e;
+    color: #999;
+    border: 2px solid #0f3460;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .btn-cancel:active {
+    background: #0f3460;
+  }
+
+  /* 预览区 */
+  .preview-box {
+    background: #0f3460;
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 16px;
+    display: none;
+  }
+
+  .preview-box.show {
+    display: block;
+  }
+
+  .preview-title {
+    font-size: 16px;
+    color: #00d2ff;
+    margin-bottom: 8px;
+  }
+
+  .preview-text {
+    font-size: 18px;
+    color: #e0e0e0;
+    line-height: 1.7;
+    white-space: pre-wrap;
+  }
+
+  .btn-copy-preview {
+    width: 100%;
+    margin-top: 12px;
+    padding: 14px;
+    font-size: 22px;
+    font-weight: bold;
+    background: #00d2ff;
+    color: #0f0f1a;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .btn-copy-preview:active {
+    background: #00a8cc;
+    transform: scale(0.96);
+  }
+
+  /* 可选标签 */
+  .optional-tag {
+    font-size: 14px;
+    background: #0f3460;
+    color: #888;
+    padding: 2px 8px;
+    border-radius: 6px;
+    margin-left: 6px;
+    vertical-align: middle;
   }
 </style>
 </head>
@@ -252,82 +439,89 @@
   <input type="text" class="search-box" id="searchInput" placeholder="输入关键词搜索功能，如：专家、金融、文件..." oninput="filterFunctions()">
 </div>
 
+<!-- 使用说明 -->
+<div class="guide-banner">
+  <span class="step">三步用法：</span>1. 点下方按钮 → 2. 填股票代码 → 3. 点"复制"后粘贴到 WorkBuddy 对话发送
+</div>
+
 <div class="quick-section">
   <div class="section-title">快捷指令</div>
   <div class="quick-grid">
-    <div class="quick-btn" onclick="copyTip(this)" data-tip="查A股行情">
+    <!-- 需要输入的 -->
+    <div class="quick-btn" onclick="openModal(this)" data-tip="A股行情" data-input="请输入A股股票代码或名称，如：贵州茅台、688981">
       <span class="quick-icon">📈</span>
       A股行情
     </div>
-    <div class="quick-btn" onclick="copyTip(this)" data-tip="查美股行情">
+    <div class="quick-btn" onclick="openModal(this)" data-tip="美股行情" data-input="请输入美股股票代码，如：NVDA、AAPL、TSLA">
       <span class="quick-icon">🇺🇸</span>
       美股行情
     </div>
-    <div class="quick-btn" onclick="copyTip(this)" data-tip="查公司财报">
+    <div class="quick-btn" onclick="openModal(this)" data-tip="公司财报" data-input="请输入公司名称或代码，如：比亚迪、贵州茅台">
       <span class="quick-icon">📋</span>
       公司财报
     </div>
-    <div class="quick-btn" onclick="copyTip(this)" data-tip="今日板块热点">
-      <span class="quick-icon">🔥</span>
-      板块热点
-    </div>
-    <div class="quick-btn" onclick="copyTip(this)" data-tip="生成Word报告">
-      <span class="quick-icon">📝</span>
-      Word报告
-    </div>
-    <div class="quick-btn" onclick="copyTip(this)" data-tip="数据分析出图">
-      <span class="quick-icon">📊</span>
-      数据分析
-    </div>
-    <div class="quick-btn" onclick="copyTip(this)" data-tip="设置每日推送">
-      <span class="quick-icon">⏰</span>
-      每日推送
-    </div>
-    <div class="quick-btn" onclick="copyTip(this)" data-tip="投资逻辑分析">
+    <div class="quick-btn" onclick="openModal(this)" data-tip="投资分析" data-input="请输入股票名称或代码">
       <span class="quick-icon">📊</span>
       投资分析
     </div>
-    <div class="quick-btn" onclick="copyTip(this)" data-tip="公司研报分析">
+    <div class="quick-btn" onclick="openModal(this)" data-tip="公司研报" data-input="请输入股票名称或代码，如：澜起科技">
       <span class="quick-icon">💼</span>
       公司研报
     </div>
-    <div class="quick-btn" onclick="copyTip(this)" data-tip="恐慌指数">
-      <span class="quick-icon">😱</span>
-      恐慌指数
-    </div>
-    <div class="quick-btn" onclick="copyTip(this)" data-tip="资金流向">
+    <div class="quick-btn" onclick="openModal(this)" data-tip="资金流向" data-input="请输入关注的股票或板块（可不填，留空看全市场）">
       <span class="quick-icon">💰</span>
       资金流向
     </div>
-    <div class="quick-btn" onclick="copyTip(this)" data-tip="公告事件">
+    <div class="quick-btn" onclick="openModal(this)" data-tip="公告事件" data-input="请输入股票名称或代码">
       <span class="quick-icon">📢</span>
       公告事件
     </div>
-    <div class="quick-btn" onclick="copyTip(this)" data-tip="估值对比">
+    <div class="quick-btn" onclick="openModal(this)" data-tip="估值对比" data-input="请输入股票名称或代码">
       <span class="quick-icon">⚖️</span>
       估值对比
     </div>
-    <div class="quick-btn" onclick="copyTip(this)" data-tip="异动提醒">
-      <span class="quick-icon">🔔</span>
-      异动提醒
-    </div>
-    <div class="quick-btn" onclick="copyTip(this)" data-tip="行业板块对比">
-      <span class="quick-icon">🏭</span>
-      板块对比
-    </div>
-    <div class="quick-btn" onclick="copyTip(this)" data-tip="分红查询">
+    <div class="quick-btn" onclick="openModal(this)" data-tip="分红查询" data-input="请输入股票名称或代码">
       <span class="quick-icon">💎</span>
       分红查询
     </div>
-    <div class="quick-btn" onclick="copyTip(this)" data-tip="新股日历">
-      <span class="quick-icon">📅</span>
-      新股日历
+    <!-- 不需要输入，直接复制 -->
+    <div class="quick-btn" onclick="copyDirect(this)" data-tip="板块热点">
+      <span class="quick-icon">🔥</span>
+      板块热点
     </div>
-    <div class="quick-btn" onclick="copyTip(this)" data-tip="热股热搜">
+    <div class="quick-btn" onclick="copyDirect(this)" data-tip="恐慌指数">
+      <span class="quick-icon">😱</span>
+      恐慌指数
+    </div>
+    <div class="quick-btn" onclick="copyDirect(this)" data-tip="异动提醒">
+      <span class="quick-icon">🔔</span>
+      异动提醒
+    </div>
+    <div class="quick-btn" onclick="copyDirect(this)" data-tip="板块对比">
+      <span class="quick-icon">🏭</span>
+      板块对比
+    </div>
+    <div class="quick-btn" onclick="copyDirect(this)" data-tip="热股热搜">
       <span class="quick-icon">🌐</span>
       热股热搜
     </div>
-    <div class="quick-btn" onclick="copyTip(this)" data-tip="查看我的记忆">
+    <div class="quick-btn" onclick="copyDirect(this)" data-tip="新股日历">
+      <span class="quick-icon">📅</span>
+      新股日历
+    </div>
+    <div class="quick-btn" onclick="copyDirect(this)" data-tip="Word报告">
+      <span class="quick-icon">📝</span>
+      Word报告
+    </div>
+    <div class="quick-btn" onclick="copyDirect(this)" data-tip="数据分析">
+      <span class="quick-icon">📊</span>
+      数据分析
+    </div>
+    <div class="quick-btn" onclick="copyDirect(this)" data-tip="每日推送">
+      <span class="quick-icon">⏰</span>
+      每日推送
+    </div>
+    <div class="quick-btn" onclick="copyDirect(this)" data-tip="我的记忆">
       <span class="quick-icon">🧠</span>
       我的记忆
     </div>
@@ -335,17 +529,17 @@
 </div>
 
 <div class="content" id="content">
-  
+
   <!-- 专家功能 -->
   <div class="func-card" data-tags="专家,expert,专业,咨询">
     <div class="func-header" onclick="toggleCard(this)">
-      🎓 专家功能
+      专家功能
       <span class="arrow">▶</span>
     </div>
     <div class="func-body">
       <h3>功能介绍</h3>
       <p>专家中心提供 <span class="highlight">100+ 专业领域专家</span>，每个专家有专属知识和对话风格。</p>
-      
+
       <h3>如何使用</h3>
       <ul>
         <li><span class="highlight">步骤1：</span>在 WorkBuddy 左侧边栏找到「专家」入口</li>
@@ -353,32 +547,32 @@
         <li><span class="highlight">步骤3：</span>点击专家头像，开始对话</li>
         <li><span class="highlight">步骤4：</span>专家会根据专业知识回答你的问题</li>
       </ul>
-      
+
       <h3>常用专家类型</h3>
       <ul>
-        <li>📊 金融分析专家</li>
-        <li>⚖️ 法律顾问专家</li>
-        <li>🏥 医疗健康专家</li>
-        <li>💻 编程技术专家</li>
-        <li>📈 投资理财专家</li>
+        <li>金融分析专家</li>
+        <li>法律顾问专家</li>
+        <li>医疗健康专家</li>
+        <li>编程技术专家</li>
+        <li>投资理财专家</li>
       </ul>
-      
+
       <div class="tip-box">
-        💡 提示：你可以直接对我说"帮我找投资专家"，我会帮你连接对应专家。
+        提示：你可以直接对我说"帮我找投资专家"，我会帮你连接对应专家。
       </div>
     </div>
   </div>
-  
+
   <!-- 金融数据功能 -->
   <div class="func-card" data-tags="金融,股票,A股,美股,行情,财报,投资,数据,finance,stock">
     <div class="func-header" onclick="toggleCard(this)">
-      💰 金融数据功能
+      金融数据功能
       <span class="arrow">▶</span>
     </div>
     <div class="func-body">
       <h3>功能介绍</h3>
       <p>支持 <span class="highlight">A股、港股、美股</span> 全市场数据查询，包括实时行情、财务报表、资金流向、研报评级等。</p>
-      
+
       <h3>如何使用</h3>
       <ul>
         <li><span class="highlight">查行情：</span>对我说"查贵州茅台股价"或"查英伟达行情"</li>
@@ -386,32 +580,32 @@
         <li><span class="highlight">查板块：</span>对我说"今天A股什么板块涨得最好"</li>
         <li><span class="highlight">技术分析：</span>对我说"分析澜起科技均线走势"</li>
       </ul>
-      
+
       <h3>支持的数据类型</h3>
       <ul>
-        <li>📈 实时行情（股价、涨跌、成交额）</li>
-        <li>📊 技术指标（均线、MACD、RSI）</li>
-        <li>📋 财务报表（利润表、资产负债表）</li>
-        <li>💰 资金流向（主力资金进出）</li>
-        <li>📰 公告新闻、研报评级</li>
+        <li>实时行情（股价、涨跌、成交额）</li>
+        <li>技术指标（均线、MACD、RSI）</li>
+        <li>财务报表（利润表、资产负债表）</li>
+        <li>资金流向（主力资金进出）</li>
+        <li>公告新闻、研报评级</li>
       </ul>
-      
+
       <div class="tip-box">
-        💡 提示：你可以对我说"设置每日15:30推送A股美股分析"，我会帮你创建定时任务。
+        提示：你可以对我说"设置每日15:30推送A股美股分析"，我会帮你创建定时任务。
       </div>
     </div>
   </div>
-  
+
   <!-- 公司研报摘要分析 -->
   <div class="func-card" data-tags="研报,研报摘要,公司研报,券商,评级,分析,research,report">
     <div class="func-header" onclick="toggleCard(this)">
-      💼 公司研报摘要分析
+      公司研报摘要分析
       <span class="arrow">▶</span>
     </div>
     <div class="func-body">
       <h3>功能介绍</h3>
       <p>快速获取 <span class="highlight">机构研报核心摘要</span>，包括券商评级、财务数据摘要、行业地位分析和投资建议，省去阅读长篇研报的时间。</p>
-      
+
       <h3>如何使用</h3>
       <ul>
         <li><span class="highlight">步骤1：</span>对我说"帮我查XX公司研报摘要"</li>
@@ -419,50 +613,50 @@
         <li><span class="highlight">步骤3：</span>自动提取核心观点和评级变化</li>
         <li><span class="highlight">步骤4：</span>生成摘要分析报告</li>
       </ul>
-      
+
       <h3>分析内容包括</h3>
       <ul>
-        <li>📋 <span class="highlight">机构评级汇总</span> — 各券商买入/增持/中性/减持评级</li>
-        <li>📊 <span class="highlight">财务数据摘要</span> — 营收、净利润、毛利率、ROE等核心指标</li>
-        <li>🏭 <span class="highlight">行业地位分析</span> — 市占率、竞争优势、行业趋势</li>
-        <li>📈 <span class="highlight">盈利预测</span> — 未来1-2年营收和利润预期</li>
-        <li>⚡ <span class="highlight">投资逻辑</span> — 核心看点和风险因素分析</li>
-        <li>💡 <span class="highlight">汇总建议</span> — 综合各机构观点形成参考建议</li>
+        <li><span class="highlight">机构评级汇总</span> — 各券商买入/增持/中性/减持评级</li>
+        <li><span class="highlight">财务数据摘要</span> — 营收、净利润、毛利率、ROE等核心指标</li>
+        <li><span class="highlight">行业地位分析</span> — 市占率、竞争优势、行业趋势</li>
+        <li><span class="highlight">盈利预测</span> — 未来1-2年营收和利润预期</li>
+        <li><span class="highlight">投资逻辑</span> — 核心看点和风险因素分析</li>
+        <li><span class="highlight">汇总建议</span> — 综合各机构观点形成参考建议</li>
       </ul>
-      
+
       <h3>示例对话</h3>
       <ul>
-        <li>💬 "帮我查澜起科技最新研报摘要"</li>
-        <li>💬 "比亚迪最近三个月券商评级怎么样"</li>
-        <li>💬 "分析英伟达机构研报核心观点"</li>
-        <li>💬 "对比茅台和五粮液的研报评级"</li>
+        <li>"帮我查澜起科技最新研报摘要"</li>
+        <li>"比亚迪最近三个月券商评级怎么样"</li>
+        <li>"分析英伟达机构研报核心观点"</li>
+        <li>"对比茅台和五粮液的研报评级"</li>
       </ul>
-      
+
       <div class="tip-box">
-        💡 提示：点击上方「💼 公司研报」快捷按钮，自动复制提示语，粘贴给我即可。
+        提示：点击上方「公司研报」快捷按钮，输入股票名称即可自动生成提示语。
       </div>
     </div>
   </div>
-  
+
   <!-- 恐慌指数 -->
   <div class="func-card" data-tags="恐慌指数,恐慌,fear,vix,vix指数,波动率,市场情绪,恐惧贪婪,波动率指数">
     <div class="func-header" onclick="toggleCard(this)">
-      😱 恐慌指数分析
+      恐慌指数分析
       <span class="arrow">▶</span>
     </div>
     <div class="func-body">
       <h3>功能介绍</h3>
       <p><span class="highlight">恐慌指数</span>是衡量市场恐惧/贪婪情绪的核心指标。它反映了市场对未来波动的预期——数值越低市场越贪婪（风险偏好高），数值越高市场越恐慌（避险情绪重）。</p>
-      
+
       <h3>恐慌指数包含什么</h3>
       <ul>
-        <li>🇺🇸 <span class="highlight">VIX 恐慌指数（美股）</span> — 芝加哥期权交易所波动率指数，美股"恐惧指标"</li>
-        <li>🇨🇳 <span class="highlight">中国波指（A股）</span> — A股市场波动率指数</li>
-        <li>📊 <span class="highlight">恐惧贪婪指数</span> — CNN/Alternative综合市场情绪指标</li>
-        <li>💰 <span class="highlight">资金流向情绪</span> — 北向资金、融资融券余额</li>
-        <li>📈 <span class="highlight">涨跌家数比</span> — 市场广度指标</li>
+        <li><span class="highlight">VIX 恐慌指数（美股）</span> — 芝加哥期权交易所波动率指数，美股"恐惧指标"</li>
+        <li><span class="highlight">中国波指（A股）</span> — A股市场波动率指数</li>
+        <li><span class="highlight">恐惧贪婪指数</span> — CNN/Alternative综合市场情绪指标</li>
+        <li><span class="highlight">资金流向情绪</span> — 北向资金、融资融券余额</li>
+        <li><span class="highlight">涨跌家数比</span> — 市场广度指标</li>
       </ul>
-      
+
       <h3>如何使用</h3>
       <ul>
         <li><span class="highlight">步骤1：</span>对我说"帮我查当前恐慌指数"</li>
@@ -470,48 +664,48 @@
         <li><span class="highlight">步骤3：</span>综合分析当前市场情绪状态</li>
         <li><span class="highlight">步骤4：</span>给出操作建议（仅供参考）</li>
       </ul>
-      
+
       <h3>恐慌指数解读</h3>
       <ul>
-        <li><span class="highlight">0-12（极度贪婪）：</span>市场过热，注意回撤风险 ⚠️</li>
-        <li><span class="highlight">12-20（正常/偏贪婪）：</span>市场正常，适合持仓 ✅</li>
-        <li><span class="highlight">20-30（担忧）：</span>市场不确定性上升，谨慎操作 ⚡</li>
-        <li><span class="highlight">30+（恐慌）：</span>市场极度恐慌，可能是抄底机会 🔥</li>
-        <li><span class="highlight">40+（极度恐慌）：</span>市场崩盘恐慌，长线可关注 💎</li>
+        <li><span class="highlight">0-12（极度贪婪）：</span>市场过热，注意回撤风险</li>
+        <li><span class="highlight">12-20（正常/偏贪婪）：</span>市场正常，适合持仓</li>
+        <li><span class="highlight">20-30（担忧）：</span>市场不确定性上升，谨慎操作</li>
+        <li><span class="highlight">30+（恐慌）：</span>市场极度恐慌，可能是抄底机会</li>
+        <li><span class="highlight">40+（极度恐慌）：</span>市场崩盘恐慌，长线可关注</li>
       </ul>
-      
+
       <h3>投资应用</h3>
       <ul>
-        <li>💡 <span class="highlight">VIX > 30：</span>市场恐慌阶段，长线投资者可分批建仓</li>
-        <li>💡 <span class="highlight">VIX < 12：</span>市场过度乐观，建议减仓防范回调</li>
-        <li>💡 <span class="highlight">VIX 暴涨 20%+：</span>短期避险信号，降低仓位</li>
-        <li>💡 <span class="highlight">VIX 从高位回落：</span>恐慌消退，反弹机会</li>
+        <li><span class="highlight">VIX > 30：</span>市场恐慌阶段，长线投资者可分批建仓</li>
+        <li><span class="highlight">VIX < 12：</span>市场过度乐观，建议减仓防范回调</li>
+        <li><span class="highlight">VIX 暴涨 20%+：</span>短期避险信号，降低仓位</li>
+        <li><span class="highlight">VIX 从高位回落：</span>恐慌消退，反弹机会</li>
       </ul>
-      
+
       <h3>示例对话</h3>
       <ul>
-        <li>💬 "现在VIX恐慌指数是多少？市场情绪如何？"</li>
-        <li>💬 "分析当前A股市场恐慌程度"</li>
-        <li>💬 "恐慌指数和北向资金一起分析"</li>
-        <li>💬 "今天市场情绪适合加仓吗？"</li>
+        <li>"现在VIX恐慌指数是多少？市场情绪如何？"</li>
+        <li>"分析当前A股市场恐慌程度"</li>
+        <li>"恐慌指数和北向资金一起分析"</li>
+        <li>"今天市场情绪适合加仓吗？"</li>
       </ul>
-      
+
       <div class="tip-box">
-        💡 巴菲特名言："别人恐惧时我贪婪，别人贪婪时我恐惧。"——恐慌指数就是帮你判断这个时机的工具。
+        巴菲特名言："别人恐惧时我贪婪，别人贪婪时我恐惧。"——恐慌指数就是帮你判断这个时机的工具。
       </div>
     </div>
   </div>
-  
+
   <!-- 资金流向分析 -->
   <div class="func-card" data-tags="资金流向,资金,主力资金,北向资金,外资,净流入,净流出,flow,money">
     <div class="func-header" onclick="toggleCard(this)">
-      💰 资金流向分析
+      资金流向分析
       <span class="arrow">▶</span>
     </div>
     <div class="func-body">
       <h3>功能介绍</h3>
       <p>跟踪 <span class="highlight">主力资金和北向资金（外资）</span> 的实时动向，看清大资金在买什么、卖什么。</p>
-      
+
       <h3>如何使用</h3>
       <ul>
         <li><span class="highlight">步骤1：</span>对我说"今天北向资金流向如何"</li>
@@ -519,43 +713,43 @@
         <li><span class="highlight">步骤3：</span>分析主要买入/卖出板块和个股</li>
         <li><span class="highlight">步骤4：</span>给出资金面参考建议</li>
       </ul>
-      
+
       <h3>分析内容包括</h3>
       <ul>
-        <li>🌏 <span class="highlight">北向资金（陆股通）</span> — 外资每日净买入/卖出金额</li>
-        <li>💰 <span class="highlight">主力资金净流向</span> — 大单、超大单买卖数据</li>
-        <li>📊 <span class="highlight">板块资金流向</span> — 哪个板块资金在流入/流出</li>
-        <li>📈 <span class="highlight">个股资金排名</span> — 净流入/流出前10名</li>
-        <li>💹 <span class="highlight">融资融券余额</span> — 杠杆资金情绪</li>
+        <li><span class="highlight">北向资金（陆股通）</span> — 外资每日净买入/卖出金额</li>
+        <li><span class="highlight">主力资金净流向</span> — 大单、超大单买卖数据</li>
+        <li><span class="highlight">板块资金流向</span> — 哪个板块资金在流入/流出</li>
+        <li><span class="highlight">个股资金排名</span> — 净流入/流出前10名</li>
+        <li><span class="highlight">融资融券余额</span> — 杠杆资金情绪</li>
       </ul>
-      
+
       <h3>为什么重要</h3>
       <p>A股市场里，<span class="highlight">资金的动向往比消息更重要</span>。北向资金被称为"聪明钱"，其持续流入/流出往往预示着市场方向。</p>
-      
+
       <h3>示例对话</h3>
       <ul>
-        <li>💬 "今天北向资金买了哪些股票？"</li>
-        <li>💬 "最近一周主力资金流向分析"</li>
-        <li>💬 "科创板资金流向怎么样？"</li>
-        <li>💬 "融资余额变化，市场情绪如何？"</li>
+        <li>"今天北向资金买了哪些股票？"</li>
+        <li>"最近一周主力资金流向分析"</li>
+        <li>"科创板资金流向怎么样？"</li>
+        <li>"融资余额变化，市场情绪如何？"</li>
       </ul>
-      
+
       <div class="tip-box">
-        💡 提示：持续3天以上北向资金净流入，通常意味着外资看好后市。
+        提示：持续3天以上北向资金净流入，通常意味着外资看好后市。
       </div>
     </div>
   </div>
-  
+
   <!-- 公告事件监控 -->
   <div class="func-card" data-tags="公告,事件,业绩预告,增减持,质押,解禁,诉讼,风险,分红,news,announcement">
     <div class="func-header" onclick="toggleCard(this)">
-      📢 公告事件监控
+      公告事件监控
       <span class="arrow">▶</span>
     </div>
     <div class="func-body">
       <h3>功能介绍</h3>
       <p>第一时间获取公司 <span class="highlight">重大公告和风险事件</span>，包括业绩预告、增减持、质押解禁等影响股价的关键信息。</p>
-      
+
       <h3>如何使用</h3>
       <ul>
         <li><span class="highlight">步骤1：</span>对我说"XX公司最近有什么公告"</li>
@@ -563,43 +757,43 @@
         <li><span class="highlight">步骤3：</span>标注重要事件和风险等级</li>
         <li><span class="highlight">步骤4：</span>分析对股价的影响</li>
       </ul>
-      
+
       <h3>监控事件类型</h3>
       <ul>
-        <li>📋 <span class="highlight">业绩预告/快报</span> — 赚了多少？超预期还是低于预期？</li>
-        <li>🤝 <span class="highlight">增减持公告</span> — 大股东在买还是卖？</li>
-        <li>🔒 <span class="highlight">股权质押</span> — 质押比例过高有爆仓风险</li>
-        <li>📅 <span class="highlight">限售解禁</span> — 大量解禁可能带来抛压</li>
-        <li>⚖️ <span class="highlight">诉讼仲裁</span> — 法律风险影响估值</li>
-        <li>⚠️ <span class="highlight">ST风险警示</span> — 退市风险警告</li>
-        <li>💸 <span class="highlight">增发配股</span> — 稀释股权影响股价</li>
-        <li>🎁 <span class="highlight">分红方案</span> — 分红比例和除权日期</li>
+        <li><span class="highlight">业绩预告/快报</span> — 赚了多少？超预期还是低于预期？</li>
+        <li><span class="highlight">增减持公告</span> — 大股东在买还是卖？</li>
+        <li><span class="highlight">股权质押</span> — 质押比例过高有爆仓风险</li>
+        <li><span class="highlight">限售解禁</span> — 大量解禁可能带来抛压</li>
+        <li><span class="highlight">诉讼仲裁</span> — 法律风险影响估值</li>
+        <li><span class="highlight">ST风险警示</span> — 退市风险警告</li>
+        <li><span class="highlight">增发配股</span> — 稀释股权影响股价</li>
+        <li><span class="highlight">分红方案</span> — 分红比例和除权日期</li>
       </ul>
-      
+
       <h3>示例对话</h3>
       <ul>
-        <li>💬 "澜起科技最近有什么重要公告？"</li>
-        <li>💬 "本周A股有哪些公司发了业绩预告？"</li>
-        <li>💬 "提醒我有解禁风险的股票"</li>
-        <li>💬 "XX公司大股东最近在减持吗？"</li>
+        <li>"澜起科技最近有什么重要公告？"</li>
+        <li>"本周A股有哪些公司发了业绩预告？"</li>
+        <li>"提醒我有解禁风险的股票"</li>
+        <li>"XX公司大股东最近在减持吗？"</li>
       </ul>
-      
+
       <div class="tip-box">
-        ⚠️ 重要：大股东减持和限售解禁是最常见的利空信号，散户吃亏就吃亏在反应慢。
+        重要：大股东减持和限售解禁是最常见的利空信号，散户吃亏就吃亏在反应慢。
       </div>
     </div>
   </div>
-  
+
   <!-- 估值对比分析 -->
   <div class="func-card" data-tags="估值,PE,PB,ROE,市盈率,市净率,估值对比,估值分位,valuation">
     <div class="func-header" onclick="toggleCard(this)">
-      ⚖️ 估值对比分析
+      估值对比分析
       <span class="arrow">▶</span>
     </div>
     <div class="func-body">
       <h3>功能介绍</h3>
       <p>用 <span class="highlight">PE、PB、ROE 等核心估值指标</span> 判断股票贵不贵，值不值得买。包括历史估值分位数和同行业对比。</p>
-      
+
       <h3>如何使用</h3>
       <ul>
         <li><span class="highlight">步骤1：</span>对我说"XX公司目前估值水平如何"</li>
@@ -607,48 +801,48 @@
         <li><span class="highlight">步骤3：</span>对比历史分位和同行业水平</li>
         <li><span class="highlight">步骤4：</span>给出估值高低判断</li>
       </ul>
-      
+
       <h3>核心估值指标</h3>
       <ul>
-        <li>📊 <span class="highlight">PE（市盈率）</span> — 当前股价 ÷ 每股收益，越低越便宜</li>
-        <li>📊 <span class="highlight">PE 历史分位</span> — 当前 PE 比历史上多少时间贵</li>
-        <li>📊 <span class="highlight">PB（市净率）</span> — 当前股价 ÷ 每股净资产</li>
-        <li>📊 <span class="highlight">ROE（净资产收益率）</span> — 公司赚钱能力，越高越好</li>
-        <li>📊 <span class="highlight">PEG</span> — PE ÷ 盈利增速，< 1 表示估值合理</li>
-        <li>📊 <span class="highlight">同行业对比</span> — 同类公司估值排名</li>
+        <li><span class="highlight">PE（市盈率）</span> — 当前股价 除以 每股收益，越低越便宜</li>
+        <li><span class="highlight">PE 历史分位</span> — 当前 PE 比历史上多少时间贵</li>
+        <li><span class="highlight">PB（市净率）</span> — 当前股价 除以 每股净资产</li>
+        <li><span class="highlight">ROE（净资产收益率）</span> — 公司赚钱能力，越高越好</li>
+        <li><span class="highlight">PEG</span> — PE 除以 盈利增速，< 1 表示估值合理</li>
+        <li><span class="highlight">同行业对比</span> — 同类公司估值排名</li>
       </ul>
-      
+
       <h3>估值判断参考</h3>
       <ul>
-        <li>🟢 <span class="highlight">分位 < 30%：</span> 低估区域，适合关注</li>
-        <li>🟡 <span class="highlight">分位 30%-70%：</span> 合理区间，正常持有</li>
-        <li>🔴 <span class="highlight">分位 > 70%：</span> 高估区域，注意风险</li>
+        <li><span class="highlight">分位 < 30%：</span> 低估区域，适合关注</li>
+        <li><span class="highlight">分位 30%-70%：</span> 合理区间，正常持有</li>
+        <li><span class="highlight">分位 > 70%：</span> 高估区域，注意风险</li>
       </ul>
-      
+
       <h3>示例对话</h3>
       <ul>
-        <li>💬 "贵州茅台现在估值贵不贵？"</li>
-        <li>💬 "对比宁德时代和比亚迪的估值"</li>
-        <li>💬 "科创板半导体板块平均PE是多少？"</li>
-        <li>💬 "澜起科技PE历史分位在什么位置？"</li>
+        <li>"贵州茅台现在估值贵不贵？"</li>
+        <li>"对比宁德时代和比亚迪的估值"</li>
+        <li>"科创板半导体板块平均PE是多少？"</li>
+        <li>"澜起科技PE历史分位在什么位置？"</li>
       </ul>
-      
+
       <div class="tip-box">
-        💡 提示：不能只看PE，要结合行业增速和ROE综合判断。高增长行业PE高是正常的。
+        提示：不能只看PE，要结合行业增速和ROE综合判断。高增长行业PE高是正常的。
       </div>
     </div>
   </div>
-  
+
   <!-- 异动提醒 -->
   <div class="func-card" data-tags="异动,提醒,涨跌幅,成交量,放量,拉升,砸盘,alert,异常">
     <div class="func-header" onclick="toggleCard(this)">
-      🔔 异动提醒
+      异动提醒
       <span class="arrow">▶</span>
     </div>
     <div class="func-body">
       <h3>功能介绍</h3>
       <p>监控 <span class="highlight">股价异常波动</span>，包括大涨大跌、成交量突然放大、盘中拉升砸盘等情况，不需要时刻盯盘。</p>
-      
+
       <h3>如何使用</h3>
       <ul>
         <li><span class="highlight">步骤1：</span>对我说"今天有哪些异动股票"</li>
@@ -656,44 +850,44 @@
         <li><span class="highlight">步骤3：</span>分析异动原因</li>
         <li><span class="highlight">步骤4：</span>给出关注建议</li>
       </ul>
-      
+
       <h3>异动类型</h3>
       <ul>
-        <li>📈 <span class="highlight">涨幅异动</span> — 涨超 5%、10%、20%（科创板）</li>
-        <li>📉 <span class="highlight">跌幅异动</span> — 跌超 5%、10%、20%</li>
-        <li>📊 <span class="highlight">量能异动</span> — 成交量放大2倍以上</li>
-        <li>⚡ <span class="highlight">盘中异动</span> — 突然拉升或砸盘</li>
-        <li>🔄 <span class="highlight">换手率异动</span> — 换手率超过10%</li>
-        <li>🏦 <span class="highlight">大宗交易</span> — 大额折价/溢价交易</li>
+        <li><span class="highlight">涨幅异动</span> — 涨超 5%、10%、20%（科创板）</li>
+        <li><span class="highlight">跌幅异动</span> — 跌超 5%、10%、20%</li>
+        <li><span class="highlight">量能异动</span> — 成交量放大2倍以上</li>
+        <li><span class="highlight">盘中异动</span> — 突然拉升或砸盘</li>
+        <li><span class="highlight">换手率异动</span> — 换手率超过10%</li>
+        <li><span class="highlight">大宗交易</span> — 大额折价/溢价交易</li>
       </ul>
-      
+
       <h3>为什么需要（对视力的帮助）</h3>
       <p>你不需要时刻盯着行情软件，<span class="highlight">我来帮你监控异动</span>，有重要变化时通知你。大字体呈现，一目了然。</p>
-      
+
       <h3>示例对话</h3>
       <ul>
-        <li>💬 "今天科创板有哪些股票异动？"</li>
-        <li>💬 "最近3天成交量放大的股票"</li>
-        <li>💬 "帮我设置股价异动提醒（涨跌超5%通知）"</li>
-        <li>💬 "XX股票今天为什么突然大跌？"</li>
+        <li>"今天科创板有哪些股票异动？"</li>
+        <li>"最近3天成交量放大的股票"</li>
+        <li>"帮我设置股价异动提醒（涨跌超5%通知）"</li>
+        <li>"XX股票今天为什么突然大跌？"</li>
       </ul>
-      
+
       <div class="tip-box">
-        🔔 提示：可以对我说"设置每天自动推送异动提醒"，我会创建定时任务帮你自动监控。
+        提示：可以对我说"设置每天自动推送异动提醒"，我会创建定时任务帮你自动监控。
       </div>
     </div>
   </div>
-  
+
   <!-- 行业板块对比 -->
   <div class="func-card" data-tags="板块,行业,概念,对比,排行,轮动,sector,申万,排名">
     <div class="func-header" onclick="toggleCard(this)">
-      🏭 行业板块对比
+      行业板块对比
       <span class="arrow">▶</span>
     </div>
     <div class="func-body">
       <h3>功能介绍</h3>
       <p>对比 <span class="highlight">不同行业和概念板块</span> 的表现，找出谁更强、谁在轮动，选对板块比选对个股更重要。</p>
-      
+
       <h3>如何使用</h3>
       <ul>
         <li><span class="highlight">步骤1：</span>对我说"今天什么板块涨得最好"</li>
@@ -701,47 +895,47 @@
         <li><span class="highlight">步骤3：</span>分析板块轮动趋势</li>
         <li><span class="highlight">步骤4：</span>推荐关注的板块和龙头股</li>
       </ul>
-      
+
       <h3>分析内容</h3>
       <ul>
-        <li>📊 <span class="highlight">申万行业排行</span> — 31个一级行业涨跌排名</li>
-        <li>💡 <span class="highlight">概念板块排行</span> — 热门概念涨跌排名</li>
-        <li>🔄 <span class="highlight">板块轮动分析</span> — 资金在板块间如何切换</li>
-        <li>🏆 <span class="highlight">龙头股筛选</span> — 板块内涨幅靠前的成分股</li>
-        <li>📈 <span class="highlight">多周期对比</span> — 今日/本周/本月涨幅排行</li>
+        <li><span class="highlight">申万行业排行</span> — 31个一级行业涨跌排名</li>
+        <li><span class="highlight">概念板块排行</span> — 热门概念涨跌排名</li>
+        <li><span class="highlight">板块轮动分析</span> — 资金在板块间如何切换</li>
+        <li><span class="highlight">龙头股筛选</span> — 板块内涨幅靠前的成分股</li>
+        <li><span class="highlight">多周期对比</span> — 今日/本周/本月涨幅排行</li>
       </ul>
-      
+
       <h3>常用分析</h3>
       <ul>
         <li>科创板、创业板 vs 主板热度对比</li>
         <li>科技股 vs 消费股 vs 金融股轮动</li>
         <li>AI、芯片、新能源概念对比</li>
       </ul>
-      
+
       <h3>示例对话</h3>
       <ul>
-        <li>💬 "本周涨幅前5的板块是哪些？"</li>
-        <li>💬 "半导体和新能源哪个板块更强？"</li>
-        <li>💬 "科创板概念板块热度排行"</li>
-        <li>💬 "最近板块轮动规律是什么？"</li>
+        <li>"本周涨幅前5的板块是哪些？"</li>
+        <li>"半导体和新能源哪个板块更强？"</li>
+        <li>"科创板概念板块热度排行"</li>
+        <li>"最近板块轮动规律是什么？"</li>
       </ul>
-      
+
       <div class="tip-box">
-        💡 提示：板块连续3天涨幅靠前，往往意味着资金在持续流入，可以重点关注。
+        提示：板块连续3天涨幅靠前，往往意味着资金在持续流入，可以重点关注。
       </div>
     </div>
   </div>
-  
+
   <!-- 分红查询 -->
   <div class="func-card" data-tags="分红,股息,除权,除息,红利,配股,dividend,股息率">
     <div class="func-header" onclick="toggleCard(this)">
-      💎 分红查询
+      分红查询
       <span class="arrow">▶</span>
     </div>
     <div class="func-body">
       <h3>功能介绍</h3>
       <p>查询 <span class="highlight">分红方案、除权除息日期和股息率</span>，帮助长线投资者选择稳定分红的优质标的。</p>
-      
+
       <h3>如何使用</h3>
       <ul>
         <li><span class="highlight">步骤1：</span>对我说"XX公司什么时候分红"</li>
@@ -749,47 +943,47 @@
         <li><span class="highlight">步骤3：</span>计算股息率和分红收益</li>
         <li><span class="highlight">步骤4：</span>对比同行业分红水平</li>
       </ul>
-      
+
       <h3>查询内容</h3>
       <ul>
-        <li>🎁 <span class="highlight">分红方案</span> — 每10股派多少元</li>
-        <li>📅 <span class="highlight">除权除息日</span> — 哪天之前买入能享受分红</li>
-        <li>💵 <span class="highlight">股息率</span> — 分红金额 ÷ 股价，越高越好</li>
-        <li>📊 <span class="highlight">股息率排行</span> — A股股息率前20名</li>
-        <li>📜 <span class="highlight">历史分红记录</span> — 过去5年分红稳定性</li>
+        <li><span class="highlight">分红方案</span> — 每10股派多少元</li>
+        <li><span class="highlight">除权除息日</span> — 哪天之前买入能享受分红</li>
+        <li><span class="highlight">股息率</span> — 分红金额 除以 股价，越高越好</li>
+        <li><span class="highlight">股息率排行</span> — A股股息率前20名</li>
+        <li><span class="highlight">历史分红记录</span> — 过去5年分红稳定性</li>
       </ul>
-      
+
       <h3>高股息策略</h3>
       <ul>
-        <li>🥇 <span class="highlight">股息率 > 4%：</span> 高分红的优质标的</li>
-        <li>🥈 <span class="highlight">股息率 2%-4%：</span> 中等分红水平</li>
-        <li>🥉 <span class="highlight">红利再投资：</span> 用分红继续买入，复利增长</li>
+        <li><span class="highlight">股息率 > 4%：</span> 高分红的优质标的</li>
+        <li><span class="highlight">股息率 2%-4%：</span> 中等分红水平</li>
+        <li><span class="highlight">红利再投资：</span> 用分红继续买入，复利增长</li>
       </ul>
-      
+
       <h3>示例对话</h3>
       <ul>
-        <li>💬 "贵州茅台今年分红方案是什么？"</li>
-        <li>💬 "A股股息率最高的股票有哪些？"</li>
-        <li>💬 "银行股分红对比分析"</li>
-        <li>💬 "近期即将除权的股票提醒"</li>
+        <li>"贵州茅台今年分红方案是什么？"</li>
+        <li>"A股股息率最高的股票有哪些？"</li>
+        <li>"银行股分红对比分析"</li>
+        <li>"近期即将除权的股票提醒"</li>
       </ul>
-      
+
       <div class="tip-box">
-        💡 提示：连续5年股息率 > 3% 的公司，通常是现金流稳定的优质企业。
+        提示：连续5年股息率 > 3% 的公司，通常是现金流稳定的优质企业。
       </div>
     </div>
   </div>
-  
+
   <!-- 新股日历 -->
   <div class="func-card" data-tags="新股,打新,申购,上市,IPO,中签,日历">
     <div class="func-header" onclick="toggleCard(this)">
-      📅 新股日历
+      新股日历
       <span class="arrow">▶</span>
     </div>
     <div class="func-body">
       <h3>功能介绍</h3>
       <p>查看 <span class="highlight">新股申购、上市时间表</span>，不错过打新机会。A股打新是散户最稳定的低风险收益方式。</p>
-      
+
       <h3>如何使用</h3>
       <ul>
         <li><span class="highlight">步骤1：</span>对我说"最近有什么新股可以申购"</li>
@@ -797,47 +991,47 @@
         <li><span class="highlight">步骤3：</span>分析新股市盈率、行业、发行规模</li>
         <li><span class="highlight">步骤4：</span>给出申购建议</li>
       </ul>
-      
+
       <h3>查询内容</h3>
       <ul>
-        <li>🆕 <span class="highlight">即将申购</span> — 未来7天可申购的新股</li>
-        <li>📋 <span class="highlight">申购详情</span> — 申购代码、发行价、发行PE</li>
-        <li>🎯 <span class="highlight">中签率参考</span> — 历史中签率分析</li>
-        <li>🚀 <span class="highlight">即将上市</span> — 已完成申购即将上市的新股</li>
-        <li>📊 <span class="highlight">新股表现</span> — 近期上市新股首日涨跌幅</li>
+        <li><span class="highlight">即将申购</span> — 未来7天可申购的新股</li>
+        <li><span class="highlight">申购详情</span> — 申购代码、发行价、发行PE</li>
+        <li><span class="highlight">中签率参考</span> — 历史中签率分析</li>
+        <li><span class="highlight">即将上市</span> — 已完成申购即将上市的新股</li>
+        <li><span class="highlight">新股表现</span> — 近期上市新股首日涨跌幅</li>
       </ul>
-      
+
       <h3>打新建议</h3>
       <ul>
         <li>科创板/创业板新股：上市前5日不限涨跌幅</li>
         <li>主板新股：首日涨跌幅44%限制</li>
         <li>发行PE低于行业平均PE的，首日涨幅空间更大</li>
       </ul>
-      
+
       <h3>示例对话</h3>
       <ul>
-        <li>💬 "这周有什么新股可以申购？"</li>
-        <li>💬 "明天上市的新股有哪些？"</li>
-        <li>💬 "最近新股中签率怎么样？"</li>
-        <li>💬 "科创板最近新股表现分析"</li>
+        <li>"这周有什么新股可以申购？"</li>
+        <li>"明天上市的新股有哪些？"</li>
+        <li>"最近新股中签率怎么样？"</li>
+        <li>"科创板最近新股表现分析"</li>
       </ul>
-      
+
       <div class="tip-box">
-        💡 提示：打新不需要盯盘，申购后等中签结果即可，非常适合你。
+        提示：打新不需要盯盘，申购后等中签结果即可，非常适合你。
       </div>
     </div>
   </div>
-  
+
   <!-- 热股热搜 -->
   <div class="func-card" data-tags="热搜,热股,热门,人气,关注,情绪,hot,trending">
     <div class="func-header" onclick="toggleCard(this)">
-      🌐 热股热搜
+      热股热搜
       <span class="arrow">▶</span>
     </div>
     <div class="func-body">
       <h3>功能介绍</h3>
       <p>查看 <span class="highlight">市场热搜榜和热门股票</span>，了解大家都在关注什么，把握市场情绪和舆论方向。</p>
-      
+
       <h3>如何使用</h3>
       <ul>
         <li><span class="highlight">步骤1：</span>对我说"今天A股热搜榜有哪些"</li>
@@ -845,48 +1039,48 @@
         <li><span class="highlight">步骤3：</span>分析市场情绪和资金偏好</li>
         <li><span class="highlight">步骤4：</span>给出关注建议</li>
       </ul>
-      
+
       <h3>查询内容</h3>
       <ul>
-        <li>🔥 <span class="highlight">A股热搜排行</span> — 搜索量最大的股票</li>
-        <li>💬 <span class="highlight">社区热度</span> — 讨论量最大的股票</li>
-        <li>👀 <span class="highlight">加自选排行</span> — 用户添加到自选最多的股票</li>
-        <li>📊 <span class="highlight">交易热度</span> — 成交量和换手率排行</li>
-        <li>🎯 <span class="highlight">热门概念</span> — 大家都在关注什么概念</li>
+        <li><span class="highlight">A股热搜排行</span> — 搜索量最大的股票</li>
+        <li><span class="highlight">社区热度</span> — 讨论量最大的股票</li>
+        <li><span class="highlight">加自选排行</span> — 用户添加到自选最多的股票</li>
+        <li><span class="highlight">交易热度</span> — 成交量和换手率排行</li>
+        <li><span class="highlight">热门概念</span> — 大家都在关注什么概念</li>
       </ul>
-      
+
       <h3>如何利用热搜</h3>
       <ul>
         <li>热搜股短期波动大，适合短线关注</li>
         <li>持续热搜可能意味着趋势行情启动</li>
         <li>热门概念代表了当前市场的主线方向</li>
-        <li>⚠️ 注意：热搜顶点往往是短期高点</li>
+        <li>注意：热搜顶点往往是短期高点</li>
       </ul>
-      
+
       <h3>示例对话</h3>
       <ul>
-        <li>💬 "今天A股热搜前10是哪些？"</li>
-        <li>💬 "最近大家都在讨论什么概念？"</li>
-        <li>💬 "分析一下当前市场情绪"</li>
-        <li>💬 "本周热搜榜和上周有什么变化？"</li>
+        <li>"今天A股热搜前10是哪些？"</li>
+        <li>"最近大家都在讨论什么概念？"</li>
+        <li>"分析一下当前市场情绪"</li>
+        <li>"本周热搜榜和上周有什么变化？"</li>
       </ul>
-      
+
       <div class="tip-box">
-        ⚠️ 注意：热搜代表市场关注度，但不等于投资建议。追涨热搜股风险较大，建议结合基本面判断。
+        注意：热搜代表市场关注度，但不等于投资建议。追涨热搜股风险较大，建议结合基本面判断。
       </div>
     </div>
   </div>
-  
+
   <!-- 文件处理功能 -->
   <div class="func-card" data-tags="文件,word,excel,ppt,pdf,文档,表格,演示文稿,file,doc,xls,pptx">
     <div class="func-header" onclick="toggleCard(this)">
-      📄 文件处理功能
+      文件处理功能
       <span class="arrow">▶</span>
     </div>
     <div class="func-body">
       <h3>功能介绍</h3>
       <p>支持 <span class="highlight">Word、Excel、PPT、PDF</span> 等常见文件格式的读取、生成、编辑和转换。</p>
-      
+
       <h3>如何使用</h3>
       <ul>
         <li><span class="highlight">生成Word：</span>对我说"帮我写一份项目总结，生成Word文档"</li>
@@ -894,93 +1088,93 @@
         <li><span class="highlight">制作PPT：</span>对我说"帮我做一份产品介绍PPT"</li>
         <li><span class="highlight">处理PDF：</span>对我说"合并这两份PDF"或"提取PDF文字"</li>
       </ul>
-      
+
       <h3>支持的操作</h3>
       <ul>
-        <li>📝 Word：创建、编辑、格式调整、批注</li>
-        <li>📊 Excel：数据分析、公式计算、图表生成</li>
-        <li>📽️ PPT：创建幻灯片、添加动画、模板应用</li>
-        <li>📄 PDF：合并、拆分、加密、OCR识别</li>
+        <li>Word：创建、编辑、格式调整、批注</li>
+        <li>Excel：数据分析、公式计算、图表生成</li>
+        <li>PPT：创建幻灯片、添加动画、模板应用</li>
+        <li>PDF：合并、拆分、加密、OCR识别</li>
       </ul>
-      
+
       <div class="tip-box">
-        💡 提示：处理后的文件会自动保存到工作区，你可以在微信小程序"文件"tab查看。
+        提示：处理后的文件会自动保存到工作区，你可以在微信小程序"文件"tab查看。
       </div>
     </div>
   </div>
-  
+
   <!-- 自动化功能 -->
   <div class="func-card" data-tags="自动化,定时,推送,任务,计划,automation,定时任务">
     <div class="func-header" onclick="toggleCard(this)">
-      ⏰ 自动化功能
+      自动化功能
       <span class="arrow">▶</span>
     </div>
     <div class="func-body">
       <h3>功能介绍</h3>
       <p>可以设置 <span class="highlight">定时任务</span>，让 WorkBuddy 在指定时间自动执行任务并推送结果到微信。</p>
-      
+
       <h3>如何使用</h3>
       <ul>
         <li><span class="highlight">步骤1：</span>对我说"帮我设置每天早上8点推送A股热点"</li>
         <li><span class="highlight">步骤2：</span>我会创建自动化任务</li>
         <li><span class="highlight">步骤3：</span>到指定时间，自动执行并推送到微信</li>
       </ul>
-      
+
       <h3>常用自动化场景</h3>
       <ul>
-        <li>📈 每日收盘后推送股票分析（15:30）</li>
-        <li>📰 每天早上推送财经新闻摘要（8:00）</li>
-        <li>📊 每周五推送美股周报（16:30）</li>
-        <li>🔔 股价到达指定价位时提醒</li>
+        <li>每日收盘后推送股票分析（15:30）</li>
+        <li>每天早上推送财经新闻摘要（8:00）</li>
+        <li>每周五推送美股周报（16:30）</li>
+        <li>股价到达指定价位时提醒</li>
       </ul>
-      
+
       <div class="tip-box">
-        💡 提示：对我说"查看定时任务"可以管理所有自动化任务。
+        提示：对我说"查看定时任务"可以管理所有自动化任务。
       </div>
     </div>
   </div>
-  
+
   <!-- 记忆功能 -->
   <div class="func-card" data-tags="记忆,记忆中心,偏好,记录,memory,记住">
     <div class="func-header" onclick="toggleCard(this)">
-      🧠 记忆功能
+      记忆功能
       <span class="arrow">▶</span>
     </div>
     <div class="func-body">
       <h3>功能介绍</h3>
       <p>WorkBuddy 会 <span class="highlight">记住你的偏好、习惯和背景信息</span>，下次对话不用重新介绍自己。</p>
-      
+
       <h3>如何使用</h3>
       <ul>
         <li><span class="highlight">查看记忆：</span>对我说"显示完整记忆"</li>
         <li><span class="highlight">添加记忆：</span>直接告诉我新信息，我会自动记录</li>
         <li><span class="highlight">删除记忆：</span>对我说"删除XX记忆"</li>
       </ul>
-      
+
       <h3>记忆内容包括</h3>
       <ul>
-        <li>👤 你的基本信息（名字、语言偏好）</li>
-        <li>💼 工作背景和兴趣领域</li>
-        <li>⚙️ 操作习惯和偏好设置</li>
-        <li>📝 重要事件记录</li>
+        <li>你的基本信息（名字、语言偏好）</li>
+        <li>工作背景和兴趣领域</li>
+        <li>操作习惯和偏好设置</li>
+        <li>重要事件记录</li>
       </ul>
-      
+
       <div class="tip-box">
-        💡 提示：记忆是持久化的，即使重启对话也能记住。
+        提示：记忆是持久化的，即使重启对话也能记住。
       </div>
     </div>
   </div>
-  
+
   <!-- 技能功能 -->
   <div class="func-card" data-tags="技能,skill,扩展,插件,能力">
     <div class="func-header" onclick="toggleCard(this)">
-      🔧 技能功能
+      技能功能
       <span class="arrow">▶</span>
     </div>
     <div class="func-body">
       <h3>功能介绍</h3>
       <p>技能是 <span class="highlight">扩展 WorkBuddy 能力的插件</span>，安装后可以使用更多专业功能。</p>
-      
+
       <h3>如何使用</h3>
       <ul>
         <li><span class="highlight">步骤1：</span>在 WorkBuddy 左侧边栏找到「技能」入口</li>
@@ -988,31 +1182,31 @@
         <li><span class="highlight">步骤3：</span>点击安装，等待安装完成</li>
         <li><span class="highlight">步骤4：</span>安装后自动生效，直接对我说指令即可</li>
       </ul>
-      
+
       <h3>常用技能</h3>
       <ul>
-        <li>📄 文档处理（Word、Excel、PPT、PDF）</li>
-        <li>🌐 网页浏览（自动打开网页、截图、提取信息）</li>
-        <li>💰 金融数据（股票、基金、财报）</li>
-        <li>🎨 多模态生成（文生图、文生视频）</li>
+        <li>文档处理（Word、Excel、PPT、PDF）</li>
+        <li>网页浏览（自动打开网页、截图、提取信息）</li>
+        <li>金融数据（股票、基金、财报）</li>
+        <li>多模态生成（文生图、文生视频）</li>
       </ul>
-      
+
       <div class="tip-box">
-        💡 提示：也可以直接对我说"帮我找处理PDF的技能"，我会帮你安装。
+        提示：也可以直接对我说"帮我找处理PDF的技能"，我会帮你安装。
       </div>
     </div>
   </div>
-  
+
   <!-- 连接器功能 -->
   <div class="func-card" data-tags="连接器,连接,微信,腾讯文档,飞书,钉钉,connector">
     <div class="func-header" onclick="toggleCard(this)">
-      🔌 连接器功能
+      连接器功能
       <span class="arrow">▶</span>
     </div>
     <div class="func-body">
       <h3>功能介绍</h3>
       <p>连接器可以 <span class="highlight">对接外部平台</span>，让 WorkBuddy 直接操作这些平台的数据。</p>
-      
+
       <h3>如何使用</h3>
       <ul>
         <li><span class="highlight">步骤1：</span>在 WorkBuddy 左侧边栏找到「连接器」入口</li>
@@ -1020,61 +1214,61 @@
         <li><span class="highlight">步骤3：</span>按照提示完成授权</li>
         <li><span class="highlight">步骤4：</span>连接后可以直接操作平台数据</li>
       </ul>
-      
+
       <h3>支持的平台</h3>
       <ul>
-        <li>💬 微信小程序（你已连接 ✅）</li>
-        <li>📝 腾讯文档（在线文档读写）</li>
-        <li>📚 乐享知识库（企业知识库）</li>
-        <li>💼 飞书、钉钉、企业微信</li>
+        <li>微信小程序（你已连接）</li>
+        <li>腾讯文档（在线文档读写）</li>
+        <li>乐享知识库（企业知识库）</li>
+        <li>飞书、钉钉、企业微信</li>
       </ul>
-      
+
       <div class="tip-box">
-        💡 提示：连接腾讯文档后，可以直接对我说"把这份报告保存到腾讯文档"。
+        提示：连接腾讯文档后，可以直接对我说"把这份报告保存到腾讯文档"。
       </div>
     </div>
   </div>
-  
+
   <!-- 工作模式 -->
   <div class="func-card" data-tags="工作模式,模式,craft,plan,ask,执行,规划,问答">
     <div class="func-header" onclick="toggleCard(this)">
-      🎯 工作模式
+      工作模式
       <span class="arrow">▶</span>
     </div>
     <div class="func-body">
       <h3>功能介绍</h3>
       <p>WorkBuddy 有 <span class="highlight">三种工作模式</span>，可以根据任务类型切换。</p>
-      
+
       <h3>三种模式</h3>
       <ul>
         <li><span class="highlight">Craft（执行模式）：</span>直接帮你做，不问那么多。适合明确任务。</li>
         <li><span class="highlight">Plan（规划模式）：</span>先给看计划，确认后再执行。适合复杂任务。</li>
         <li><span class="highlight">Ask（问答模式）：</span>只聊天，不动文件。适合咨询类问题。</li>
       </ul>
-      
+
       <h3>如何切换</h3>
       <ul>
         <li>直接对我说"切换到规划模式"</li>
         <li>或直接对我说"切换到执行模式"</li>
         <li>或直接对我说"只回答，不要操作"</li>
       </ul>
-      
+
       <div class="tip-box">
-        💡 提示：默认是 Craft（执行模式），大部分情况不需要切换。
+        提示：默认是 Craft（执行模式），大部分情况不需要切换。
       </div>
     </div>
   </div>
-  
+
   <!-- 多模态生成 -->
   <div class="func-card" data-tags="多模态,生成,图片,视频,3D,文生图,文生视频">
     <div class="func-header" onclick="toggleCard(this)">
-      🎨 多模态生成功能
+      多模态生成功能
       <span class="arrow">▶</span>
     </div>
     <div class="func-body">
       <h3>功能介绍</h3>
       <p>支持 <span class="highlight">文字生成图片、视频、3D模型</span>，以及图片视频特效。</p>
-      
+
       <h3>如何使用</h3>
       <ul>
         <li><span class="highlight">生成图片：</span>对我说"帮我画一只猫"</li>
@@ -1082,13 +1276,13 @@
         <li><span class="highlight">生成3D模型：</span>对我说"生成一个咖啡杯的3D模型"</li>
         <li><span class="highlight">图片特效：</span>上传图片，对我说"给这张图加动画效果"</li>
       </ul>
-      
+
       <div class="tip-box">
-        💡 提示：生成的内容会保存到工作区，你可以在微信小程序查看。
+        提示：生成的内容会保存到工作区，你可以在微信小程序查看。
       </div>
     </div>
   </div>
-  
+
   <div class="empty-state" id="emptyState">
     没有找到匹配的功能<br>
     <span style="font-size: 16px; color: #888;">试试其他关键词</span>
@@ -1099,125 +1293,220 @@
   WorkBuddy 功能速查 · 输入关键词搜索
 </div>
 
+<!-- 弹窗 -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOnOverlay(event)">
+  <div class="modal-card" id="modalCard">
+    <h2 id="modalTitle"></h2>
+    <div class="modal-desc" id="modalDesc"></div>
+    <label id="modalLabel">请输入：</label>
+    <input type="text" id="modalInput" placeholder="" onkeydown="if(event.key==='Enter')generateTip()">
+    <input type="hidden" id="modalTipName" value="">
+    <input type="hidden" id="modalOptional" value="">
+    <div class="modal-buttons">
+      <button class="btn-generate" onclick="generateTip()">生成提示语</button>
+      <button class="btn-cancel" onclick="closeModal()">取消</button>
+    </div>
+    <div class="preview-box" id="previewBox">
+      <div class="preview-title">已生成提示语：</div>
+      <div class="preview-text" id="previewText"></div>
+      <button class="btn-copy-preview" onclick="copyPreview()">复制并关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
 <div class="toast" id="toast">已复制到剪贴板</div>
 
 <script>
-  // 快捷指令对应的提示语
+  // 快捷指令模板（{{INPUT}} 为占位符）
   const tipMap = {
-    "查A股行情": "请帮我查询A股行情：\n股票代码/名称：\n请查询实时行情、涨跌、成交额、均线走势分析。",
-    "查美股行情": "请帮我查询美股行情：\n股票代码/名称：\n请查询实时行情、涨跌、成交额、均线走势分析。",
-    "查公司财报": "请帮我查询以下公司的财报：\n公司名称/代码：\n请查询最新季报/年报，包括营收、净利润、同比增长。",
-    "今日板块热点": "请帮我分析今日A股板块热点：\n1. 查询涨幅前5的板块\n2. 分析板块内龙头股票\n3. 给出投资建议（仅供参考）",
-    "生成Word报告": "请帮我生成一份Word报告：\n主题：\n内容要求：\n请生成后保存到工作区。",
-    "数据分析出图": "请帮我做数据分析和可视化：\n（请上传数据文件或描述数据）\n请分析并生成图表。",
-    "设置每日推送": "请帮我设置每天早上8点自动推送：A股科创板/创业板热点摘要。请创建自动化任务。",
-    "投资逻辑分析": "请根据以下数据/股票：[股票名称或代码]，帮我做投资逻辑分析，包括：1. 基本面分析（财务数据、行业地位）2. 技术面分析（趋势、支撑压力位）3. 风险提示 4. 投资建议（仅供参考）",
-    "公司研报分析": "请帮我获取 [股票名称/代码] 的机构研报摘要分析，包括：\n1. 最近3个月主要券商评级和核心观点\n2. 财务数据摘要（营收、净利润、毛利率、ROE等核心指标）\n3. 行业地位与竞争优势分析\n4. 盈利预测与估值分析\n5. 投资逻辑与风险提示\n6. 综合投资建议（仅供参考）",
-    "恐慌指数": "请帮我查询当前市场恐慌指数分析，包括：\n1. VIX恐慌指数（美股）当前数值和历史分位\n2. 恐惧贪婪指数（Fear & Greed Index）\n3. A股市场情绪指标（涨跌家数比、北向资金流向、融资余额）\n4. 当前市场情绪解读：贪婪/中性/恐慌\n5. 结合情绪指标给出操作建议（仅供参考）",
-    "资金流向": "请帮我分析当前资金流向：\n1. 北向资金（陆股通）今日净流入/流出金额\n2. 主要买入/卖出板块和个股（前5名）\n3. 主力资金净流向分析（大单/超大单）\n4. 融资融券余额变化\n5. 综合资金面判断和建议（仅供参考）",
-    "公告事件": "请帮我查询 [股票名称/代码] 的最新公告和事件：\n1. 最近30天重要公告列表\n2. 业绩预告/快报（如有）\n3. 大股东增减持情况\n4. 股权质押比例和风险\n5. 限售解禁计划\n6. 重大风险提示（诉讼、ST、增发等）",
-    "估值对比": "请帮我做 [股票名称/代码] 的估值分析：\n1. 当前PE（市盈率）和PE历史分位\n2. PB（市净率）及同行业对比\n3. ROE（净资产收益率）分析\n4. PEG（市盈率相对盈利增长比）\n5. 同行业估值排名对比\n6. 估值高低判断和投资建议（仅供参考）",
+    "A股行情": "请帮我查询A股行情：\n股票：{{INPUT}}\n请查询实时行情、涨跌、成交额、均线走势分析。",
+    "美股行情": "请帮我查询美股行情：\n股票：{{INPUT}}\n请查询实时行情、涨跌、成交额、均线走势分析。",
+    "公司财报": "请帮我查询公司财报：\n公司：{{INPUT}}\n请查询最新季报/年报，包括营收、净利润、同比增长、毛利率等核心指标。",
+    "投资分析": "请帮我做投资逻辑分析：\n股票：{{INPUT}}\n包括：1. 基本面分析（财务数据、行业地位）\n2. 技术面分析（趋势、支撑压力位）\n3. 风险提示\n4. 投资建议（仅供参考）",
+    "公司研报": "请帮我获取 {{INPUT}} 的机构研报摘要分析：\n1. 最近3个月主要券商评级和核心观点\n2. 财务数据摘要（营收、净利润、毛利率、ROE等）\n3. 行业地位与竞争优势分析\n4. 盈利预测与估值分析\n5. 投资逻辑与风险提示\n6. 综合投资建议（仅供参考）",
+    "资金流向": "请帮我分析资金流向：\n{{INPUT}}\n1. 北向资金今日净流入/流出金额\n2. 主要买入/卖出板块和个股（前5名）\n3. 主力资金净流向分析（大单/超大单）\n4. 融资融券余额变化\n5. 综合资金面判断和建议（仅供参考）",
+    "公告事件": "请帮我查询 {{INPUT}} 的最新公告和事件：\n1. 最近30天重要公告列表\n2. 业绩预告/快报（如有）\n3. 大股东增减持情况\n4. 股权质押比例和风险\n5. 限售解禁计划\n6. 重大风险提示（诉讼、ST、增发等）",
+    "估值对比": "请帮我做 {{INPUT}} 的估值分析：\n1. 当前PE（市盈率）和PE历史分位\n2. PB（市净率）及同行业对比\n3. ROE（净资产收益率）分析\n4. PEG（市盈率相对盈利增长比）\n5. 同行业估值排名对比\n6. 估值高低判断和投资建议（仅供参考）",
+    "分红查询": "请帮我查询分红信息：\n股票：{{INPUT}}\n1. 最新分红方案\n2. 除权除息日期\n3. 股息率计算和排名\n4. A股股息率前10名\n5. 历史分红稳定性分析（过去5年）\n6. 高股息投资建议（仅供参考）",
+    "板块热点": "请帮我分析今日A股板块热点：\n1. 查询涨幅前5的板块\n2. 分析板块内龙头股票\n3. 给出投资建议（仅供参考）",
+    "恐慌指数": "请帮我查询当前市场恐慌指数分析：\n1. VIX恐慌指数（美股）当前数值和历史分位\n2. 恐惧贪婪指数（Fear & Greed Index）\n3. A股市场情绪指标（涨跌家数比、北向资金流向、融资余额）\n4. 当前市场情绪解读：贪婪/中性/恐慌\n5. 结合情绪指标给出操作建议（仅供参考）",
     "异动提醒": "请帮我查询今日市场异动：\n1. 涨跌幅超过5%的个股（重点看科创板/创业板）\n2. 成交量放大2倍以上的个股\n3. 换手率异常的个股（换手率>10%）\n4. 盘中突然拉升或砸盘的个股\n5. 大宗交易记录\n6. 给出关注建议（仅供参考）",
-    "行业板块对比": "请帮我做行业板块对比分析：\n1. 今日申万行业涨跌幅排行（前5和后5）\n2. 热门概念板块涨跌排行\n3. 科创板/创业板板块热度\n4. 板块资金流向分析\n5. 板块轮动趋势分析\n6. 推荐关注板块及龙头股（仅供参考）",
-    "分红查询": "请帮我查询分红信息：\n1. [股票名称/代码] 最新分红方案\n2. 除权除息日期\n3. 股息率计算和排名\n4. A股股息率前10名\n5. 历史分红稳定性分析（过去5年）\n6. 高股息投资建议（仅供参考）",
-    "新股日历": "请帮我查询新股日历：\n1. 未来7天可申购的新股列表\n2. 每只新股的发行价、发行PE、行业\n3. 即将上市的新股\n4. 近期新股上市首日表现\n5. 申购建议（仅供参考）",
+    "板块对比": "请帮我做行业板块对比分析：\n1. 今日申万行业涨跌幅排行（前5和后5）\n2. 热门概念板块涨跌排行\n3. 科创板/创业板板块热度\n4. 板块资金流向分析\n5. 板块轮动趋势分析\n6. 推荐关注板块及龙头股（仅供参考）",
     "热股热搜": "请帮我查询市场热搜：\n1. A股今日热搜榜前10\n2. 讨论热度最高的股票\n3. 加自选最多的股票\n4. 当前热门概念和话题\n5. 市场情绪分析\n6. 关注建议和风险提示（仅供参考）",
-    "查看我的记忆": "请显示完整记忆，包括你目前记住的关于我的所有信息。"
+    "新股日历": "请帮我查询新股日历：\n1. 未来7天可申购的新股列表\n2. 每只新股的发行价、发行PE、行业\n3. 即将上市的新股\n4. 近期新股上市首日表现\n5. 申购建议（仅供参考）",
+    "Word报告": "请帮我生成一份Word报告：\n主题：（请在此补充）\n内容要求：（请在此补充）\n请生成后保存到工作区。",
+    "数据分析": "请帮我做数据分析和可视化：\n（请上传数据文件或描述数据内容）\n请分析并生成图表。",
+    "每日推送": "请帮我设置每天早上8点自动推送：A股科创板/创业板热点摘要。请创建自动化任务。",
+    "我的记忆": "请显示完整记忆，包括你目前记住的关于我的所有信息。"
   };
-  
-  // 搜索过滤功能
-  function filterFunctions() {
-    const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
-    const cards = document.querySelectorAll('.func-card');
-    const emptyState = document.getElementById('emptyState');
-    
-    if (!keyword) {
-      // 显示所有
-      cards.forEach(c => {
-        c.classList.add('show');
-        c.querySelector('.func-body').classList.remove('open');
-        c.querySelector('.arrow').classList.remove('open');
-      });
-      emptyState.classList.remove('show');
+
+  // ---- 弹窗系统 ----
+
+  let currentPreviewText = "";
+
+  function openModal(btn) {
+    const tipName = btn.getAttribute("data-tip");
+    const placeholder = btn.getAttribute("data-input") || "";
+    const modal = document.getElementById("modalOverlay");
+    const titleEl = document.getElementById("modalTitle");
+    const descEl = document.getElementById("modalDesc");
+    const inputEl = document.getElementById("modalInput");
+    const labelEl = document.getElementById("modalLabel");
+    const previewBox = document.getElementById("previewBox");
+    const tipNameInput = document.getElementById("modalTipName");
+
+    // 判断是否可留空（资金流向、Word报告等）
+    const isOptional = (tipName === "资金流向" || tipName === "Word报告");
+
+    titleEl.textContent = tipName;
+    descEl.textContent = "填写后自动生成完整提示语";
+    if (isOptional) {
+      labelEl.innerHTML = '请输入：<span class="optional-tag">可留空</span>';
+    } else {
+      labelEl.textContent = "请输入：";
+    }
+    inputEl.placeholder = placeholder;
+    inputEl.value = "";
+    previewBox.classList.remove("show");
+    tipNameInput.value = tipName;
+    document.getElementById("modalOptional").value = isOptional ? "1" : "";
+    currentPreviewText = "";
+
+    modal.classList.add("show");
+    setTimeout(() => { inputEl.focus(); }, 200);
+  }
+
+  function closeModal() {
+    document.getElementById("modalOverlay").classList.remove("show");
+  }
+
+  function closeModalOnOverlay(e) {
+    if (e.target === document.getElementById("modalOverlay")) {
+      closeModal();
+    }
+  }
+
+  function generateTip() {
+    const tipName = document.getElementById("modalTipName").value;
+    const rawInput = document.getElementById("modalInput").value.trim();
+    const isOptional = document.getElementById("modalOptional").value === "1";
+
+    // 非可选的必须填
+    if (!rawInput && !isOptional) {
+      showToast("请填写股票代码或名称");
+      document.getElementById("modalInput").focus();
       return;
     }
-    
-    let hasMatch = false;
-    cards.forEach(c => {
-      const tags = c.getAttribute('data-tags').toLowerCase();
-      const title = c.querySelector('.func-header').textContent.toLowerCase();
-      const body = c.querySelector('.func-body').textContent.toLowerCase();
-      
-      if (tags.includes(keyword) || title.includes(keyword) || body.includes(keyword)) {
-        c.classList.add('show');
-        hasMatch = true;
-      } else {
-        c.classList.remove('show');
-      }
-    });
-    
-    if (hasMatch) {
-      emptyState.classList.remove('show');
-    } else {
-      emptyState.classList.add('show');
+
+    let inputValue = rawInput || "全市场";
+
+    // "资金流向" 特殊处理
+    if (tipName === "资金流向" && !rawInput) {
+      inputValue = "请查询全市场资金流向";
     }
+
+    let template = tipMap[tipName];
+    if (!template) return;
+
+    let fullText = template.replace("{{INPUT}}", inputValue);
+
+    // 显示预览
+    const previewBox = document.getElementById("previewBox");
+    const previewText = document.getElementById("previewText");
+    previewText.textContent = fullText;
+    previewBox.classList.add("show");
+    currentPreviewText = fullText;
+
+    // 滚动到预览区
+    previewBox.scrollIntoView({ behavior: "smooth", block: "center" });
   }
-  
-  // 展开/折叠卡片
-  function toggleCard(header) {
-    const body = header.nextElementSibling;
-    const arrow = header.querySelector('.arrow');
-    body.classList.toggle('open');
-    arrow.classList.toggle('open');
+
+  function copyPreview() {
+    if (!currentPreviewText) return;
+    copyToClipboard(currentPreviewText);
+    showToast("已复制！请粘贴到 WorkBuddy 发送");
+    setTimeout(() => { closeModal(); }, 800);
   }
-  
-  // 复制提示语
-  function copyTip(btn) {
-    const tipName = btn.getAttribute('data-tip');
+
+  // ---- 直接复制（不需要输入的按钮） ----
+
+  function copyDirect(btn) {
+    const tipName = btn.getAttribute("data-tip");
     const text = tipMap[tipName];
     if (!text) return;
-    
-    // 复制到剪贴板
+    copyToClipboard(text);
+    showToast("已复制！请粘贴到 WorkBuddy 发送");
+  }
+
+  // ---- 剪贴板 ----
+
+  function copyToClipboard(text) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(() => {
-        showToast('已复制：' + tipName);
-      }).catch(() => {
-        fallbackCopy(text);
-      });
+      navigator.clipboard.writeText(text).catch(() => {});
     } else {
-      fallbackCopy(text);
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.left = "-9999px";
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); } catch(e) {}
+      document.body.removeChild(ta);
     }
   }
-  
-  function fallbackCopy(text) {
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.position = 'fixed';
-    ta.style.left = '-9999px';
-    document.body.appendChild(ta);
-    ta.select();
-    try {
-      document.execCommand('copy');
-      showToast('已复制到剪贴板');
-    } catch(e) {
-      showToast('复制失败，请手动复制');
-    }
-    document.body.removeChild(ta);
-  }
-  
+
   function showToast(msg) {
-    const toast = document.getElementById('toast');
+    const toast = document.getElementById("toast");
     toast.textContent = msg;
-    toast.classList.add('show');
-    setTimeout(() => {
-      toast.classList.remove('show');
-    }, 2000);
+    toast.classList.add("show");
+    setTimeout(() => { toast.classList.remove("show"); }, 2000);
   }
-  
-  // 页面加载时显示所有功能
+
+  // ---- 功能搜索 ----
+
+  function filterFunctions() {
+    const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
+    const cards = document.querySelectorAll(".func-card");
+    const emptyState = document.getElementById("emptyState");
+
+    if (!keyword) {
+      cards.forEach(c => {
+        c.classList.add("show");
+        c.querySelector(".func-body").classList.remove("open");
+        c.querySelector(".arrow").classList.remove("open");
+      });
+      emptyState.classList.remove("show");
+      return;
+    }
+
+    let hasMatch = false;
+    cards.forEach(c => {
+      const tags = c.getAttribute("data-tags").toLowerCase();
+      const title = c.querySelector(".func-header").textContent.toLowerCase();
+      const body = c.querySelector(".func-body").textContent.toLowerCase();
+
+      if (tags.includes(keyword) || title.includes(keyword) || body.includes(keyword)) {
+        c.classList.add("show");
+        hasMatch = true;
+      } else {
+        c.classList.remove("show");
+      }
+    });
+
+    emptyState.classList.toggle("show", !hasMatch);
+  }
+
+  function toggleCard(header) {
+    const body = header.nextElementSibling;
+    const arrow = header.querySelector(".arrow");
+    body.classList.toggle("open");
+    arrow.classList.toggle("open");
+  }
+
   window.onload = function() {
-    const cards = document.querySelectorAll('.func-card');
-    cards.forEach(c => c.classList.add('show'));
+    const cards = document.querySelectorAll(".func-card");
+    cards.forEach(c => c.classList.add("show"));
   };
 </script>
 </body>
