@@ -287,6 +287,10 @@
       <span class="quick-icon">📊</span>
       投资分析
     </div>
+    <div class="quick-btn" onclick="copyTip(this)" data-tip="公司研报分析">
+      <span class="quick-icon">💼</span>
+      公司研报
+    </div>
     <div class="quick-btn" onclick="copyTip(this)" data-tip="查看我的记忆">
       <span class="quick-icon">🧠</span>
       我的记忆
@@ -358,6 +362,48 @@
       
       <div class="tip-box">
         💡 提示：你可以对我说"设置每日15:30推送A股美股分析"，我会帮你创建定时任务。
+      </div>
+    </div>
+  </div>
+  
+  <!-- 公司研报摘要分析 -->
+  <div class="func-card" data-tags="研报,研报摘要,公司研报,券商,评级,分析,research,report">
+    <div class="func-header" onclick="toggleCard(this)">
+      💼 公司研报摘要分析
+      <span class="arrow">▶</span>
+    </div>
+    <div class="func-body">
+      <h3>功能介绍</h3>
+      <p>快速获取 <span class="highlight">机构研报核心摘要</span>，包括券商评级、财务数据摘要、行业地位分析和投资建议，省去阅读长篇研报的时间。</p>
+      
+      <h3>如何使用</h3>
+      <ul>
+        <li><span class="highlight">步骤1：</span>对我说"帮我查XX公司研报摘要"</li>
+        <li><span class="highlight">步骤2：</span>我会查询最近3个月的机构研报</li>
+        <li><span class="highlight">步骤3：</span>自动提取核心观点和评级变化</li>
+        <li><span class="highlight">步骤4：</span>生成摘要分析报告</li>
+      </ul>
+      
+      <h3>分析内容包括</h3>
+      <ul>
+        <li>📋 <span class="highlight">机构评级汇总</span> — 各券商买入/增持/中性/减持评级</li>
+        <li>📊 <span class="highlight">财务数据摘要</span> — 营收、净利润、毛利率、ROE等核心指标</li>
+        <li>🏭 <span class="highlight">行业地位分析</span> — 市占率、竞争优势、行业趋势</li>
+        <li>📈 <span class="highlight">盈利预测</span> — 未来1-2年营收和利润预期</li>
+        <li>⚡ <span class="highlight">投资逻辑</span> — 核心看点和风险因素分析</li>
+        <li>💡 <span class="highlight">汇总建议</span> — 综合各机构观点形成参考建议</li>
+      </ul>
+      
+      <h3>示例对话</h3>
+      <ul>
+        <li>💬 "帮我查澜起科技最新研报摘要"</li>
+        <li>💬 "比亚迪最近三个月券商评级怎么样"</li>
+        <li>💬 "分析英伟达机构研报核心观点"</li>
+        <li>💬 "对比茅台和五粮液的研报评级"</li>
+      </ul>
+      
+      <div class="tip-box">
+        💡 提示：点击上方「💼 公司研报」快捷按钮，自动复制提示语，粘贴给我即可。
       </div>
     </div>
   </div>
@@ -597,6 +643,7 @@
     "数据分析出图": "请帮我做数据分析和可视化：\n（请上传数据文件或描述数据）\n请分析并生成图表。",
     "设置每日推送": "请帮我设置每天早上8点自动推送：A股科创板/创业板热点摘要。请创建自动化任务。",
     "投资逻辑分析": "请根据以下数据/股票：[股票名称或代码]，帮我做投资逻辑分析，包括：1. 基本面分析（财务数据、行业地位）2. 技术面分析（趋势、支撑压力位）3. 风险提示 4. 投资建议（仅供参考）",
+    "公司研报分析": "请帮我获取 [股票名称/代码] 的机构研报摘要分析，包括：\n1. 最近3个月主要券商评级和核心观点\n2. 财务数据摘要（营收、净利润、毛利率、ROE等核心指标）\n3. 行业地位与竞争优势分析\n4. 盈利预测与估值分析\n5. 投资逻辑与风险提示\n6. 综合投资建议（仅供参考）",
     "查看我的记忆": "请显示完整记忆，包括你目前记住的关于我的所有信息。"
   };
   
