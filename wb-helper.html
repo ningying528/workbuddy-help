@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WB助手">
+<meta name="theme-color" content="#1a1a2e">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<title>WorkBuddy 功能助手</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Microsoft YaHei", sans-serif;
+  background: #1a1a2e; color: #e0e0e0; font-size: 18px;
+  line-height: 1.7; min-height: 100vh;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Header */
+.header {
+  background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+  padding: 28px 20px 22px; text-align: center;
+  border-bottom: 3px solid #e94560;
+}
+.header h1 { font-size: 26px; color: #fff; margin-bottom: 6px; letter-spacing: 2px; }
+.header .sub { font-size: 16px; color: #a0a0c0; }
+
+/* Search */
+.search-wrap { padding: 16px 16px 10px; }
+.search-wrap input {
+  width: 100%; padding: 14px 18px; font-size: 18px;
+  border: 2px solid #2a2a4a; border-radius: 14px;
+  background: #16213e; color: #fff; outline: none;
+}
+.search-wrap input:focus { border-color: #e94560; }
+.search-wrap input::placeholder { color: #666; }
+
+/* Steps */
+.steps { padding: 6px 20px 14px; font-size: 16px; color: #888; }
+.steps span { color: #e94560; font-weight: bold; }
+
+/* Quick Buttons */
+.quick-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px; padding: 0 16px 20px;
+}
+.quick-btn {
+  background: #16213e; border: 2px solid #2a2a4a;
+  border-radius: 14px; padding: 18px 12px;
+  text-align: center; cursor: pointer;
+  font-size: 18px; font-weight: bold; color: #e0e0e0;
+  transition: all 0.2s; display: flex;
+  flex-direction: column; align-items: center; gap: 6px;
+  -webkit-tap-highlight-color: transparent;
+}
+.quick-btn:active { background: #0f3460; border-color: #e94560; transform: scale(0.96); }
+.quick-icon { font-size: 32px; }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+  background: #e94560; color: #fff; padding: 12px 28px;
+  border-radius: 30px; font-size: 18px; font-weight: bold;
+  z-index: 999; opacity: 0; transition: opacity 0.3s;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; }
+
+/* Section Title */
+.section-title {
+  padding: 10px 20px; font-size: 20px; font-weight: bold;
+  color: #e94560; border-bottom: 1px solid #2a2a4a;
+}
+
+/* Function Cards */
+.func-card {
+  margin: 12px 16px; background: #16213e;
+  border-radius: 14px; overflow: hidden;
+  border: 1px solid #2a2a4a;
+}
+.func-header {
+  padding: 16px 20px; font-size: 20px; font-weight: bold;
+  color: #fff; display: flex; justify-content: space-between;
+  align-items: center; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.func-header:active { background: #1a2748; }
+.arrow { font-size: 14px; transition: transform 0.3s; }
+.arrow.open { transform: rotate(90deg); }
+.func-body {
+  padding: 0 20px; max-height: 0; overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.4s ease;
+}
+.func-body.open { max-height: 2000px; padding: 0 20px 20px; }
+
+.func-body h3 {
+  font-size: 20px; color: #e94560; margin: 16px 0 8px;
+  padding-top: 8px; border-top: 1px solid #2a2a4a;
+}
+.func-body h3:first-child { border-top: none; padding-top: 0; }
+.func-body p { margin: 6px 0; font-size: 18px; }
+.func-body ul { padding-left: 20px; margin: 8px 0; }
+.func-body li { margin: 8px 0; font-size: 18px; }
+.highlight { color: #ffd700; font-weight: bold; }
+.tip-box {
+  background: #1a2748; border-left: 4px solid #e94560;
+  padding: 14px 16px; margin: 14px 0; border-radius: 0 10px 10px 0;
+  font-size: 17px; color: #c0c0e0;
+}
+
+/* No results */
+.no-result {
+  text-align: center; padding: 40px 20px;
+  font-size: 20px; color: #666; display: none;
+}
+.no-result.show { display: block; }
+
+/* Footer */
+.footer {
+  text-align: center; padding: 30px 20px;
+  font-size: 15px; color: #555;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>WorkBuddy 功能助手</h1>
+  <div class="sub">AI 办公助手 · 功能速查指南</div>
+</div>
+
+<div class="search-wrap">
+  <input type="text" id="searchInput" placeholder="搜功能：专家、文件、自动化、技能..." oninput="filterCards()">
+</div>
+
+<div class="steps">
+  <span>三步用法：</span>1. 点按钮 → 2. 复制提示语 → 3. 粘贴到 WorkBuddy 发送
+</div>
+
+<!-- 快捷按钮 -->
+<div class="quick-grid">
+  <div class="quick-btn" onclick="copyTip('Word报告')">
+    <span class="quick-icon">📝</span>
+    Word报告
+  </div>
+  <div class="quick-btn" onclick="copyTip('数据分析')">
+    <span class="quick-icon">📊</span>
+    数据分析
+  </div>
+  <div class="quick-btn" onclick="copyTip('每日推送')">
+    <span class="quick-icon">⏰</span>
+    每日推送
+  </div>
+  <div class="quick-btn" onclick="copyTip('我的记忆')">
+    <span class="quick-icon">🧠</span>
+    我的记忆
+  </div>
+</div>
+
+<div class="toast" id="toast">✅ 已复制到剪贴板</div>
+
+<!-- 功能卡片 -->
+<div class="section-title">全部功能</div>
+
+<div class="func-card" data-tags="专家,expert,顾问,咨询">
+  <div class="func-header" onclick="toggleCard(this)">
+    专家功能
+    <span class="arrow">&#9654;</span>
+  </div>
+  <div class="func-body">
+    <h3>功能介绍</h3>
+    <p>WorkBuddy 内置 <span class="highlight">100+ 领域专家</span>，涵盖法律、医疗、编程、设计、运营等各行业。每位专家都有专属知识库，提供专业级解答。</p>
+
+    <h3>如何使用</h3>
+    <ul>
+      <li><span class="highlight">步骤1：</span>对我说"帮我找XX专家"</li>
+      <li><span class="highlight">步骤2：</span>进入专家中心浏览或搜索</li>
+      <li><span class="highlight">步骤3：</span>选择专家开始专业对话</li>
+    </ul>
+
+    <h3>常用专家类型</h3>
+    <ul>
+      <li>法律顾问专家</li>
+      <li>医疗健康专家</li>
+      <li>编程技术专家</li>
+      <li>数据分析专家</li>
+      <li>写作助手专家</li>
+    </ul>
+
+    <div class="tip-box">
+      提示：直接对我说"帮我找XX专家"，我会帮你连接对应专家。
+    </div>
+  </div>
+</div>
+
+<div class="func-card" data-tags="文件,file,文档,Word,Excel,PPT,PDF,处理">
+  <div class="func-header" onclick="toggleCard(this)">
+    文件处理功能
+    <span class="arrow">&#9654;</span>
+  </div>
+  <div class="func-body">
+    <h3>功能介绍</h3>
+    <p>支持 <span class="highlight">Word、Excel、PPT、PDF</span> 等文件的创建、读取、编辑和转换，一站式文件处理。</p>
+
+    <h3>如何使用</h3>
+    <ul>
+      <li><span class="highlight">创建文档：</span>"帮我生成一份Word报告"</li>
+      <li><span class="highlight">处理表格：</span>"帮我分析这个Excel数据"</li>
+      <li><span class="highlight">制作PPT：</span>"帮我做一个演示文稿"</li>
+      <li><span class="highlight">PDF操作：</span>"帮我把这个PDF转成Word"</li>
+    </ul>
+
+    <h3>支持的文件类型</h3>
+    <ul>
+      <li>📝 Word文档（.docx）— 创建、编辑、格式化</li>
+      <li>📊 Excel表格（.xlsx）— 数据分析、公式、图表</li>
+      <li>📽️ PPT演示（.pptx）— 幻灯片制作</li>
+      <li>📄 PDF文件 — 阅读、合并、拆分、转换</li>
+    </ul>
+
+    <div class="tip-box">
+      提示：点击上方「Word报告」按钮可直接生成提示语。
+    </div>
+  </div>
+</div>
+
+<div class="func-card" data-tags="自动化,automation,定时,推送,提醒,任务">
+  <div class="func-header" onclick="toggleCard(this)">
+    自动化功能
+    <span class="arrow">&#9654;</span>
+  </div>
+  <div class="func-body">
+    <h3>功能介绍</h3>
+    <p>设定 <span class="highlight">定时任务</span>，让 WorkBuddy 在指定时间自动执行工作，结果推送到微信小程序。</p>
+
+    <h3>如何使用</h3>
+    <ul>
+      <li><span class="highlight">步骤1：</span>"帮我设置每天早上8点推送新闻摘要"</li>
+      <li><span class="highlight">步骤2：</span>我会创建自动化任务</li>
+      <li><span class="highlight">步骤3：</span>到时间自动执行并推送到微信</li>
+    </ul>
+
+    <h3>常用自动化场景</h3>
+    <ul>
+      <li>每天早上推送新闻摘要（8:00）</li>
+      <li>每周一生成工作周报（9:00）</li>
+      <li>每日定时数据备份（22:00）</li>
+      <li>定时提醒重要待办事项</li>
+    </ul>
+
+    <div class="tip-box">
+      提示：点击上方「每日推送」按钮可直接生成定时任务提示语。
+    </div>
+  </div>
+</div>
+
+<div class="func-card" data-tags="记忆,memory,记住,偏好">
+  <div class="func-header" onclick="toggleCard(this)">
+    记忆功能
+    <span class="arrow">&#9654;</span>
+  </div>
+  <div class="func-body">
+    <h3>功能介绍</h3>
+    <p>WorkBuddy 拥有 <span class="highlight">三层记忆系统</span>，能记住你的偏好、习惯和重要信息，越用越懂你。</p>
+
+    <h3>三层记忆</h3>
+    <ul>
+      <li><span class="highlight">云记忆：</span>自动学习的长期偏好，跨会话保持</li>
+      <li><span class="highlight">用户级记忆：</span>跨项目通用规则和习惯</li>
+      <li><span class="highlight">项目记忆：</span>当前项目的工作日志和笔记</li>
+    </ul>
+
+    <h3>如何使用</h3>
+    <ul>
+      <li>"记住我偏好大字体显示"</li>
+      <li>"查看你记住了关于我的哪些信息"</li>
+      <li>"记住这个项目的技术选型"</li>
+    </ul>
+
+    <div class="tip-box">
+      提示：点击上方「我的记忆」按钮查看已存储的信息。
+    </div>
+  </div>
+</div>
+
+<div class="func-card" data-tags="技能,skill,插件,扩展">
+  <div class="func-header" onclick="toggleCard(this)">
+    技能功能
+    <span class="arrow">&#9654;</span>
+  </div>
+  <div class="func-body">
+    <h3>功能介绍</h3>
+    <p>WorkBuddy 支持安装 <span class="highlight">技能扩展</span>，增强特定领域能力，如文档处理、网页浏览等。</p>
+
+    <h3>如何使用</h3>
+    <ul>
+      <li><span class="highlight">查找：</span>"有没有处理PDF的技能"</li>
+      <li><span class="highlight">安装：</span>找到后自动安装并加载</li>
+      <li><span class="highlight">使用：</span>之后相关任务会自动调用</li>
+    </ul>
+
+    <h3>常用技能</h3>
+    <ul>
+      <li>文档处理（Word、Excel、PPT、PDF）</li>
+      <li>网页浏览（自动打开网页、截图、提取信息）</li>
+      <li>网页自动化（自动浏览、截图、提取）</li>
+      <li>多模态生成（文生图、文生视频）</li>
+    </ul>
+
+    <div class="tip-box">
+      提示：直接对我说"帮我找处理PDF的技能"，我会帮你安装。
+    </div>
+  </div>
+</div>
+
+<div class="func-card" data-tags="连接器,connector,MCP,工具,集成">
+  <div class="func-header" onclick="toggleCard(this)">
+    连接器功能
+    <span class="arrow">&#9654;</span>
+  </div>
+  <div class="func-body">
+    <h3>功能介绍</h3>
+    <p>通过 <span class="highlight">MCP 连接器</span>，让 WorkBuddy 连接外部工具和服务，如浏览器、数据库、云存储等。</p>
+
+    <h3>如何使用</h3>
+    <ul>
+      <li><span class="highlight">安装：</span>"帮我安装浏览器连接器"</li>
+      <li><span class="highlight">配置：</span>设置连接参数（如有需要）</li>
+      <li><span class="highlight">使用：</span>之后直接对 WorkBuddy 说"帮我打开XX网页"</li>
+    </ul>
+
+    <h3>常用连接器</h3>
+    <ul>
+      <li>浏览器自动化连接器</li>
+      <li>腾讯文档连接器</li>
+      <li>飞书/钉钉连接器</li>
+      <li>自定义 API 连接器</li>
+    </ul>
+
+    <div class="tip-box">
+      提示：连接器安装后需在设置中"信任"才能使用。
+    </div>
+  </div>
+</div>
+
+<div class="func-card" data-tags="工作模式,模式,mode,plan,craft,ask">
+  <div class="func-header" onclick="toggleCard(this)">
+    工作模式
+    <span class="arrow">&#9654;</span>
+  </div>
+  <div class="func-body">
+    <h3>功能介绍</h3>
+    <p>三种工作模式，灵活切换：<span class="highlight">Craft（直接执行）、Plan（先规划再执行）、Ask（仅回答不修改）</span>。</p>
+
+    <h3>三种模式</h3>
+    <ul>
+      <li><span class="highlight">Craft 模式：</span>你说我做 — 直接执行任务，读写文件、运行命令</li>
+      <li><span class="highlight">Plan 模式：</span>先想再做 — 分析需求、设计方案，等你确认后执行</li>
+      <li><span class="highlight">Ask 模式：</span>只说不做 — 纯问答模式，不修改任何文件</li>
+    </ul>
+
+    <h3>如何切换</h3>
+    <p>在 WorkBuddy 对话框顶部可以切换模式，或直接对我说"切换到 Plan 模式"。</p>
+  </div>
+</div>
+
+<div class="func-card" data-tags="多模态,生成,图片,视频,3D,文生图,文生视频">
+  <div class="func-header" onclick="toggleCard(this)">
+    多模态生成功能
+    <span class="arrow">&#9654;</span>
+  </div>
+  <div class="func-body">
+    <h3>功能介绍</h3>
+    <p>WorkBuddy 支持 <span class="highlight">文生图、文生视频、文生3D模型</span>等多种 AI 内容生成能力。</p>
+
+    <h3>如何使用</h3>
+    <ul>
+      <li><span class="highlight">生成图片：</span>"帮我生成一张XX的图片"</li>
+      <li><span class="highlight">生成视频：</span>"帮我制作一段XX的视频"</li>
+      <li><span class="highlight">生成3D模型：</span>"帮我做一个XX的3D模型"</li>
+    </ul>
+
+    <h3>支持的类型</h3>
+    <ul>
+      <li>🎨 文生图 — 文字描述生成图片</li>
+      <li>🎬 文生视频 — 文字描述生成视频</li>
+      <li>🧊 文生3D — 文字描述生成3D模型</li>
+      <li>🖼️ 图生3D — 上传图片生成3D模型</li>
+    </ul>
+
+    <div class="tip-box">
+      提示：使用"多模态内容生成"技能可以解锁完整的媒体创作能力。
+    </div>
+  </div>
+</div>
+
+<div class="no-result" id="noResult">
+  😕 没有找到匹配的功能，换个关键词试试
+</div>
+
+<div class="footer">
+  WorkBuddy 功能助手 · 学习作业
+</div>
+
+<script>
+// 提示语模板
+var tips = {
+  'Word报告': '请帮我生成一份Word报告：\n主题：（请在此补充）\n内容要求：（请在此补充）\n请生成后保存到工作区。',
+  '数据分析': '请帮我做数据分析和可视化：\n（请上传数据文件或描述数据内容）\n请分析并生成图表。',
+  '每日推送': '请帮我设置每天早上8点自动推送：新闻摘要和待办事项提醒。请创建自动化任务。',
+  '我的记忆': '请显示完整记忆，包括你目前记住的关于我的所有信息。'
+};
+
+function copyTip(name) {
+  var text = tips[name];
+  if (!text) return;
+  copyToClipboard(text);
+  showToast('✅ 已复制「' + name + '」提示语');
+}
+
+function copyToClipboard(text) {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text);
+  } else {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+  }
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2000);
+}
+
+function toggleCard(header) {
+  var body = header.nextElementSibling;
+  var arrow = header.querySelector('.arrow');
+  body.classList.toggle('open');
+  arrow.classList.toggle('open');
+}
+
+function filterCards() {
+  var q = document.getElementById('searchInput').value.toLowerCase().trim();
+  var cards = document.querySelectorAll('.func-card');
+  var found = 0;
+  cards.forEach(function(c) {
+    var tags = (c.getAttribute('data-tags') || '').toLowerCase();
+    var title = (c.querySelector('.func-header').textContent || '').toLowerCase();
+    if (!q || tags.indexOf(q) > -1 || title.indexOf(q) > -1) {
+      c.style.display = '';
+      found++;
+    } else {
+      c.style.display = 'none';
+    }
+  });
+  document.getElementById('noResult').style.display = found === 0 ? 'block' : 'none';
+}
+</script>
+
+</body>
+</html>
