@@ -2,978 +2,477 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="WB助手">
-<meta name="theme-color" content="#e94560">
-<meta name="wb-version" content="2026-06-01-v4-NO-SW">
+<meta name="theme-color" content="#1a1a2e">
 <link rel="manifest" href="./manifest.json">
 <link rel="apple-touch-icon" href="./icon-192.png">
 <title>WorkBuddy 功能助手</title>
-<script>
-// 强制清除旧缓存 - 解决 PWA 缓存顽固问题
-(function() {
-  var NEW_VERSION = '2026-06-01-v4';
-  var oldVer = localStorage.getItem('wb_version');
-  if (oldVer !== NEW_VERSION) {
-    // 清除所有缓存
-    if ('caches' in window) {
-      caches.keys().then(function(names) {
-        names.forEach(function(name) { caches.delete(name); });
-      });
-    }
-    // 注销旧 Service Worker
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(function(regs) {
-        regs.forEach(function(reg) { reg.unregister(); });
-      });
-    }
-    localStorage.setItem('wb_version', NEW_VERSION);
-    // 强制重新加载
-    if (oldVer) { location.reload(true); }
-  }
-})();
-</script>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Microsoft YaHei", sans-serif;
+  background: #1a1a2e; color: #e0e0e0; font-size: 18px;
+  line-height: 1.7; min-height: 100vh;
+  -webkit-text-size-adjust: 100%;
+}
 
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-    background: #0f0f1a;
-    color: #ffffff;
-    min-height: 100vh;
-    padding: 0;
-    -webkit-tap-highlight-color: transparent;
-  }
+/* Header */
+.header {
+  background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+  padding: 28px 20px 22px; text-align: center;
+  border-bottom: 3px solid #e94560;
+}
+.header h1 { font-size: 26px; color: #fff; margin-bottom: 6px; letter-spacing: 2px; }
+.header .sub { font-size: 16px; color: #a0a0c0; }
 
-  /* 顶部搜索区 */
-  .header {
-    position: sticky;
-    top: 0;
-    background: #1a1a2e;
-    padding: 16px;
-    z-index: 100;
-    border-bottom: 2px solid #16213e;
-  }
+/* Search */
+.search-wrap { padding: 16px 16px 10px; }
+.search-wrap input {
+  width: 100%; padding: 14px 18px; font-size: 18px;
+  border: 2px solid #2a2a4a; border-radius: 14px;
+  background: #16213e; color: #fff; outline: none;
+}
+.search-wrap input:focus { border-color: #e94560; }
+.search-wrap input::placeholder { color: #666; }
 
-  .search-box {
-    width: 100%;
-    padding: 16px 20px;
-    font-size: 20px;
-    border: 3px solid #0f3460;
-    border-radius: 16px;
-    background: #16213e;
-    color: #ffffff;
-    outline: none;
-    transition: border-color 0.3s;
-  }
+/* Steps */
+.steps { padding: 6px 20px 14px; font-size: 16px; color: #888; }
+.steps span { color: #e94560; font-weight: bold; }
 
-  .search-box:focus {
-    border-color: #e94560;
-  }
+/* Quick Buttons */
+.quick-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px; padding: 0 16px 20px;
+}
+.quick-btn {
+  background: #16213e; border: 2px solid #2a2a4a;
+  border-radius: 14px; padding: 18px 12px;
+  text-align: center; cursor: pointer;
+  font-size: 18px; font-weight: bold; color: #e0e0e0;
+  transition: all 0.2s; display: flex;
+  flex-direction: column; align-items: center; gap: 6px;
+  -webkit-tap-highlight-color: transparent;
+}
+.quick-btn:active { background: #0f3460; border-color: #e94560; transform: scale(0.96); }
+.quick-icon { font-size: 32px; }
 
-  .search-box::placeholder {
-    color: #666;
-    font-size: 18px;
-  }
+/* Toast */
+.toast {
+  position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+  background: #e94560; color: #fff; padding: 12px 28px;
+  border-radius: 30px; font-size: 18px; font-weight: bold;
+  z-index: 999; opacity: 0; transition: opacity 0.3s;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; }
 
-  /* 使用说明横幅 */
-  .guide-banner {
-    margin: 16px;
-    padding: 16px 20px;
-    background: linear-gradient(135deg, #0f3460, #16213e);
-    border: 2px solid #e94560;
-    border-radius: 16px;
-    font-size: 18px;
-    line-height: 1.8;
-    color: #ffd700;
-  }
+/* Section Title */
+.section-title {
+  padding: 10px 20px; font-size: 20px; font-weight: bold;
+  color: #e94560; border-bottom: 1px solid #2a2a4a;
+}
 
-  .guide-banner .step {
-    font-size: 20px;
-    font-weight: bold;
-    margin-right: 4px;
-  }
+/* Function Cards */
+.func-card {
+  margin: 12px 16px; background: #16213e;
+  border-radius: 14px; overflow: hidden;
+  border: 1px solid #2a2a4a;
+}
+.func-header {
+  padding: 16px 20px; font-size: 20px; font-weight: bold;
+  color: #fff; display: flex; justify-content: space-between;
+  align-items: center; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.func-header:active { background: #1a2748; }
+.arrow { font-size: 14px; transition: transform 0.3s; }
+.arrow.open { transform: rotate(90deg); }
+.func-body {
+  padding: 0 20px; max-height: 0; overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.4s ease;
+}
+.func-body.open { max-height: 2000px; padding: 0 20px 20px; }
 
-  /* 快捷按钮区 */
-  .quick-section {
-    padding: 16px;
-    background: #1a1a2e;
-  }
+.func-body h3 {
+  font-size: 20px; color: #e94560; margin: 16px 0 8px;
+  padding-top: 8px; border-top: 1px solid #2a2a4a;
+}
+.func-body h3:first-child { border-top: none; padding-top: 0; }
+.func-body p { margin: 6px 0; font-size: 18px; }
+.func-body ul { padding-left: 20px; margin: 8px 0; }
+.func-body li { margin: 8px 0; font-size: 18px; }
+.highlight { color: #ffd700; font-weight: bold; }
+.tip-box {
+  background: #1a2748; border-left: 4px solid #e94560;
+  padding: 14px 16px; margin: 14px 0; border-radius: 0 10px 10px 0;
+  font-size: 17px; color: #c0c0e0;
+}
 
-  .section-title {
-    font-size: 22px;
-    font-weight: bold;
-    color: #e94560;
-    margin-bottom: 12px;
-    padding-left: 4px;
-  }
+/* No results */
+.no-result {
+  text-align: center; padding: 40px 20px;
+  font-size: 20px; color: #666; display: none;
+}
+.no-result.show { display: block; }
 
-  .quick-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-  }
-
-  .quick-btn {
-    background: #16213e;
-    border: 2px solid #0f3460;
-    border-radius: 16px;
-    padding: 16px 8px;
-    text-align: center;
-    font-size: 18px;
-    color: #ffffff;
-    cursor: pointer;
-    transition: all 0.3s;
-    user-select: none;
-  }
-
-  .quick-btn:active {
-    background: #0f3460;
-    transform: scale(0.95);
-  }
-
-  .quick-btn:hover {
-    border-color: #e94560;
-    background: #1a1a4e;
-  }
-
-  .quick-icon {
-    font-size: 32px;
-    display: block;
-    margin-bottom: 8px;
-  }
-
-  /* 功能列表区 */
-  .content {
-    padding: 16px;
-    padding-bottom: 100px;
-  }
-
-  .func-card {
-    background: #16213e;
-    border: 2px solid #0f3460;
-    border-radius: 16px;
-    margin-bottom: 20px;
-    overflow: hidden;
-    display: none;
-  }
-
-  .func-card.show {
-    display: block;
-  }
-
-  .func-header {
-    padding: 20px;
-    font-size: 22px;
-    font-weight: bold;
-    color: #e94560;
-    border-bottom: 2px solid #0f3460;
-    cursor: pointer;
-    user-select: none;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .func-header:active {
-    background: #1a1a4e;
-  }
-
-  .arrow {
-    font-size: 18px;
-    transition: transform 0.3s;
-  }
-
-  .arrow.open {
-    transform: rotate(90deg);
-  }
-
-  .func-body {
-    padding: 20px;
-    font-size: 20px;
-    line-height: 1.8;
-    display: none;
-  }
-
-  .func-body.open {
-    display: block;
-  }
-
-  .func-body h3 {
-    color: #00d2ff;
-    font-size: 20px;
-    margin-top: 16px;
-    margin-bottom: 8px;
-  }
-
-  .func-body p {
-    margin-bottom: 12px;
-    color: #e0e0e0;
-  }
-
-  .func-body ul {
-    margin-left: 20px;
-    margin-bottom: 12px;
-  }
-
-  .func-body li {
-    margin-bottom: 8px;
-    color: #e0e0e0;
-  }
-
-  .highlight {
-    color: #ffd700;
-    font-weight: bold;
-  }
-
-  .tip-box {
-    background: #0f3460;
-    border-left: 6px solid #e94560;
-    padding: 16px;
-    margin: 16px 0;
-    border-radius: 0 12px 12px 0;
-    font-size: 18px;
-  }
-
-  /* 空状态 */
-  .empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    color: #666;
-    font-size: 20px;
-    display: none;
-  }
-
-  .empty-state.show {
-    display: block;
-  }
-
-  /* 底部提示 */
-  .footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: #1a1a2e;
-    border-top: 2px solid #16213e;
-    padding: 12px;
-    text-align: center;
-    font-size: 16px;
-    color: #666;
-    z-index: 100;
-  }
-
-  /* Toast 提示 */
-  .toast {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(0, 0, 0, 0.9);
-    color: #ffffff;
-    padding: 20px 40px;
-    border-radius: 16px;
-    font-size: 20px;
-    z-index: 1000;
-    display: none;
-    border: 2px solid #e94560;
-  }
-
-  .toast.show {
-    display: block;
-    animation: fadeIn 0.3s;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
-    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-  }
-
-  /* ==================== 弹窗样式 ==================== */
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
-    z-index: 500;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-  }
-
-  .modal-overlay.show {
-    display: flex;
-    animation: fadeIn 0.2s;
-  }
-
-  .modal-card {
-    background: #1a1a2e;
-    border: 3px solid #e94560;
-    border-radius: 20px;
-    padding: 28px 24px;
-    width: 100%;
-    max-width: 420px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-  }
-
-  .modal-card h2 {
-    font-size: 26px;
-    color: #e94560;
-    margin-bottom: 8px;
-    text-align: center;
-  }
-
-  .modal-card .modal-desc {
-    font-size: 18px;
-    color: #999;
-    text-align: center;
-    margin-bottom: 24px;
-  }
-
-  .modal-card label {
-    font-size: 18px;
-    color: #ffd700;
-    display: block;
-    margin-bottom: 8px;
-    font-weight: bold;
-  }
-
-  .modal-card input {
-    width: 100%;
-    padding: 16px 18px;
-    font-size: 22px;
-    border: 3px solid #0f3460;
-    border-radius: 14px;
-    background: #16213e;
-    color: #ffffff;
-    outline: none;
-    margin-bottom: 20px;
-    transition: border-color 0.3s;
-  }
-
-  .modal-card input:focus {
-    border-color: #e94560;
-  }
-
-  .modal-card input::placeholder {
-    color: #5a5a7a;
-    font-size: 18px;
-  }
-
-  .modal-buttons {
-    display: flex;
-    gap: 12px;
-  }
-
-  .btn-generate {
-    flex: 2;
-    padding: 16px 12px;
-    font-size: 22px;
-    font-weight: bold;
-    background: #e94560;
-    color: #ffffff;
-    border: none;
-    border-radius: 14px;
-    cursor: pointer;
-    transition: all 0.3s;
-  }
-
-  .btn-generate:active {
-    background: #c73a54;
-    transform: scale(0.96);
-  }
-
-  .btn-cancel {
-    flex: 1;
-    padding: 16px 12px;
-    font-size: 22px;
-    background: #16213e;
-    color: #999;
-    border: 2px solid #0f3460;
-    border-radius: 14px;
-    cursor: pointer;
-    transition: all 0.3s;
-  }
-
-  .btn-cancel:active {
-    background: #0f3460;
-  }
-
-  /* 预览区 */
-  .preview-box {
-    background: #0f3460;
-    border-radius: 12px;
-    padding: 16px;
-    margin-top: 16px;
-    display: none;
-  }
-
-  .preview-box.show {
-    display: block;
-  }
-
-  .preview-title {
-    font-size: 16px;
-    color: #00d2ff;
-    margin-bottom: 8px;
-  }
-
-  .preview-text {
-    font-size: 18px;
-    color: #e0e0e0;
-    line-height: 1.7;
-    white-space: pre-wrap;
-  }
-
-  .btn-copy-preview {
-    width: 100%;
-    margin-top: 12px;
-    padding: 14px;
-    font-size: 22px;
-    font-weight: bold;
-    background: #00d2ff;
-    color: #0f0f1a;
-    border: none;
-    border-radius: 14px;
-    cursor: pointer;
-    transition: all 0.3s;
-  }
-
-  .btn-copy-preview:active {
-    background: #00a8cc;
-    transform: scale(0.96);
-  }
-
-  /* 可选标签 */
-  .optional-tag {
-    font-size: 14px;
-    background: #0f3460;
-    color: #888;
-    padding: 2px 8px;
-    border-radius: 6px;
-    margin-left: 6px;
-    vertical-align: middle;
-  }
+/* Footer */
+.footer {
+  text-align: center; padding: 30px 20px;
+  font-size: 15px; color: #555;
+}
 </style>
 </head>
 <body>
 
-<!-- WB助手 - 纯WorkBuddy功能指南 -->
-
 <div class="header">
-  <input type="text" class="search-box" id="searchInput" placeholder="输入关键词搜索功能，如：专家、文件、自动化、技能..." oninput="filterFunctions()">
+  <h1>WorkBuddy 功能助手</h1>
+  <div class="sub">AI 办公助手 · 功能速查指南</div>
 </div>
 
-<!-- 使用说明 -->
-<div class="guide-banner">
-  <span class="step">三步用法：</span>1. 点下方按钮 → 2. 填写内容 → 3. 点"复制"后粘贴到 WorkBuddy 对话发送
+<div class="search-wrap">
+  <input type="text" id="searchInput" placeholder="搜功能：专家、文件、自动化、技能..." oninput="filterCards()">
 </div>
 
-<div class="quick-section">
-  <div class="section-title">快捷指令</div>
-  <div class="quick-grid">
-    <div class="quick-btn" onclick="copyDirect(this)" data-tip="Word报告">
-      <span class="quick-icon">📝</span>
-      Word报告
-    </div>
-    <div class="quick-btn" onclick="copyDirect(this)" data-tip="数据分析">
-      <span class="quick-icon">📊</span>
-      数据分析
-    </div>
-    <div class="quick-btn" onclick="copyDirect(this)" data-tip="每日推送">
-      <span class="quick-icon">⏰</span>
-      每日推送
-    </div>
-    <div class="quick-btn" onclick="copyDirect(this)" data-tip="我的记忆">
-      <span class="quick-icon">🧠</span>
-      我的记忆
+<div class="steps">
+  <span>三步用法：</span>1. 点按钮 → 2. 复制提示语 → 3. 粘贴到 WorkBuddy 发送
+</div>
+
+<!-- 快捷按钮 -->
+<div class="quick-grid">
+  <div class="quick-btn" onclick="copyTip('Word报告')">
+    <span class="quick-icon">📝</span>
+    Word报告
+  </div>
+  <div class="quick-btn" onclick="copyTip('数据分析')">
+    <span class="quick-icon">📊</span>
+    数据分析
+  </div>
+  <div class="quick-btn" onclick="copyTip('每日推送')">
+    <span class="quick-icon">⏰</span>
+    每日推送
+  </div>
+  <div class="quick-btn" onclick="copyTip('我的记忆')">
+    <span class="quick-icon">🧠</span>
+    我的记忆
+  </div>
+</div>
+
+<div class="toast" id="toast">✅ 已复制到剪贴板</div>
+
+<!-- 功能卡片 -->
+<div class="section-title">全部功能</div>
+
+<div class="func-card" data-tags="专家,expert,顾问,咨询">
+  <div class="func-header" onclick="toggleCard(this)">
+    专家功能
+    <span class="arrow">&#9654;</span>
+  </div>
+  <div class="func-body">
+    <h3>功能介绍</h3>
+    <p>WorkBuddy 内置 <span class="highlight">100+ 领域专家</span>，涵盖法律、医疗、编程、设计、运营等各行业。每位专家都有专属知识库，提供专业级解答。</p>
+
+    <h3>如何使用</h3>
+    <ul>
+      <li><span class="highlight">步骤1：</span>对我说"帮我找XX专家"</li>
+      <li><span class="highlight">步骤2：</span>进入专家中心浏览或搜索</li>
+      <li><span class="highlight">步骤3：</span>选择专家开始专业对话</li>
+    </ul>
+
+    <h3>常用专家类型</h3>
+    <ul>
+      <li>法律顾问专家</li>
+      <li>医疗健康专家</li>
+      <li>编程技术专家</li>
+      <li>数据分析专家</li>
+      <li>写作助手专家</li>
+    </ul>
+
+    <div class="tip-box">
+      提示：直接对我说"帮我找XX专家"，我会帮你连接对应专家。
     </div>
   </div>
 </div>
 
-<div class="content" id="content">
+<div class="func-card" data-tags="文件,file,文档,Word,Excel,PPT,PDF,处理">
+  <div class="func-header" onclick="toggleCard(this)">
+    文件处理功能
+    <span class="arrow">&#9654;</span>
+  </div>
+  <div class="func-body">
+    <h3>功能介绍</h3>
+    <p>支持 <span class="highlight">Word、Excel、PPT、PDF</span> 等文件的创建、读取、编辑和转换，一站式文件处理。</p>
 
-  <!-- 专家功能 -->
-  <div class="func-card" data-tags="专家,expert,专业,咨询">
-    <div class="func-header" onclick="toggleCard(this)">
-      专家功能
-      <span class="arrow">▶</span>
-    </div>
-    <div class="func-body">
-      <h3>功能介绍</h3>
-      <p>专家中心提供 <span class="highlight">100+ 专业领域专家</span>，每个专家有专属知识和对话风格。</p>
+    <h3>如何使用</h3>
+    <ul>
+      <li><span class="highlight">创建文档：</span>"帮我生成一份Word报告"</li>
+      <li><span class="highlight">处理表格：</span>"帮我分析这个Excel数据"</li>
+      <li><span class="highlight">制作PPT：</span>"帮我做一个演示文稿"</li>
+      <li><span class="highlight">PDF操作：</span>"帮我把这个PDF转成Word"</li>
+    </ul>
 
-      <h3>如何使用</h3>
-      <ul>
-        <li><span class="highlight">步骤1：</span>在 WorkBuddy 左侧边栏找到「专家」入口</li>
-        <li><span class="highlight">步骤2：</span>浏览或搜索你需要的专家领域</li>
-        <li><span class="highlight">步骤3：</span>点击专家头像，开始对话</li>
-        <li><span class="highlight">步骤4：</span>专家会根据专业知识回答你的问题</li>
-      </ul>
+    <h3>支持的文件类型</h3>
+    <ul>
+      <li>📝 Word文档（.docx）— 创建、编辑、格式化</li>
+      <li>📊 Excel表格（.xlsx）— 数据分析、公式、图表</li>
+      <li>📽️ PPT演示（.pptx）— 幻灯片制作</li>
+      <li>📄 PDF文件 — 阅读、合并、拆分、转换</li>
+    </ul>
 
-      <h3>常用专家类型</h3>
-      <ul>
-        <li>法律顾问专家</li>
-        <li>医疗健康专家</li>
-        <li>编程技术专家</li>
-        <li>数据分析专家</li>
-        <li>写作助手专家</li>
-      </ul>
-
-      <div class="tip-box">
-        提示：你可以直接对我说"帮我找XX专家"，我会帮你连接对应专家。
-      </div>
+    <div class="tip-box">
+      提示：点击上方「Word报告」按钮可直接生成提示语。
     </div>
   </div>
+</div>
 
-  <!-- 文件处理功能 -->
-  <div class="func-card" data-tags="文件,word,excel,ppt,pdf,文档,表格,演示文稿,file,doc,xls,pptx">
-    <div class="func-header" onclick="toggleCard(this)">
-      文件处理功能
-      <span class="arrow">▶</span>
-    </div>
-    <div class="func-body">
-      <h3>功能介绍</h3>
-      <p>支持 <span class="highlight">Word、Excel、PPT、PDF</span> 等常见文件格式的读取、生成、编辑和转换。</p>
+<div class="func-card" data-tags="自动化,automation,定时,推送,提醒,任务">
+  <div class="func-header" onclick="toggleCard(this)">
+    自动化功能
+    <span class="arrow">&#9654;</span>
+  </div>
+  <div class="func-body">
+    <h3>功能介绍</h3>
+    <p>设定 <span class="highlight">定时任务</span>，让 WorkBuddy 在指定时间自动执行工作，结果推送到微信小程序。</p>
 
-      <h3>如何使用</h3>
-      <ul>
-        <li><span class="highlight">生成Word：</span>对我说"帮我写一份项目总结，生成Word文档"</li>
-        <li><span class="highlight">处理Excel：</span>上传Excel文件，对我说"分析这份数据"</li>
-        <li><span class="highlight">制作PPT：</span>对我说"帮我做一份产品介绍PPT"</li>
-        <li><span class="highlight">处理PDF：</span>对我说"合并这两份PDF"或"提取PDF文字"</li>
-      </ul>
+    <h3>如何使用</h3>
+    <ul>
+      <li><span class="highlight">步骤1：</span>"帮我设置每天早上8点推送新闻摘要"</li>
+      <li><span class="highlight">步骤2：</span>我会创建自动化任务</li>
+      <li><span class="highlight">步骤3：</span>到时间自动执行并推送到微信</li>
+    </ul>
 
-      <h3>支持的操作</h3>
-      <ul>
-        <li>Word：创建、编辑、格式调整、批注</li>
-        <li>Excel：数据分析、公式计算、图表生成</li>
-        <li>PPT：创建幻灯片、添加动画、模板应用</li>
-        <li>PDF：合并、拆分、加密、OCR识别</li>
-      </ul>
+    <h3>常用自动化场景</h3>
+    <ul>
+      <li>每天早上推送新闻摘要（8:00）</li>
+      <li>每周一生成工作周报（9:00）</li>
+      <li>每日定时数据备份（22:00）</li>
+      <li>定时提醒重要待办事项</li>
+    </ul>
 
-      <div class="tip-box">
-        提示：处理后的文件会自动保存到工作区，你可以在微信小程序"文件"tab查看。
-      </div>
+    <div class="tip-box">
+      提示：点击上方「每日推送」按钮可直接生成定时任务提示语。
     </div>
   </div>
+</div>
 
-  <!-- 自动化功能 -->
-  <div class="func-card" data-tags="自动化,定时,推送,任务,计划,automation,定时任务">
-    <div class="func-header" onclick="toggleCard(this)">
-      自动化功能
-      <span class="arrow">▶</span>
-    </div>
-    <div class="func-body">
-      <h3>功能介绍</h3>
-      <p>可以设置 <span class="highlight">定时任务</span>，让 WorkBuddy 在指定时间自动执行任务并推送结果到微信。</p>
+<div class="func-card" data-tags="记忆,memory,记住,偏好">
+  <div class="func-header" onclick="toggleCard(this)">
+    记忆功能
+    <span class="arrow">&#9654;</span>
+  </div>
+  <div class="func-body">
+    <h3>功能介绍</h3>
+    <p>WorkBuddy 拥有 <span class="highlight">三层记忆系统</span>，能记住你的偏好、习惯和重要信息，越用越懂你。</p>
 
-      <h3>如何使用</h3>
-      <ul>
-        <li><span class="highlight">步骤1：</span>对我说"帮我设置每天早上8点推送新闻摘要"</li>
-        <li><span class="highlight">步骤2：</span>我会创建自动化任务</li>
-        <li><span class="highlight">步骤3：</span>到指定时间，自动执行并推送到微信</li>
-      </ul>
+    <h3>三层记忆</h3>
+    <ul>
+      <li><span class="highlight">云记忆：</span>自动学习的长期偏好，跨会话保持</li>
+      <li><span class="highlight">用户级记忆：</span>跨项目通用规则和习惯</li>
+      <li><span class="highlight">项目记忆：</span>当前项目的工作日志和笔记</li>
+    </ul>
 
-      <h3>常用自动化场景</h3>
-      <ul>
-        <li>每天早上推送新闻摘要（8:00）</li>
-        <li>每周一生成工作周报（9:00）</li>
-        <li>每日定时数据备份（22:00）</li>
-        <li>定时提醒重要待办事项</li>
-      </ul>
+    <h3>如何使用</h3>
+    <ul>
+      <li>"记住我偏好大字体显示"</li>
+      <li>"查看你记住了关于我的哪些信息"</li>
+      <li>"记住这个项目的技术选型"</li>
+    </ul>
 
-      <div class="tip-box">
-        提示：对我说"查看定时任务"可以管理所有自动化任务。
-      </div>
+    <div class="tip-box">
+      提示：点击上方「我的记忆」按钮查看已存储的信息。
     </div>
   </div>
+</div>
 
-  <!-- 记忆功能 -->
-  <div class="func-card" data-tags="记忆,记忆中心,偏好,记录,memory,记住">
-    <div class="func-header" onclick="toggleCard(this)">
-      记忆功能
-      <span class="arrow">▶</span>
-    </div>
-    <div class="func-body">
-      <h3>功能介绍</h3>
-      <p>WorkBuddy 会 <span class="highlight">记住你的偏好、习惯和背景信息</span>，下次对话不用重新介绍自己。</p>
+<div class="func-card" data-tags="技能,skill,插件,扩展">
+  <div class="func-header" onclick="toggleCard(this)">
+    技能功能
+    <span class="arrow">&#9654;</span>
+  </div>
+  <div class="func-body">
+    <h3>功能介绍</h3>
+    <p>WorkBuddy 支持安装 <span class="highlight">技能扩展</span>，增强特定领域能力，如文档处理、网页浏览等。</p>
 
-      <h3>如何使用</h3>
-      <ul>
-        <li><span class="highlight">查看记忆：</span>对我说"显示完整记忆"</li>
-        <li><span class="highlight">添加记忆：</span>直接告诉我新信息，我会自动记录</li>
-        <li><span class="highlight">删除记忆：</span>对我说"删除XX记忆"</li>
-      </ul>
+    <h3>如何使用</h3>
+    <ul>
+      <li><span class="highlight">查找：</span>"有没有处理PDF的技能"</li>
+      <li><span class="highlight">安装：</span>找到后自动安装并加载</li>
+      <li><span class="highlight">使用：</span>之后相关任务会自动调用</li>
+    </ul>
 
-      <h3>记忆内容包括</h3>
-      <ul>
-        <li>你的基本信息（名字、语言偏好）</li>
-        <li>工作背景和兴趣领域</li>
-        <li>操作习惯和偏好设置</li>
-        <li>重要事件记录</li>
-      </ul>
+    <h3>常用技能</h3>
+    <ul>
+      <li>文档处理（Word、Excel、PPT、PDF）</li>
+      <li>网页浏览（自动打开网页、截图、提取信息）</li>
+      <li>网页自动化（自动浏览、截图、提取）</li>
+      <li>多模态生成（文生图、文生视频）</li>
+    </ul>
 
-      <div class="tip-box">
-        提示：记忆是持久化的，即使重启对话也能记住。
-      </div>
+    <div class="tip-box">
+      提示：直接对我说"帮我找处理PDF的技能"，我会帮你安装。
     </div>
   </div>
+</div>
 
-  <!-- 技能功能 -->
-  <div class="func-card" data-tags="技能,skill,扩展,插件,能力">
-    <div class="func-header" onclick="toggleCard(this)">
-      技能功能
-      <span class="arrow">▶</span>
-    </div>
-    <div class="func-body">
-      <h3>功能介绍</h3>
-      <p>技能是 <span class="highlight">扩展 WorkBuddy 能力的插件</span>，安装后可以使用更多专业功能。</p>
+<div class="func-card" data-tags="连接器,connector,MCP,工具,集成">
+  <div class="func-header" onclick="toggleCard(this)">
+    连接器功能
+    <span class="arrow">&#9654;</span>
+  </div>
+  <div class="func-body">
+    <h3>功能介绍</h3>
+    <p>通过 <span class="highlight">MCP 连接器</span>，让 WorkBuddy 连接外部工具和服务，如浏览器、数据库、云存储等。</p>
 
-      <h3>如何使用</h3>
-      <ul>
-        <li><span class="highlight">步骤1：</span>在 WorkBuddy 左侧边栏找到「技能」入口</li>
-        <li><span class="highlight">步骤2：</span>浏览或搜索需要的技能</li>
-        <li><span class="highlight">步骤3：</span>点击安装，等待安装完成</li>
-        <li><span class="highlight">步骤4：</span>安装后自动生效，直接对我说指令即可</li>
-      </ul>
+    <h3>如何使用</h3>
+    <ul>
+      <li><span class="highlight">安装：</span>"帮我安装浏览器连接器"</li>
+      <li><span class="highlight">配置：</span>设置连接参数（如有需要）</li>
+      <li><span class="highlight">使用：</span>之后直接对 WorkBuddy 说"帮我打开XX网页"</li>
+    </ul>
 
-      <h3>常用技能</h3>
-      <ul>
-        <li>文档处理（Word、Excel、PPT、PDF）</li>
-        <li>网页浏览（自动打开网页、截图、提取信息）</li>
-        <li>网页自动化（自动浏览、截图、提取）</li>
-        <li>多模态生成（文生图、文生视频）</li>
-      </ul>
+    <h3>常用连接器</h3>
+    <ul>
+      <li>浏览器自动化连接器</li>
+      <li>腾讯文档连接器</li>
+      <li>飞书/钉钉连接器</li>
+      <li>自定义 API 连接器</li>
+    </ul>
 
-      <div class="tip-box">
-        提示：也可以直接对我说"帮我找处理PDF的技能"，我会帮你安装。
-      </div>
+    <div class="tip-box">
+      提示：连接器安装后需在设置中"信任"才能使用。
     </div>
   </div>
+</div>
 
-  <!-- 连接器功能 -->
-  <div class="func-card" data-tags="连接器,连接,微信,腾讯文档,飞书,钉钉,connector">
-    <div class="func-header" onclick="toggleCard(this)">
-      连接器功能
-      <span class="arrow">▶</span>
-    </div>
-    <div class="func-body">
-      <h3>功能介绍</h3>
-      <p>连接器可以 <span class="highlight">对接外部平台</span>，让 WorkBuddy 直接操作这些平台的数据。</p>
+<div class="func-card" data-tags="工作模式,模式,mode,plan,craft,ask">
+  <div class="func-header" onclick="toggleCard(this)">
+    工作模式
+    <span class="arrow">&#9654;</span>
+  </div>
+  <div class="func-body">
+    <h3>功能介绍</h3>
+    <p>三种工作模式，灵活切换：<span class="highlight">Craft（直接执行）、Plan（先规划再执行）、Ask（仅回答不修改）</span>。</p>
 
-      <h3>如何使用</h3>
-      <ul>
-        <li><span class="highlight">步骤1：</span>在 WorkBuddy 左侧边栏找到「连接器」入口</li>
-        <li><span class="highlight">步骤2：</span>选择要连接的平台</li>
-        <li><span class="highlight">步骤3：</span>按照提示完成授权</li>
-        <li><span class="highlight">步骤4：</span>连接后可以直接操作平台数据</li>
-      </ul>
+    <h3>三种模式</h3>
+    <ul>
+      <li><span class="highlight">Craft 模式：</span>你说我做 — 直接执行任务，读写文件、运行命令</li>
+      <li><span class="highlight">Plan 模式：</span>先想再做 — 分析需求、设计方案，等你确认后执行</li>
+      <li><span class="highlight">Ask 模式：</span>只说不做 — 纯问答模式，不修改任何文件</li>
+    </ul>
 
-      <h3>支持的平台</h3>
-      <ul>
-        <li>微信小程序（你已连接）</li>
-        <li>腾讯文档（在线文档读写）</li>
-        <li>乐享知识库（企业知识库）</li>
-        <li>飞书、钉钉、企业微信</li>
-      </ul>
+    <h3>如何切换</h3>
+    <p>在 WorkBuddy 对话框顶部可以切换模式，或直接对我说"切换到 Plan 模式"。</p>
+  </div>
+</div>
 
-      <div class="tip-box">
-        提示：连接腾讯文档后，可以直接对我说"把这份报告保存到腾讯文档"。
-      </div>
+<div class="func-card" data-tags="多模态,生成,图片,视频,3D,文生图,文生视频">
+  <div class="func-header" onclick="toggleCard(this)">
+    多模态生成功能
+    <span class="arrow">&#9654;</span>
+  </div>
+  <div class="func-body">
+    <h3>功能介绍</h3>
+    <p>WorkBuddy 支持 <span class="highlight">文生图、文生视频、文生3D模型</span>等多种 AI 内容生成能力。</p>
+
+    <h3>如何使用</h3>
+    <ul>
+      <li><span class="highlight">生成图片：</span>"帮我生成一张XX的图片"</li>
+      <li><span class="highlight">生成视频：</span>"帮我制作一段XX的视频"</li>
+      <li><span class="highlight">生成3D模型：</span>"帮我做一个XX的3D模型"</li>
+    </ul>
+
+    <h3>支持的类型</h3>
+    <ul>
+      <li>🎨 文生图 — 文字描述生成图片</li>
+      <li>🎬 文生视频 — 文字描述生成视频</li>
+      <li>🧊 文生3D — 文字描述生成3D模型</li>
+      <li>🖼️ 图生3D — 上传图片生成3D模型</li>
+    </ul>
+
+    <div class="tip-box">
+      提示：使用"多模态内容生成"技能可以解锁完整的媒体创作能力。
     </div>
   </div>
+</div>
 
-  <!-- 工作模式 -->
-  <div class="func-card" data-tags="工作模式,模式,craft,plan,ask,执行,规划,问答">
-    <div class="func-header" onclick="toggleCard(this)">
-      工作模式
-      <span class="arrow">▶</span>
-    </div>
-    <div class="func-body">
-      <h3>功能介绍</h3>
-      <p>WorkBuddy 有 <span class="highlight">三种工作模式</span>，可以根据任务类型切换。</p>
-
-      <h3>三种模式</h3>
-      <ul>
-        <li><span class="highlight">Craft（执行模式）：</span>直接帮你做，不问那么多。适合明确任务。</li>
-        <li><span class="highlight">Plan（规划模式）：</span>先给看计划，确认后再执行。适合复杂任务。</li>
-        <li><span class="highlight">Ask（问答模式）：</span>只聊天，不动文件。适合咨询类问题。</li>
-      </ul>
-
-      <h3>如何切换</h3>
-      <ul>
-        <li>直接对我说"切换到规划模式"</li>
-        <li>或直接对我说"切换到执行模式"</li>
-        <li>或直接对我说"只回答，不要操作"</li>
-      </ul>
-
-      <div class="tip-box">
-        提示：默认是 Craft（执行模式），大部分情况不需要切换。
-      </div>
-    </div>
-  </div>
-
-  <!-- 多模态生成 -->
-  <div class="func-card" data-tags="多模态,生成,图片,视频,3D,文生图,文生视频">
-    <div class="func-header" onclick="toggleCard(this)">
-      多模态生成功能
-      <span class="arrow">▶</span>
-    </div>
-    <div class="func-body">
-      <h3>功能介绍</h3>
-      <p>支持 <span class="highlight">文字生成图片、视频、3D模型</span>，以及图片视频特效。</p>
-
-      <h3>如何使用</h3>
-      <ul>
-        <li><span class="highlight">生成图片：</span>对我说"帮我画一只猫"</li>
-        <li><span class="highlight">生成视频：</span>对我说"生成一段海滩日落的视频"</li>
-        <li><span class="highlight">生成3D模型：</span>对我说"生成一个咖啡杯的3D模型"</li>
-        <li><span class="highlight">图片特效：</span>上传图片，对我说"给这张图加动画效果"</li>
-      </ul>
-
-      <div class="tip-box">
-        提示：生成的内容会保存到工作区，你可以在微信小程序查看。
-      </div>
-    </div>
-  </div>
-
-  <div class="empty-state" id="emptyState">
-    没有找到匹配的功能<br>
-    <span style="font-size: 16px; color: #888;">试试其他关键词</span>
-  </div>
+<div class="no-result" id="noResult">
+  😕 没有找到匹配的功能，换个关键词试试
 </div>
 
 <div class="footer">
-  WorkBuddy 功能助手 · 输入关键词搜索
+  WorkBuddy 功能助手 · 学习作业
 </div>
-
-<!-- 弹窗 -->
-<div class="modal-overlay" id="modalOverlay" onclick="closeModalOnOverlay(event)">
-  <div class="modal-card" id="modalCard">
-    <h2 id="modalTitle"></h2>
-    <div class="modal-desc" id="modalDesc"></div>
-    <label id="modalLabel">请输入：</label>
-    <input type="text" id="modalInput" placeholder="" onkeydown="if(event.key==='Enter')generateTip()">
-    <input type="hidden" id="modalTipName" value="">
-    <input type="hidden" id="modalOptional" value="">
-    <div class="modal-buttons">
-      <button class="btn-generate" onclick="generateTip()">生成提示语</button>
-      <button class="btn-cancel" onclick="closeModal()">取消</button>
-    </div>
-    <div class="preview-box" id="previewBox">
-      <div class="preview-title">已生成提示语：</div>
-      <div class="preview-text" id="previewText"></div>
-      <button class="btn-copy-preview" onclick="copyPreview()">复制并关闭</button>
-    </div>
-  </div>
-</div>
-
-<!-- Toast -->
-<div class="toast" id="toast">已复制到剪贴板</div>
 
 <script>
-  // 快捷指令模板（{{INPUT}} 为占位符）
-  const tipMap = {
-    "Word报告": "请帮我生成一份Word报告：\n主题：（请在此补充）\n内容要求：（请在此补充）\n请生成后保存到工作区。",
-    "数据分析": "请帮我做数据分析和可视化：\n（请上传数据文件或描述数据内容）\n请分析并生成图表。",
-    "每日推送": "请帮我设置每天早上8点自动推送：新闻摘要和待办事项提醒。请创建自动化任务。",
-    "我的记忆": "请显示完整记忆，包括你目前记住的关于我的所有信息。"
-  };
+// 提示语模板
+var tips = {
+  'Word报告': '请帮我生成一份Word报告：\n主题：（请在此补充）\n内容要求：（请在此补充）\n请生成后保存到工作区。',
+  '数据分析': '请帮我做数据分析和可视化：\n（请上传数据文件或描述数据内容）\n请分析并生成图表。',
+  '每日推送': '请帮我设置每天早上8点自动推送：新闻摘要和待办事项提醒。请创建自动化任务。',
+  '我的记忆': '请显示完整记忆，包括你目前记住的关于我的所有信息。'
+};
 
-  // ---- 弹窗系统 ----
+function copyTip(name) {
+  var text = tips[name];
+  if (!text) return;
+  copyToClipboard(text);
+  showToast('✅ 已复制「' + name + '」提示语');
+}
 
-  let currentPreviewText = "";
+function copyToClipboard(text) {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text);
+  } else {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+  }
+}
 
-  function openModal(btn) {
-    const tipName = btn.getAttribute("data-tip");
-    const placeholder = btn.getAttribute("data-input") || "";
-    const modal = document.getElementById("modalOverlay");
-    const titleEl = document.getElementById("modalTitle");
-    const descEl = document.getElementById("modalDesc");
-    const inputEl = document.getElementById("modalInput");
-    const labelEl = document.getElementById("modalLabel");
-    const previewBox = document.getElementById("previewBox");
-    const tipNameInput = document.getElementById("modalTipName");
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2000);
+}
 
-    // 判断是否可留空（资金流向、Word报告等）
-    const isOptional = (tipName === "资金流向" || tipName === "Word报告");
+function toggleCard(header) {
+  var body = header.nextElementSibling;
+  var arrow = header.querySelector('.arrow');
+  body.classList.toggle('open');
+  arrow.classList.toggle('open');
+}
 
-    titleEl.textContent = tipName;
-    descEl.textContent = "填写后自动生成完整提示语";
-    if (isOptional) {
-      labelEl.innerHTML = '请输入：<span class="optional-tag">可留空</span>';
+function filterCards() {
+  var q = document.getElementById('searchInput').value.toLowerCase().trim();
+  var cards = document.querySelectorAll('.func-card');
+  var found = 0;
+  cards.forEach(function(c) {
+    var tags = (c.getAttribute('data-tags') || '').toLowerCase();
+    var title = (c.querySelector('.func-header').textContent || '').toLowerCase();
+    if (!q || tags.indexOf(q) > -1 || title.indexOf(q) > -1) {
+      c.style.display = '';
+      found++;
     } else {
-      labelEl.textContent = "请输入：";
+      c.style.display = 'none';
     }
-    inputEl.placeholder = placeholder;
-    inputEl.value = "";
-    previewBox.classList.remove("show");
-    tipNameInput.value = tipName;
-    document.getElementById("modalOptional").value = isOptional ? "1" : "";
-    currentPreviewText = "";
-
-    modal.classList.add("show");
-    setTimeout(() => { inputEl.focus(); }, 200);
-  }
-
-  function closeModal() {
-    document.getElementById("modalOverlay").classList.remove("show");
-  }
-
-  function closeModalOnOverlay(e) {
-    if (e.target === document.getElementById("modalOverlay")) {
-      closeModal();
-    }
-  }
-
-  function generateTip() {
-    const tipName = document.getElementById("modalTipName").value;
-    const rawInput = document.getElementById("modalInput").value.trim();
-    const isOptional = document.getElementById("modalOptional").value === "1";
-
-    // 非可选的必须填
-    if (!rawInput && !isOptional) {
-      showToast("请填写股票代码或名称");
-      document.getElementById("modalInput").focus();
-      return;
-    }
-
-    let inputValue = rawInput || "全市场";
-
-    // "资金流向" 特殊处理
-    if (tipName === "资金流向" && !rawInput) {
-      inputValue = "请查询全市场资金流向";
-    }
-
-    let template = tipMap[tipName];
-    if (!template) return;
-
-    let fullText = template.replace("{{INPUT}}", inputValue);
-
-    // 显示预览
-    const previewBox = document.getElementById("previewBox");
-    const previewText = document.getElementById("previewText");
-    previewText.textContent = fullText;
-    previewBox.classList.add("show");
-    currentPreviewText = fullText;
-
-    // 滚动到预览区
-    previewBox.scrollIntoView({ behavior: "smooth", block: "center" });
-  }
-
-  function copyPreview() {
-    if (!currentPreviewText) return;
-    copyToClipboard(currentPreviewText);
-    showToast("已复制！请粘贴到 WorkBuddy 发送");
-    setTimeout(() => { closeModal(); }, 800);
-  }
-
-  // ---- 直接复制（不需要输入的按钮） ----
-
-  function copyDirect(btn) {
-    const tipName = btn.getAttribute("data-tip");
-    const text = tipMap[tipName];
-    if (!text) return;
-    copyToClipboard(text);
-    showToast("已复制！请粘贴到 WorkBuddy 发送");
-  }
-
-  // ---- 剪贴板 ----
-
-  function copyToClipboard(text) {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).catch(() => {});
-    } else {
-      const ta = document.createElement("textarea");
-      ta.value = text;
-      ta.style.position = "fixed";
-      ta.style.left = "-9999px";
-      document.body.appendChild(ta);
-      ta.select();
-      try { document.execCommand("copy"); } catch(e) {}
-      document.body.removeChild(ta);
-    }
-  }
-
-  function showToast(msg) {
-    const toast = document.getElementById("toast");
-    toast.textContent = msg;
-    toast.classList.add("show");
-    setTimeout(() => { toast.classList.remove("show"); }, 2000);
-  }
-
-  // ---- 功能搜索 ----
-
-  function filterFunctions() {
-    const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
-    const cards = document.querySelectorAll(".func-card");
-    const emptyState = document.getElementById("emptyState");
-
-    if (!keyword) {
-      cards.forEach(c => {
-        c.classList.add("show");
-        c.querySelector(".func-body").classList.remove("open");
-        c.querySelector(".arrow").classList.remove("open");
-      });
-      emptyState.classList.remove("show");
-      return;
-    }
-
-    let hasMatch = false;
-    cards.forEach(c => {
-      const tags = c.getAttribute("data-tags").toLowerCase();
-      const title = c.querySelector(".func-header").textContent.toLowerCase();
-      const body = c.querySelector(".func-body").textContent.toLowerCase();
-
-      if (tags.includes(keyword) || title.includes(keyword) || body.includes(keyword)) {
-        c.classList.add("show");
-        hasMatch = true;
-      } else {
-        c.classList.remove("show");
-      }
-    });
-
-    emptyState.classList.toggle("show", !hasMatch);
-  }
-
-  function toggleCard(header) {
-    const body = header.nextElementSibling;
-    const arrow = header.querySelector(".arrow");
-    body.classList.toggle("open");
-    arrow.classList.toggle("open");
-  }
-
-  window.onload = function() {
-    const cards = document.querySelectorAll(".func-card");
-    cards.forEach(c => c.classList.add("show"));
-  };
+  });
+  document.getElementById('noResult').style.display = found === 0 ? 'block' : 'none';
+}
 </script>
 
 <script>
-// PWA install prompt
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  // Show install button
-  const btn = document.getElementById('installBtn');
-  if (btn) btn.style.display = 'block';
-});
-
-function installApp() {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
-  }
+// 注册自毁 SW：清除旧缓存后自杀
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.getRegistrations().then(function(regs) {
+      if (regs.length === 0) {
+        navigator.serviceWorker.register('./sw.js');
+      }
+    });
+  });
 }
 </script>
 
