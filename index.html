@@ -2,19 +2,22 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="WB助手">
 <meta name="theme-color" content="#e94560">
-<meta name="wb-version" content="2026-06-01-v2">
+<meta name="wb-version" content="2026-06-01-v3">
 <link rel="manifest" href="./manifest.json">
 <link rel="apple-touch-icon" href="./icon-192.png">
 <title>WorkBuddy 功能助手</title>
 <script>
 // 强制清除旧缓存 - 解决 PWA 缓存顽固问题
 (function() {
-  var NEW_VERSION = '2026-06-01-v2';
+  var NEW_VERSION = '2026-06-01-v3';
   var oldVer = localStorage.getItem('wb_version');
   if (oldVer !== NEW_VERSION) {
     // 清除所有缓存

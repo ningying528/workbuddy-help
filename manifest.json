@@ -2,7 +2,7 @@
   "name": "WorkBuddy 工具助手",
   "short_name": "WB助手",
   "description": "WorkBuddy 功能速查与使用指南",
-  "start_url": "./index.html",
+  "start_url": "./index.html?v=3",
   "display": "standalone",
   "background_color": "#0f0f1a",
   "theme_color": "#e94560",
