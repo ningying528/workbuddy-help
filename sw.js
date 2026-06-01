@@ -1,5 +1,5 @@
 // Service Worker for WorkBuddy PWA
-const CACHE_NAME = 'wb-helper-v1';
+const CACHE_NAME = 'wb-helper-v2';
 const urlsToCache = [
   './',
   './index.html',
