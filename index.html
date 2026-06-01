@@ -7,9 +7,34 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="WB助手">
 <meta name="theme-color" content="#e94560">
+<meta name="wb-version" content="2026-06-01-v2">
 <link rel="manifest" href="./manifest.json">
 <link rel="apple-touch-icon" href="./icon-192.png">
 <title>WorkBuddy 功能助手</title>
+<script>
+// 强制清除旧缓存 - 解决 PWA 缓存顽固问题
+(function() {
+  var NEW_VERSION = '2026-06-01-v2';
+  var oldVer = localStorage.getItem('wb_version');
+  if (oldVer !== NEW_VERSION) {
+    // 清除所有缓存
+    if ('caches' in window) {
+      caches.keys().then(function(names) {
+        names.forEach(function(name) { caches.delete(name); });
+      });
+    }
+    // 注销旧 Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(regs) {
+        regs.forEach(function(reg) { reg.unregister(); });
+      });
+    }
+    localStorage.setItem('wb_version', NEW_VERSION);
+    // 强制重新加载
+    if (oldVer) { location.reload(true); }
+  }
+})();
+</script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
