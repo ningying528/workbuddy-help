@@ -10,14 +10,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="WB助手">
 <meta name="theme-color" content="#e94560">
-<meta name="wb-version" content="2026-06-01-v3">
+<meta name="wb-version" content="2026-06-01-v4-NO-SW">
 <link rel="manifest" href="./manifest.json">
 <link rel="apple-touch-icon" href="./icon-192.png">
 <title>WorkBuddy 功能助手</title>
 <script>
 // 强制清除旧缓存 - 解决 PWA 缓存顽固问题
 (function() {
-  var NEW_VERSION = '2026-06-01-v3';
+  var NEW_VERSION = '2026-06-01-v4';
   var oldVer = localStorage.getItem('wb_version');
   if (oldVer !== NEW_VERSION) {
     // 清除所有缓存
@@ -521,15 +521,15 @@
 
       <h3>常用专家类型</h3>
       <ul>
-        <li>金融分析专家</li>
         <li>法律顾问专家</li>
         <li>医疗健康专家</li>
         <li>编程技术专家</li>
-        <li>投资理财专家</li>
+        <li>数据分析专家</li>
+        <li>写作助手专家</li>
       </ul>
 
       <div class="tip-box">
-        提示：你可以直接对我说"帮我找投资专家"，我会帮你连接对应专家。
+        提示：你可以直接对我说"帮我找XX专家"，我会帮你连接对应专家。
       </div>
     </div>
   </div>
@@ -650,7 +650,7 @@
       <ul>
         <li>文档处理（Word、Excel、PPT、PDF）</li>
         <li>网页浏览（自动打开网页、截图、提取信息）</li>
-        <li>金融数据（股票、基金、财报）</li>
+        <li>网页自动化（自动浏览、截图、提取）</li>
         <li>多模态生成（文生图、文生视频）</li>
       </ul>
 
@@ -959,15 +959,6 @@
 </script>
 
 <script>
-// Register Service Worker for PWA
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
-      .then(reg => console.log('SW registered:', reg.scope))
-      .catch(err => console.log('SW registration failed:', err));
-  });
-}
-
 // PWA install prompt
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
