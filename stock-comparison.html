@@ -3,14 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>投资价值深度比较 - 析投资助手</title>
+<title>投资价值深度比较 · 通用版 - 析投资助手</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0a0a1a;color:#e0e0e0;font-family:"Microsoft YaHei","PingFang SC",sans-serif;padding:10px;line-height:1.7;min-height:100vh}
 h1{font-size:26px;text-align:center;color:#ffd700;margin:8px 0}
 .subtitle{text-align:center;color:#888;font-size:15px;margin-bottom:12px}
 
-/* 输入区 */
 .input-section{background:#111133;border:1px solid #222266;border-radius:14px;padding:14px;margin:10px 0}
 .input-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center}
 .input-row input{flex:1;min-width:100px;max-width:160px;padding:12px 14px;font-size:20px;border:2px solid #333;border-radius:10px;background:#0a0a1a;color:#ffd700;text-transform:uppercase;text-align:center;font-weight:bold}
@@ -20,27 +19,24 @@ h1{font-size:26px;text-align:center;color:#ffd700;margin:8px 0}
 .search-btn:hover{background:#ff5577}
 .search-btn:disabled{background:#555;cursor:not-allowed}
 
-/* 快捷对比 */
 .presets{margin:10px 0;display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 .preset-btn{padding:8px 16px;font-size:16px;background:#1a1a3a;border:1px solid #333;color:#00d4ff;border-radius:20px;cursor:pointer}
 .preset-btn:hover{background:#222255;border-color:#00d4ff}
+.preset-btn.cn{border-color:#e94560;color:#ff8888}
+.preset-group{font-size:14px;color:#888;width:100%;text-align:center;margin:4px 0 -2px}
 
-/* 加载状态 */
 .loading{display:none;text-align:center;padding:20px;font-size:20px;color:#ffd700}
 .loading.show{display:block}
 .spinner{display:inline-block;width:24px;height:24px;border:3px solid #333;border-top:3px solid #e94560;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:10px;vertical-align:middle}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* 错误 */
 .error{display:none;background:#300;border:1px solid #600;border-radius:10px;padding:12px;margin:10px 0;color:#ff6666;font-size:17px;text-align:center}
 .error.show{display:block}
 
-/* 卡片 */
 .card{background:#111133;border:1px solid #222266;border-radius:12px;padding:14px;margin:10px 0}
 .card.highlight{border-color:#ffd700;background:#1a1a0a}
 .card.verdict{border-color:#e94560;background:#1a0a0a}
 
-/* 对比网格 */
 .compare-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center}
 .compare-grid .label{color:#aaa;font-size:17px;text-align:center;padding:4px 0}
 .compare-grid .val-a,.compare-grid .val-b{font-size:20px;text-align:center;font-weight:bold}
@@ -52,14 +48,12 @@ h1{font-size:26px;text-align:center;color:#ffd700;margin:8px 0}
 .compare-grid .metric{font-size:16px;color:#ccc;text-align:center;font-weight:bold;padding:6px 0}
 .compare-grid .sep{grid-column:1/-1;height:1px;background:#222;margin:2px 0}
 
-/* 评分卡 */
 .score-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #1a1a3a}
 .score-label{font-size:17px;color:#ccc}
 .score-vals{display:flex;gap:20px;align-items:center}
 .score-item{font-size:20px;font-weight:bold;min-width:50px;text-align:center}
 .score-tag{font-size:14px;padding:2px 8px;border-radius:10px;min-width:40px;text-align:center}
 
-/* 结论区 */
 .verdict-text{font-size:19px;line-height:1.8;padding:8px 0}
 .big-price{font-size:36px;font-weight:bold}
 .stock-name{font-size:22px}
@@ -72,21 +66,22 @@ h1{font-size:26px;text-align:center;color:#ffd700;margin:8px 0}
 .red{color:#ff4444}
 .gray{color:#888}
 
-/* 标签 */
 .tag{display:inline-block;padding:3px 10px;border-radius:14px;font-size:15px;margin:3px}
 .tag.buy{background:#1a3a1a;color:#4cff4c;border:1px solid #4cff4c}
 .tag.hold{background:#1a1a0a;color:#ffd700;border:1px solid #ffd700}
 .tag.sell{background:#1a0a0a;color:#ff4444;border:1px solid #ff4444}
+.tag.mkt{font-size:13px;padding:2px 8px;border-radius:10px;margin-left:6px}
+.tag.mkt.us{background:#002244;color:#00aaff;border:1px solid #00aaff}
+.tag.mkt.cn{background:#441100;color:#ff6644;border:1px solid #ff6644}
 
 h2{font-size:22px;color:#e94560;margin:16px 0 8px;border-bottom:2px solid #e94560;padding-bottom:4px}
 h3{font-size:19px;color:#00d4ff;margin:12px 0 6px}
 
-ul{padding-left:20px;font-size:18px}
-li{margin:6px 0}
+.note-cn{font-size:14px;color:#ffaa44;text-align:center;padding:6px;background:#1a0a00;border-radius:8px;margin:6px 0}
+.note-missing{font-size:14px;color:#666;text-align:center}
 
 hr{border-color:#222;margin:16px 0}
 
-/* 响应式 */
 @media(min-width:768px){
   body{max-width:800px;margin:0 auto;padding:16px}
   .compare-grid .val-a,.compare-grid .val-b{font-size:22px}
@@ -96,48 +91,143 @@ hr{border-color:#222;margin:16px 0}
 <body>
 
 <h1>📊 投资价值深度比较</h1>
-<p class="subtitle">输入两只美股代码，自动生成全方位对比报告</p>
+<p class="subtitle">支持 A 股 + 美股，输入代码自动识别市场</p>
 
-<!-- 输入区 -->
 <div class="input-section">
   <div class="input-row">
-    <input type="text" id="tickerA" placeholder="如 ARM" maxlength="10">
+    <input type="text" id="tickerA" placeholder="如: 600036" maxlength="10">
     <span class="vs-text">VS</span>
-    <input type="text" id="tickerB" placeholder="如 MRVL" maxlength="10">
+    <input type="text" id="tickerB" placeholder="如: 300750" maxlength="10">
     <button class="search-btn" onclick="compare()" id="searchBtn">🔍 开始比较</button>
   </div>
 </div>
 
-<!-- 快捷对比 -->
+<!-- 美股快捷对比 -->
 <div class="presets">
+  <span class="preset-group">🇺🇸 美股</span>
   <button class="preset-btn" onclick="quickCompare('ARM','MRVL')">ARM vs MRVL</button>
   <button class="preset-btn" onclick="quickCompare('NVDA','AMD')">英伟达 vs AMD</button>
   <button class="preset-btn" onclick="quickCompare('AVGO','MRVL')">博通 vs MRVL</button>
-  <button class="preset-btn" onclick="quickCompare('TSLA','RIVN')">特斯拉 vs Rivian</button>
   <button class="preset-btn" onclick="quickCompare('MSFT','GOOGL')">微软 vs 谷歌</button>
   <button class="preset-btn" onclick="quickCompare('AAPL','MSFT')">苹果 vs 微软</button>
-  <button class="preset-btn" onclick="quickCompare('META','SNAP')">Meta vs Snap</button>
-  <button class="preset-btn" onclick="quickCompare('AMZN','SHOP')">亚马逊 vs Shopify</button>
 </div>
 
-<!-- 加载中 -->
+<!-- A股快捷对比 -->
+<div class="presets">
+  <span class="preset-group">🇨🇳 A 股</span>
+  <button class="preset-btn cn" onclick="quickCompare('600036','601398')">招商 vs 工商</button>
+  <button class="preset-btn cn" onclick="quickCompare('300750','002594')">宁德 vs 比亚迪</button>
+  <button class="preset-btn cn" onclick="quickCompare('688981','688256')">中芯 vs 寒武纪</button>
+  <button class="preset-btn cn" onclick="quickCompare('600519','000858')">茅台 vs 五粮液</button>
+  <button class="preset-btn cn" onclick="quickCompare('688041','688047')">海光 vs 龙芯</button>
+</div>
+
 <div class="loading" id="loading">
   <span class="spinner"></span>正在拉取数据，请稍候...
 </div>
 
-<!-- 错误 -->
 <div class="error" id="error"></div>
 
-<!-- 结果区 -->
 <div id="result"></div>
 
 <script>
-// ===== Yahoo Finance API 数据拉取 =====
+// ===== 市场识别 =====
+// A 股: 6位数字（600xxx上海 / 000xxx深圳 / 300xxx创业板 / 688xxx科创板）
+// 美股: 纯字母
+function detectMarket(code) {
+  const c = code.trim().toUpperCase();
+  if (/^\d{6}$/.test(c)) return 'CN';
+  return 'US';
+}
 
+function toTencentCode(code) {
+  const c = code.trim();
+  if (c.startsWith('6')) return 'sh' + c;
+  return 'sz' + c;
+}
+
+function toEastMoneySecid(code) {
+  const c = code.trim();
+  if (c.startsWith('6') || c.startsWith('68')) return '1.' + c;
+  return '0.' + c;
+}
+
+// ===== 腾讯 API - A股实时行情 =====
+async function fetchTencentData(code) {
+  const tc = toTencentCode(code);
+  const symbol = code.trim();
+
+  try {
+    const resp = await fetch(`https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=${tc},day,,,1,qfq`, {
+      headers: { 'User-Agent': 'Mozilla/5.0' }
+    });
+    
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+
+    // 腾讯 API 返回 GBK 编码的 JSON
+    const buffer = await resp.arrayBuffer();
+    let text;
+    try { text = new TextDecoder('gbk').decode(buffer); }
+    catch(e) { text = new TextDecoder('utf-8').decode(buffer); }
+
+    const json = JSON.parse(text);
+    const qt = json?.data?.[tc]?.qt?.[tc];
+
+    if (!qt || qt.length < 50) throw new Error('数据不完整');
+
+    const name = qt[1] || symbol;
+    const price = parseFloat(qt[3]);
+    const prevClose = parseFloat(qt[4]);
+    const open = parseFloat(qt[5]);
+    const high = parseFloat(qt[33]);
+    const low = parseFloat(qt[34]);
+    const change = price - prevClose;
+    const changePct = prevClose ? (change / prevClose) * 100 : 0;
+    const pe = parseFloat(qt[39]) || null;
+    const high52 = parseFloat(qt[41]) || null;
+    const low52 = parseFloat(qt[42]) || null;
+    const volume = parseFloat(qt[6]) || null;
+    const turnover = parseFloat(qt[37]) || null;
+    // 市值(亿)
+    const marketCapRaw = parseFloat(qt[45]);
+    const marketCap = marketCapRaw ? marketCapRaw * 1e8 : null;
+
+    if (!price || isNaN(price)) throw new Error('无行情数据');
+
+    return {
+      symbol, name, price, prevClose, change, changePct,
+      high, low, open,
+      pe, pb: null, eps: null,
+      marketCap,
+      high52w: high52, low52w: low52,
+      volume, turnover,
+      currency: 'CNY', market: 'CN',
+      // 腾讯 API 不返回的字段
+      revenueGrowth: null, earningsGrowth: null,
+      grossMargin: null, profitMargin: null,
+      roe: null, roa: null,
+      totalCash: null, totalDebt: null,
+      freeCashflow: null, operatingCashflow: null,
+      totalRevenue: null, revenuePerShare: null,
+      beta: null, dividendYield: null,
+      forwardPE: null, ps: null,
+      shortRatio: null, shortPercent: null,
+      sector: null, industry: null,
+      // 分析师数据
+      analystStrongBuy: 0, analystBuy: 0, analystHold: 0,
+      analystSell: 0, analystStrongSell: 0, analystTotal: 0,
+      targetMean: null, targetHigh: null, targetLow: null,
+      error: null
+    };
+  } catch(e) {
+    return { symbol, error: `A股数据获取失败: ${e.message}` };
+  }
+}
+
+// ===== Yahoo Finance API - 美股 =====
 async function fetchYahooData(symbol) {
   const s = symbol.toUpperCase().trim();
-  
-  // 并行拉取两个端点
+
   const [chartRes, summaryRes] = await Promise.allSettled([
     fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${s}?interval=1d&range=3mo`, {
       headers: { 'User-Agent': 'Mozilla/5.0' }
@@ -147,9 +237,8 @@ async function fetchYahooData(symbol) {
     })
   ]);
 
-  const data = { symbol: s, error: null };
+  const data = { symbol: s, market: 'US', error: null };
 
-  // 解析 chart 数据 (价格、涨跌)
   if (chartRes.status === 'fulfilled' && chartRes.value.ok) {
     try {
       const json = await chartRes.value.json();
@@ -163,8 +252,6 @@ async function fetchYahooData(symbol) {
         data.high = meta.regularMarketDayHigh;
         data.low = meta.regularMarketDayLow;
         data.currency = meta.currency || 'USD';
-        
-        // 从 chart 数据计算 20日最高最低
         const quotes = result.indicators?.quote?.[0];
         if (quotes?.high && quotes?.low) {
           const highs = quotes.high.filter(h => h !== null);
@@ -176,7 +263,6 @@ async function fetchYahooData(symbol) {
     } catch(e) { data.error = 'chart parse error'; }
   }
 
-  // 解析 summary 数据 (财务指标)
   if (summaryRes.status === 'fulfilled' && summaryRes.value.ok) {
     try {
       const json = await summaryRes.value.json();
@@ -187,7 +273,7 @@ async function fetchYahooData(symbol) {
         const ks = r.defaultKeyStatistics || {};
         const fd = r.financialData || {};
         const ap = r.assetProfile || {};
-        
+
         data.name = p.shortName || p.longName || s;
         data.marketCap = p.marketCap?.raw || ks.marketCap?.raw;
         data.pe = sd.trailingPE?.raw || ks.trailingPE?.raw || p.trailingPE?.raw;
@@ -216,7 +302,6 @@ async function fetchYahooData(symbol) {
         data.shortPercent = ks.shortPercentOfFloat?.raw;
         data.heldPercentInstitutions = ks.heldPercentInstitutions?.raw;
 
-        // 券商评级
         const rt = r.recommendationTrend || {};
         if (rt.trend && rt.trend.length > 0) {
           const latest = rt.trend[0];
@@ -235,7 +320,7 @@ async function fetchYahooData(symbol) {
   }
 
   if (!data.price && !data.name) {
-    data.error = '无法获取数据，请检查代码是否正确（美股代码如 ARM, NVDA, AAPL）';
+    data.error = '无法获取数据，请检查美股代码（如 ARM, NVDA, AAPL）';
   }
 
   return data;
@@ -267,16 +352,10 @@ function colorNum(num) {
   return num >= 0 ? 'up' : 'down';
 }
 
-function colorSign(num) {
-  if (num == null || isNaN(num)) return '';
-  return num >= 0 ? '+' : '';
-}
-
 // ===== 评分引擎 =====
 function score(dataA, dataB) {
-  const scores = { A: {}, B: {}, totalA: 0, totalB: 0 };
+  const scores = { A: {}, B: {}, totalA: 0, totalB: 0, missingA: false, missingB: false };
 
-  // 1. 估值合理性 (PE越低越好, 满分10)
   function scorePE(peA, peB) {
     if (!peA || !peB) return { A: 5, B: 5 };
     const a = Math.max(0, 10 - peA / 30);
@@ -284,7 +363,6 @@ function score(dataA, dataB) {
     return { A: Math.min(10, Math.round(a * 10) / 10), B: Math.min(10, Math.round(b * 10) / 10) };
   }
 
-  // 2. 成长性 (增速越高越好)
   function scoreGrowth(gA, gB) {
     if (gA == null && gB == null) return { A: 5, B: 5 };
     const a = gA != null ? Math.min(10, Math.max(0, 5 + gA * 40)) : 5;
@@ -292,24 +370,22 @@ function score(dataA, dataB) {
     return { A: Math.round(a * 10) / 10, B: Math.round(b * 10) / 10 };
   }
 
-  // 3. 盈利能力 (毛利率+净利率)
   function scoreProfit(gmA, gmB, pmA, pmB) {
+    if (gmA == null && gmB == null && pmA == null && pmB == null) return { A: 5, B: 5 };
     const sa = (gmA || 0.4) * 6 + (pmA || 0.1) * 4;
     const sb = (gmB || 0.4) * 6 + (pmB || 0.1) * 4;
     return { A: Math.round(Math.min(10, sa * 10) * 10) / 10, B: Math.round(Math.min(10, sb * 10) * 10) / 10 };
   }
 
-  // 4. 财务稳健度 (现金vs负债)
   function scoreFinance(cashA, debtA, cashB, debtB) {
-    function fscore(cash, debt) {
+    function f(cash, debt) {
       if (!cash || !debt) return 5;
       const ratio = cash / debt;
       return Math.min(10, Math.round(ratio * 3 * 10) / 10);
     }
-    return { A: fscore(dataA.totalCash, dataA.totalDebt), B: fscore(dataB.totalCash, dataB.totalDebt) };
+    return { A: f(dataA.totalCash, dataA.totalDebt), B: f(dataB.totalCash, dataB.totalDebt) };
   }
 
-  // 5. 市值规模
   function scoreCap(mcapA, mcapB) {
     function f(mcap) {
       if (!mcap) return 5;
@@ -321,7 +397,6 @@ function score(dataA, dataB) {
     return { A: f(dataA.marketCap), B: f(dataB.marketCap) };
   }
 
-  // 6. 现金流
   function scoreFCF(fcfA, fcfB) {
     function f(fcf) {
       if (!fcf) return 5;
@@ -333,7 +408,6 @@ function score(dataA, dataB) {
     return { A: f(dataA.freeCashflow), B: f(dataB.freeCashflow) };
   }
 
-  // 7. ROE
   function scoreROE(roeA, roeB) {
     function f(roe) {
       if (!roe) return 5;
@@ -342,7 +416,6 @@ function score(dataA, dataB) {
     return { A: f(dataA.roe), B: f(dataB.roe) };
   }
 
-  // 8. 做空比例 (做空越低越好)
   function scoreShort(sA, sB) {
     function f(s) {
       if (s == null) return 5;
@@ -351,7 +424,6 @@ function score(dataA, dataB) {
     return { A: f(dataA.shortPercent), B: f(dataB.shortPercent) };
   }
 
-  // 9. 分析师共识 (买入比例越高越好)
   function scoreAnalyst(aData, bData) {
     function f(d) {
       const total = d.analystTotal || 0;
@@ -361,6 +433,10 @@ function score(dataA, dataB) {
     }
     return { A: f(dataA), B: f(dataB) };
   }
+
+  // 检测是否有 A 股数据缺失
+  if (dataA.market === 'CN' && dataA.revenueGrowth == null) scores.missingA = true;
+  if (dataB.market === 'CN' && dataB.revenueGrowth == null) scores.missingB = true;
 
   scores.pe = scorePE(dataA.pe, dataB.pe);
   scores.growth = scoreGrowth(dataA.revenueGrowth, dataB.revenueGrowth);
@@ -379,29 +455,25 @@ function score(dataA, dataB) {
   return scores;
 }
 
-// ===== 生成建议 =====
+// ===== 投资建议 =====
 function verdict(dataA, dataB, scores) {
   const reasons = [];
-  
-  // 估值对比
+
   if (dataA.pe && dataB.pe) {
     if (dataA.pe < dataB.pe * 0.6) reasons.push({ stock: 'A', text: `PE ${dataA.pe.toFixed(1)} vs ${dataB.pe.toFixed(1)}，估值低${Math.round((1-dataA.pe/dataB.pe)*100)}%` });
     else if (dataB.pe < dataA.pe * 0.6) reasons.push({ stock: 'B', text: `PE ${dataB.pe.toFixed(1)} vs ${dataA.pe.toFixed(1)}，估值低${Math.round((1-dataB.pe/dataA.pe)*100)}%` });
   }
 
-  // 增速对比
-  if (dataA.revenueGrowth && dataB.revenueGrowth) {
+  if (dataA.revenueGrowth != null && dataB.revenueGrowth != null) {
     if (dataA.revenueGrowth > dataB.revenueGrowth * 1.5) reasons.push({ stock: 'A', text: `营收增速${fmtPct(dataA.revenueGrowth)} vs ${fmtPct(dataB.revenueGrowth)}，快${Math.round(dataA.revenueGrowth/dataB.revenueGrowth*100-100)}%` });
     else if (dataB.revenueGrowth > dataA.revenueGrowth * 1.5) reasons.push({ stock: 'B', text: `营收增速${fmtPct(dataB.revenueGrowth)} vs ${fmtPct(dataA.revenueGrowth)}，快${Math.round(dataB.revenueGrowth/dataA.revenueGrowth*100-100)}%` });
   }
 
-  // 毛利率
-  if (dataA.grossMargin && dataB.grossMargin) {
+  if (dataA.grossMargin != null && dataB.grossMargin != null) {
     if (dataA.grossMargin > dataB.grossMargin + 0.15) reasons.push({ stock: 'A', text: `毛利率${fmtPct(dataA.grossMargin)} vs ${fmtPct(dataB.grossMargin)}` });
     else if (dataB.grossMargin > dataA.grossMargin + 0.15) reasons.push({ stock: 'B', text: `毛利率${fmtPct(dataB.grossMargin)} vs ${fmtPct(dataA.grossMargin)}` });
   }
 
-  // 综合评分
   let winner = 'tie';
   if (scores.totalA > scores.totalB + 5) winner = 'A';
   else if (scores.totalB > scores.totalA + 5) winner = 'B';
@@ -409,10 +481,14 @@ function verdict(dataA, dataB, scores) {
   return { reasons, winner };
 }
 
-// ===== 渲染结果 =====
+// ===== 渲染 =====
 function render(dataA, dataB, scores, v) {
   const winA = v.winner === 'A';
   const winB = v.winner === 'B';
+  const isCnA = dataA.market === 'CN';
+  const isCnB = dataB.market === 'CN';
+  const currencyA = dataA.currency === 'CNY' ? '¥' : '$';
+  const currencyB = dataB.currency === 'CNY' ? '¥' : '$';
 
   const dimNames = {
     pe: '估值合理性', growth: '成长性', profit: '盈利能力', 
@@ -425,25 +501,29 @@ function render(dataA, dataB, scores, v) {
     const s = scores[key];
     const winnerA = s.A > s.B;
     const winnerB = s.B > s.A;
+    // 标注A股缺失的维度
+    let dimNote = '';
+    if ((isCnA || isCnB) && ['growth','profit','finance','fcf','roe'].includes(key)) {
+      dimNote = ' <span style="font-size:11px;color:#888">*</span>';
+    }
     scoreHTML += `<div class="score-row">
-      <span class="score-label">${name}</span>
+      <span class="score-label">${name}${dimNote}</span>
       <span class="score-vals">
         <span class="score-item" style="color:${winnerA ? '#ffd700' : '#888'}">${s.A.toFixed(1)}</span>
-        <span class="score-tag" style="background:${s.A > s.B ? '#332200' : s.B > s.A ? '#002233' : '#222'};color:${s.A > s.B ? '#ffd700' : s.B > s.A ? '#00d4ff' : '#888'}">${s.A > s.B ? dataA.symbol : s.B > s.A ? dataB.symbol : '='}</span>
+        <span class="score-tag" style="background:${s.A > s.B ? '#332200' : s.B > s.A ? '#002233' : '#222'};color:${s.A > s.B ? '#ffd700' : s.B > s.A ? '#00d4ff' : '#888'}">${s.A > s.B ? (dataA.symbol.length > 4 ? dataA.symbol.replace(/^\d{3}/,'') : dataA.symbol) : s.B > s.A ? (dataB.symbol.length > 4 ? dataB.symbol.replace(/^\d{3}/,'') : dataB.symbol) : '='}</span>
         <span class="score-item" style="color:${winnerB ? '#00d4ff' : '#888'}">${s.B.toFixed(1)}</span>
       </span>
     </div>`;
   }
 
-  // 对比行
   function compRow(metric, valA, valB, fmtFn = v => v, higherBetter = null) {
     const displayA = valA != null ? fmtFn(valA) : 'N/A';
     const displayB = valB != null ? fmtFn(valB) : 'N/A';
     let winTag = '';
     if (higherBetter === true && valA != null && valB != null) {
-      winTag = valA > valB ? `<span class="winner a">${dataA.symbol}胜</span>` : valB > valA ? `<span class="winner b">${dataB.symbol}胜</span>` : '';
+      winTag = valA > valB ? `<span class="winner a">胜</span>` : valB > valA ? `<span class="winner b">胜</span>` : '';
     } else if (higherBetter === false && valA != null && valB != null) {
-      winTag = valA < valB ? `<span class="winner a">${dataA.symbol}胜</span>` : valB < valA ? `<span class="winner b">${dataB.symbol}胜</span>` : '';
+      winTag = valA < valB ? `<span class="winner a">胜</span>` : valB < valA ? `<span class="winner b">胜</span>` : '';
     }
     return `<div class="sep"></div>
       <div class="val-a">${displayA}</div>
@@ -451,46 +531,72 @@ function render(dataA, dataB, scores, v) {
       <div class="val-b">${displayB}</div>`;
   }
 
-  const summaryA = `${dataA.symbol} ${dataA.name || ''}`;
-  const summaryB = `${dataB.symbol} ${dataB.name || ''}`;
+  function showPrice(d) {
+    const sym = d.currency === 'CNY' ? '¥' : '$';
+    return sym + fmtPrice(d.price);
+  }
+
+  function showMarketCap(d) {
+    if (!d.marketCap) return 'N/A';
+    const sym = d.currency === 'CNY' ? '¥' : '$';
+    if (d.marketCap >= 1e12) return sym + (d.marketCap / 1e12).toFixed(2) + 'T';
+    if (d.marketCap >= 1e9) return sym + (d.marketCap / 1e9).toFixed(1) + 'B';
+    return sym + (d.marketCap / 1e6).toFixed(0) + 'M';
+  }
+
+  // A股数据缺失提示
+  const missingNote = (isCnA || isCnB) ? 
+    '<div class="note-cn">⚠️ A股部分财务数据（营收增速/毛利率/ROE/现金流等）需扩展数据源，暂仅展示行情&PE&市值对比。标*维度为默认5分。</div>' : '';
+
+  const marketTagA = dataA.market === 'CN' ? '<span class="tag mkt cn">A股</span>' : '<span class="tag mkt us">美股</span>';
+  const marketTagB = dataB.market === 'CN' ? '<span class="tag mkt cn">A股</span>' : '<span class="tag mkt us">美股</span>';
 
   const html = `
+${missingNote}
+
 <div class="card">
   <div class="compare-grid">
-    <div style="text-align:center;font-size:20px;color:#ffd700;font-weight:bold">${dataA.symbol}</div>
+    <div style="text-align:center;font-size:20px;color:#ffd700;font-weight:bold">${dataA.symbol}${marketTagA}</div>
     <div style="text-align:center;font-size:14px;color:#888">比较维度</div>
-    <div style="text-align:center;font-size:20px;color:#00d4ff;font-weight:bold">${dataB.symbol}</div>
+    <div style="text-align:center;font-size:20px;color:#00d4ff;font-weight:bold">${dataB.symbol}${marketTagB}</div>
 
     <div style="text-align:center">
-      <span class="big-price yellow">$${fmtPrice(dataA.price)}</span><br>
+      <span class="big-price yellow">${showPrice(dataA)}</span><br>
       <span class="stock-name gray">${dataA.name || dataA.symbol}</span><br>
-      <span class="change-badge ${colorNum(dataA.changePct)}">${colorSign(dataA.changePct)}${dataA.changePct != null ? dataA.changePct.toFixed(2) : 'N/A'}%</span>
+      <span class="change-badge ${colorNum(dataA.changePct)}">${dataA.changePct != null ? (dataA.changePct > 0 ? '+' : '') + dataA.changePct.toFixed(2) : 'N/A'}%</span>
     </div>
     <div class="metric">最新行情</div>
     <div style="text-align:center">
-      <span class="big-price blue">$${fmtPrice(dataB.price)}</span><br>
+      <span class="big-price blue">${showPrice(dataB)}</span><br>
       <span class="stock-name gray">${dataB.name || dataB.symbol}</span><br>
-      <span class="change-badge ${colorNum(dataB.changePct)}">${colorSign(dataB.changePct)}${dataB.changePct != null ? dataB.changePct.toFixed(2) : 'N/A'}%</span>
+      <span class="change-badge ${colorNum(dataB.changePct)}">${dataB.changePct != null ? (dataB.changePct > 0 ? '+' : '') + dataB.changePct.toFixed(2) : 'N/A'}%</span>
     </div>
 
     ${compRow('PE(TTM)', dataA.pe ? dataA.pe.toFixed(1) + 'x' : 'N/A', dataB.pe ? dataB.pe.toFixed(1) + 'x' : 'N/A', v => v, false)}
-    ${compRow('市值', fmt(dataA.marketCap), fmt(dataB.marketCap), v => '$' + v)}
-    ${compRow('营收(TTM)', fmt(dataA.totalRevenue), fmt(dataB.totalRevenue), v => '$' + v, true)}
+    ${compRow('市值', showMarketCap(dataA), showMarketCap(dataB))}
+    ${compRow('今开', dataA.open != null ? currencyA + fmtPrice(dataA.open) : 'N/A', dataB.open != null ? currencyB + fmtPrice(dataB.open) : 'N/A')}
+    ${compRow('最高', dataA.high != null ? currencyA + fmtPrice(dataA.high) : 'N/A', dataB.high != null ? currencyB + fmtPrice(dataB.high) : 'N/A')}
+    ${compRow('最低', dataA.low != null ? currencyA + fmtPrice(dataA.low) : 'N/A', dataB.low != null ? currencyB + fmtPrice(dataB.low) : 'N/A')}
+
+    ${dataA.market === 'CN' ? compRow('52周高', dataA.high52w ? currencyA + fmtPrice(dataA.high52w) : 'N/A', dataB.high52w ? currencyB + fmtPrice(dataB.high52w) : 'N/A') : ''}
+    ${dataA.market === 'CN' ? compRow('52周低', dataA.low52w ? currencyA + fmtPrice(dataA.low52w) : 'N/A', dataB.low52w ? currencyB + fmtPrice(dataB.low52w) : 'N/A') : ''}
+
+    ${compRow('营收(TTM)', fmt(dataA.totalRevenue), fmt(dataB.totalRevenue), v => (dataA.currency === 'CNY' ? '¥' : '$') + v, true)}
     ${compRow('毛利率', fmtPct(dataA.grossMargin), fmtPct(dataB.grossMargin), v => v, true)}
     ${compRow('净利率', fmtPct(dataA.profitMargin), fmtPct(dataB.profitMargin), v => v, true)}
-    ${compRow('EPS', fmtPrice(dataA.eps), fmtPrice(dataB.eps), v => '$' + v, true)}
+    ${compRow('EPS', dataA.eps != null ? currencyA + fmtPrice(dataA.eps) : 'N/A', dataB.eps != null ? currencyB + fmtPrice(dataB.eps) : 'N/A', v => v, true)}
     ${compRow('ROE', fmtPct(dataA.roe), fmtPct(dataB.roe), v => v, true)}
     ${compRow('营收增速', fmtPct(dataA.revenueGrowth), fmtPct(dataB.revenueGrowth), v => v, true)}
     ${compRow('利润增速', fmtPct(dataA.earningsGrowth), fmtPct(dataB.earningsGrowth), v => v, true)}
-    ${compRow('自由现金流', fmt(dataA.freeCashflow), fmt(dataB.freeCashflow), v => '$' + v, true)}
-    ${compRow('经营现金流', fmt(dataA.operatingCashflow), fmt(dataB.operatingCashflow), v => '$' + v, true)}
-    ${compRow('市净率(PB)', dataA.pb ? dataA.pb.toFixed(1) + 'x' : 'N/A', dataB.pb ? dataB.pb.toFixed(1) + 'x' : 'N/A', v => v, false)}
-    ${compRow('做空比例', dataA.shortPercent ? (dataA.shortPercent*100).toFixed(1) + '%' : 'N/A', dataB.shortPercent ? (dataB.shortPercent*100).toFixed(1) + '%' : 'N/A', v => v, false)}
-    ${compRow('Beta', dataA.beta != null ? dataA.beta.toFixed(2) : 'N/A', dataB.beta != null ? dataB.beta.toFixed(2) : 'N/A')}
+    ${compRow('自由现金流', fmt(dataA.freeCashflow), fmt(dataB.freeCashflow), v => (dataA.currency === 'CNY' ? '¥' : '$') + v, true)}
+    ${compRow('经营现金流', fmt(dataA.operatingCashflow), fmt(dataB.operatingCashflow), v => (dataA.currency === 'CNY' ? '¥' : '$') + v, true)}
+    ${!isCnA && !isCnB ? compRow('市净率(PB)', dataA.pb ? dataA.pb.toFixed(1) + 'x' : 'N/A', dataB.pb ? dataB.pb.toFixed(1) + 'x' : 'N/A', v => v, false) : ''}
+    ${!isCnA && !isCnB ? compRow('做空比例', dataA.shortPercent ? (dataA.shortPercent*100).toFixed(1) + '%' : 'N/A', dataB.shortPercent ? (dataB.shortPercent*100).toFixed(1) + '%' : 'N/A', v => v, false) : ''}
+    ${!isCnA && !isCnB ? compRow('Beta', dataA.beta != null ? dataA.beta.toFixed(2) : 'N/A', dataB.beta != null ? dataB.beta.toFixed(2) : 'N/A') : ''}
   </div>
 </div>
 
-<!-- 8维评分卡 -->
+<!-- 九维评分卡 -->
 <div class="card">
   <h3 style="margin-top:0">📊 九维评分卡</h3>
   <div class="score-row" style="border-bottom:2px solid #333;margin-bottom:4px">
@@ -516,34 +622,35 @@ function render(dataA, dataB, scores, v) {
 <div class="card">
   <h3 style="margin-top:0;color:#ffd700">🏦 券商评测（分析师共识）</h3>
   ${(() => {
-    function analystBar(stock, symbol, color, data) {
+    function analystBar(data, color) {
+      const total = data.analystTotal || 0;
+      if (total === 0) {
+        if (data.market === 'CN') return '<p style="font-size:17px;color:#ffaa44;text-align:center">A 股评级数据源开发中...</p>';
+        return '<p style="font-size:17px;color:#888;text-align:center">暂无分析师数据</p>';
+      }
+      
       const strongBuy = data.analystStrongBuy || 0;
       const buy = data.analystBuy || 0;
       const hold = data.analystHold || 0;
       const sell = data.analystSell || 0;
       const strongSell = data.analystStrongSell || 0;
-      const total = data.analystTotal || 0;
-      if (total === 0) return `<p style="font-size:17px;color:#888">暂无分析师数据</p>`;
       
       const buyPct = ((strongBuy + buy) / total * 100).toFixed(0);
       const holdPct = (hold / total * 100).toFixed(0);
       const sellPct = ((sell + strongSell) / total * 100).toFixed(0);
       
-      let consensus = '';
-      let consensusColor = '';
+      let consensus = '', consensusColor = '';
       if (buyPct >= 70) { consensus = '强烈看多'; consensusColor = '#4cff4c'; }
       else if (buyPct >= 50) { consensus = '偏多'; consensusColor = '#a0ffa0'; }
       else if (buyPct >= 30) { consensus = '中性偏多'; consensusColor = '#ffd700'; }
       else if (sellPct >= 50) { consensus = '偏空'; consensusColor = '#ff6666'; }
-      else if (sellPct >= 30) { consensus = '中性偏空'; consensusColor = '#ffaa44'; }
       else { consensus = '中性'; consensusColor = '#ffd700'; }
       
       let html = `<div style="text-align:center;margin-bottom:8px">
-        <span style="font-size:18px;font-weight:bold;color:${color}">${symbol} · 共 ${total} 位分析师</span><br>
+        <span style="font-size:17px;font-weight:bold;color:${color}">${data.symbol} · ${total} 位分析师</span><br>
         <span style="font-size:14px;color:${consensusColor}">共识：${consensus}</span>
       </div>`;
       
-      // 评级分布条
       html += `<div style="display:flex;height:28px;border-radius:6px;overflow:hidden;margin:6px 0">
         ${strongBuy > 0 ? `<div style="width:${(strongBuy/total*100).toFixed(1)}%;background:#00cc44;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;color:#fff">${strongBuy}</div>` : ''}
         ${buy > 0 ? `<div style="width:${(buy/total*100).toFixed(1)}%;background:#66dd88;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;color:#fff">${buy}</div>` : ''}
@@ -552,7 +659,6 @@ function render(dataA, dataB, scores, v) {
         ${strongSell > 0 ? `<div style="width:${(strongSell/total*100).toFixed(1)}%;background:#cc2200;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;color:#fff">${strongSell}</div>` : ''}
       </div>`;
       
-      // 图例
       html += `<div style="display:flex;flex-wrap:wrap;gap:6px;font-size:14px;color:#aaa;margin-bottom:4px">
         <span style="color:#00cc44">强力买入 ${strongBuy}</span>
         <span style="color:#66dd88">买入 ${buy}</span>
@@ -561,7 +667,6 @@ function render(dataA, dataB, scores, v) {
         <span style="color:#cc2200">强力卖出 ${strongSell}</span>
       </div>`;
       
-      // 汇总
       html += `<div style="display:flex;justify-content:space-around;font-size:18px;margin-top:2px">
         <span><span style="color:#4cff4c;font-weight:bold">买入</span> ${buyPct}%</span>
         <span><span style="color:#ffd700;font-weight:bold">持有</span> ${holdPct}%</span>
@@ -572,11 +677,10 @@ function render(dataA, dataB, scores, v) {
     }
     
     let section = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px">';
-    section += `<div style="background:#0f0f2a;border-radius:10px;padding:12px">${analystBar('A', dataA.symbol, '#ffd700', dataA)}</div>`;
-    section += `<div style="background:#0f0f2a;border-radius:10px;padding:12px">${analystBar('B', dataB.symbol, '#00d4ff', dataB)}</div>`;
+    section += `<div style="background:#0f0f2a;border-radius:10px;padding:12px">${analystBar(dataA, '#ffd700')}</div>`;
+    section += `<div style="background:#0f0f2a;border-radius:10px;padding:12px">${analystBar(dataB, '#00d4ff')}</div>`;
     section += '</div>';
     
-    // 目标价对比
     const hasTargetA = dataA.targetMean != null;
     const hasTargetB = dataB.targetMean != null;
     if (hasTargetA || hasTargetB) {
@@ -584,24 +688,18 @@ function render(dataA, dataB, scores, v) {
       section += '<p style="font-size:18px;font-weight:bold;color:#ffd700;text-align:center;margin-bottom:10px">🎯 目标价对比</p>';
       section += '<div class="compare-grid">';
       
-      // 表头
-      section += '<div style="text-align:center;font-size:15px;color:#888">目标价区间</div>';
-      section += '<div></div>';
-      section += '<div style="text-align:center;font-size:15px;color:#888">目标价区间</div>';
-      
-      // 目标价行
-      const tarA = hasTargetA ? `$${dataA.targetLow.toFixed(2)} ~ <b style="color:#ffd700;font-size:20px">$${dataA.targetMean.toFixed(2)}</b> ~ $${dataA.targetHigh.toFixed(2)}` : 'N/A';
-      const tarB = hasTargetB ? `$${dataB.targetLow.toFixed(2)} ~ <b style="color:#00d4ff;font-size:20px">$${dataB.targetMean.toFixed(2)}</b> ~ $${dataB.targetHigh.toFixed(2)}` : 'N/A';
+      const symA = dataA.currency === 'CNY' ? '¥' : '$';
+      const symB = dataB.currency === 'CNY' ? '¥' : '$';
+      const tarA = hasTargetA ? `${symA}${dataA.targetLow.toFixed(2)} ~ <b style="color:#ffd700;font-size:20px">${symA}${dataA.targetMean.toFixed(2)}</b> ~ ${symA}${dataA.targetHigh.toFixed(2)}` : 'N/A';
+      const tarB = hasTargetB ? `${symB}${dataB.targetLow.toFixed(2)} ~ <b style="color:#00d4ff;font-size:20px">${symB}${dataB.targetMean.toFixed(2)}</b> ~ ${symB}${dataB.targetHigh.toFixed(2)}` : 'N/A';
       section += `<div style="text-align:center;font-size:16px">${tarA}</div>`;
       section += '<div style="text-align:center;font-size:15px;color:#888;font-weight:bold">目标价</div>';
       section += `<div style="text-align:center;font-size:16px">${tarB}</div>`;
       
-      // 上行空间
       if (hasTargetA && dataA.price) {
         const upsideA = ((dataA.targetMean - dataA.price) / dataA.price * 100).toFixed(1);
         const upColorA = upsideA > 0 ? '#4cff4c' : '#ff4444';
-        const signA = upsideA > 0 ? '+' : '';
-        section += `<div style="text-align:center;font-size:18px;font-weight:bold;color:${upColorA}">${signA}${upsideA}% 上行空间</div>`;
+        section += `<div style="text-align:center;font-size:18px;font-weight:bold;color:${upColorA}">${upsideA > 0 ? '+' : ''}${upsideA}% 上行空间</div>`;
         section += '<div style="text-align:center;font-size:14px;color:#888">潜力</div>';
       } else {
         section += '<div></div><div></div>';
@@ -609,13 +707,10 @@ function render(dataA, dataB, scores, v) {
       if (hasTargetB && dataB.price) {
         const upsideB = ((dataB.targetMean - dataB.price) / dataB.price * 100).toFixed(1);
         const upColorB = upsideB > 0 ? '#4cff4c' : '#ff4444';
-        const signB = upsideB > 0 ? '+' : '';
-        section += `<div style="text-align:center;font-size:18px;font-weight:bold;color:${upColorB}">${signB}${upsideB}% 上行空间</div>`;
+        section += `<div style="text-align:center;font-size:18px;font-weight:bold;color:${upColorB}">${upsideB > 0 ? '+' : ''}${upsideB}% 上行空间</div>`;
       }
-      
       section += '</div></div>';
     }
-    
     return section;
   })()}
 </div>
@@ -631,15 +726,18 @@ function render(dataA, dataB, scores, v) {
     <p style="font-size:18px;line-height:1.8">
       <b style="color:#ffd700">${dataA.symbol}</b>：${scores.totalA >= scores.totalB ? '<span class="tag buy">综合更优</span>' : (scores.totalA >= scores.totalB - 3 ? '<span class="tag hold">差距不大</span>' : '<span class="tag sell">估值偏贵</span>')}
       ${dataA.pe && dataA.pe > 200 ? ' ⚠️ PE极高，需注意回调风险' : ''}
+      ${dataA.pe && dataA.pe < 15 ? ' ✅ 低估值' : ''}
       ${dataA.grossMargin && dataA.grossMargin > 0.7 ? ' ✅ 顶级毛利率' : ''}
     </p>
     <p style="font-size:18px;line-height:1.8;margin-top:8px">
       <b style="color:#00d4ff">${dataB.symbol}</b>：${scores.totalB >= scores.totalA ? '<span class="tag buy">综合更优</span>' : (scores.totalB >= scores.totalA - 3 ? '<span class="tag hold">差距不大</span>' : '<span class="tag sell">估值偏贵</span>')}
       ${dataB.pe && dataB.pe > 200 ? ' ⚠️ PE极高，需注意回调风险' : ''}
+      ${dataB.pe && dataB.pe < 15 ? ' ✅ 低估值' : ''}
       ${dataB.grossMargin && dataB.grossMargin > 0.7 ? ' ✅ 顶级毛利率' : ''}
     </p>
   </div>
   
+  ${(isCnA || isCnB) ? '<p style="font-size:15px;color:#ffaa44;margin-top:10px;">⚠️ A股评分部分维度使用默认值，仅供参考。评分卡中标*维度待数据源扩展。</p>' : ''}
   <p style="font-size:17px;color:#888;margin-top:10px;">⚠️ 以上分析基于公开数据自动生成，不构成投资建议。股市有风险，投资需谨慎。</p>
 </div>
 `;
@@ -657,9 +755,12 @@ function quickCompare(a, b) {
 async function compare() {
   const a = document.getElementById('tickerA').value.trim().toUpperCase();
   const b = document.getElementById('tickerB').value.trim().toUpperCase();
-  
+
   if (!a || !b) { alert('请输入两只股票代码'); return; }
   if (a === b) { alert('请输入不同的股票代码'); return; }
+
+  const marketA = detectMarket(a);
+  const marketB = detectMarket(b);
 
   document.getElementById('loading').classList.add('show');
   document.getElementById('error').classList.remove('show');
@@ -667,14 +768,17 @@ async function compare() {
   document.getElementById('searchBtn').disabled = true;
 
   try {
-    const [dataA, dataB] = await Promise.all([fetchYahooData(a), fetchYahooData(b)]);
+    const [dataA, dataB] = await Promise.all([
+      marketA === 'CN' ? fetchTencentData(a) : fetchYahooData(a),
+      marketB === 'CN' ? fetchTencentData(b) : fetchYahooData(b)
+    ]);
 
     if (dataA.error || dataB.error) {
       const msgs = [];
       if (dataA.error) msgs.push(`${a}: ${dataA.error}`);
       if (dataB.error) msgs.push(`${b}: ${dataB.error}`);
-      document.getElementById('error').innerHTML = '❌ ' + msgs.join('<br>') + 
-        '<br><span style="font-size:15px;color:#888;">提示：仅支持美股代码（如 ARM, NVDA, AAPL）</span>';
+      document.getElementById('error').innerHTML = '❌ ' + msgs.join('<br>') +
+        '<br><span style="font-size:15px;color:#888;">A股输6位数字(600036)，美股输字母(NVDA)</span>';
       document.getElementById('error').classList.add('show');
     } else {
       const scores = score(dataA, dataB);
@@ -682,7 +786,7 @@ async function compare() {
       render(dataA, dataB, scores, v);
     }
   } catch(e) {
-    document.getElementById('error').innerHTML = '❌ 网络错误：' + e.message + 
+    document.getElementById('error').innerHTML = '❌ 网络错误：' + e.message +
       '<br><span style="font-size:15px;color:#888;">请检查网络连接后重试</span>';
     document.getElementById('error').classList.add('show');
   }
@@ -691,14 +795,11 @@ async function compare() {
   document.getElementById('searchBtn').disabled = false;
 }
 
-// ===== 页面加载时初始化 =====
 window.addEventListener('DOMContentLoaded', () => {
-  // 默认显示 ARM vs MRVL
   document.getElementById('tickerA').value = 'ARM';
   document.getElementById('tickerB').value = 'MRVL';
 });
 
-// 回车触发
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter') compare();
 });
