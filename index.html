@@ -151,6 +151,12 @@ body {
   font-size: 28px; color: #666; cursor: pointer;
   padding: 4px 8px;
 }
+.modal-note {
+  background: #0f3460; border: 1px solid #e94560;
+  border-radius: 10px; padding: 12px 14px; margin-top: 16px;
+  font-size: 17px; color: #ffd700; text-align: center;
+  line-height: 1.6;
+}
 
 /* No results */
 .no-result {
@@ -178,7 +184,7 @@ body {
 </div>
 
 <div class="steps">
-  <span>三步用法：</span>1. 点按钮看说明 → 2. 复制提示语 → 3. 粘贴到 WorkBuddy 发送
+  <span>三步用法：</span>1. 点按钮看说明 → 2. 复制提示语 → 3. 粘贴到 WorkBuddy 聊天框发送
 </div>
 
 <!-- 快捷按钮 -->
@@ -553,6 +559,8 @@ function showTip(name) {
   html += '<button class="modal-btn copy" onclick="copyFromModal(\'' + name + '\')">📋 复制提示语</button>';
   html += '<button class="modal-btn close" onclick="closeModal()">关闭</button>';
   html += '</div>';
+
+  html += '<div class="modal-note">📌 复制后，打开 <b>WorkBuddy</b>（微信小程序或电脑端），<br>粘贴到聊天输入框，发送即可。</div>';
 
   document.getElementById('modalContent').innerHTML = html;
   document.getElementById('modalOverlay').classList.add('show');
