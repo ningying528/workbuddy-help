@@ -111,6 +111,47 @@ body {
   font-size: 17px; color: #c0c0e0;
 }
 
+/* Modal */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.75); z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.modal-overlay.show { opacity: 1; pointer-events: auto; }
+.modal-box {
+  background: #16213e; border: 2px solid #e94560;
+  border-radius: 18px; width: 90%; max-width: 400px;
+  max-height: 80vh; overflow-y: auto; padding: 24px 20px 20px;
+  color: #e0e0e0; position: relative;
+}
+.modal-box h2 { font-size: 22px; color: #ffd700; margin-bottom: 12px; text-align: center; }
+.modal-box h3 { font-size: 19px; color: #e94560; margin: 16px 0 8px; }
+.modal-box p, .modal-box li { font-size: 18px; line-height: 1.8; }
+.modal-box ul { padding-left: 18px; margin: 8px 0; }
+.modal-box li { margin: 6px 0; }
+.modal-prompt {
+  background: #0f3460; border: 1px solid #2a2a4a;
+  border-radius: 10px; padding: 14px; margin: 12px 0;
+  font-size: 17px; color: #c0d0e0; white-space: pre-wrap;
+  word-break: break-all; max-height: 150px; overflow-y: auto;
+}
+.modal-btn-row { display: flex; gap: 10px; margin-top: 14px; }
+.modal-btn {
+  flex: 1; padding: 14px; border: none; border-radius: 12px;
+  font-size: 18px; font-weight: bold; cursor: pointer;
+  text-align: center;
+}
+.modal-btn.copy { background: #e94560; color: #fff; }
+.modal-btn.copy:active { background: #c0392b; }
+.modal-btn.close { background: #2a2a4a; color: #a0a0c0; }
+.modal-btn.close:active { background: #1a1a3a; }
+.modal-close-x {
+  position: absolute; top: 8px; right: 14px;
+  font-size: 28px; color: #666; cursor: pointer;
+  padding: 4px 8px;
+}
+
 /* No results */
 .no-result {
   text-align: center; padding: 40px 20px;
@@ -137,24 +178,24 @@ body {
 </div>
 
 <div class="steps">
-  <span>三步用法：</span>1. 点按钮 → 2. 复制提示语 → 3. 粘贴到 WorkBuddy 发送
+  <span>三步用法：</span>1. 点按钮看说明 → 2. 复制提示语 → 3. 粘贴到 WorkBuddy 发送
 </div>
 
 <!-- 快捷按钮 -->
 <div class="quick-grid">
-  <div class="quick-btn" onclick="copyTip('Word报告')">
+  <div class="quick-btn" onclick="showTip('Word报告')">
     <span class="quick-icon">📝</span>
     Word报告
   </div>
-  <div class="quick-btn" onclick="copyTip('数据分析')">
+  <div class="quick-btn" onclick="showTip('数据分析')">
     <span class="quick-icon">📊</span>
     数据分析
   </div>
-  <div class="quick-btn" onclick="copyTip('每日推送')">
+  <div class="quick-btn" onclick="showTip('每日推送')">
     <span class="quick-icon">⏰</span>
     每日推送
   </div>
-  <div class="quick-btn" onclick="copyTip('我的记忆')">
+  <div class="quick-btn" onclick="showTip('我的记忆')">
     <span class="quick-icon">🧠</span>
     我的记忆
   </div>
@@ -405,8 +446,130 @@ body {
   WorkBuddy 功能助手 · 学习作业
 </div>
 
+<!-- 弹窗遮罩 -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal-box" id="modalBox" onclick="event.stopPropagation()">
+    <span class="modal-close-x" onclick="closeModal()">&times;</span>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
 <script>
-// 提示语模板
+// 按钮教程内容
+var tipContent = {
+  'Word报告': {
+    icon: '📝',
+    title: 'Word报告生成',
+    desc: '让 WorkBuddy 帮你自动生成格式工整的 Word 文档，省去手动排版的时间。',
+    usage: [
+      '告诉我你想要什么主题的报告',
+      '说明内容要求（数据、结构、重点）',
+      '我会生成 .docx 文件保存到工作区',
+      '你可以下载或继续修改'
+    ],
+    examples: [
+      '"帮我生成一份项目周报"',
+      '"写一份竞品分析报告"',
+      '"生成季度工作总结"'
+    ],
+    prompt: '请帮我生成一份Word报告：\n主题：（请在此补充）\n内容要求：（请在此补充）\n请生成后保存到工作区。'
+  },
+  '数据分析': {
+    icon: '📊',
+    title: '数据分析与可视化',
+    desc: '上传数据文件或描述数据，WorkBuddy 帮你分析、计算、生成图表。',
+    usage: [
+      '上传 Excel/CSV 数据文件',
+      '告诉我你想分析什么（趋势、对比、汇总）',
+      '我会计算统计指标并生成可视化图表',
+      '分析结果可导出为报告'
+    ],
+    examples: [
+      '"分析这个销售数据，找出增长趋势"',
+      '"对比这三组数据的差异"',
+      '"帮我把这个表格做成柱状图"'
+    ],
+    prompt: '请帮我做数据分析和可视化：\n（请上传数据文件或描述数据内容）\n请分析并生成图表。'
+  },
+  '每日推送': {
+    icon: '⏰',
+    title: '定时自动推送',
+    desc: '设置自动化任务，WorkBuddy 会在指定时间自动执行并推送结果到微信。',
+    usage: [
+      '告诉我你想什么时候推送什么内容',
+      '我会创建自动化任务',
+      '到时间自动运行，结果推送到微信',
+      '随时可以对我说"修改/暂停推送"'
+    ],
+    examples: [
+      '"每天早上8点推送新闻摘要"',
+      '"每周一早上生成工作周报"',
+      '"每天22点提醒我备份文件"'
+    ],
+    prompt: '请帮我设置每天早上8点自动推送：新闻摘要和待办事项提醒。请创建自动化任务。'
+  },
+  '我的记忆': {
+    icon: '🧠',
+    title: '查看我的记忆',
+    desc: 'WorkBuddy 会记住你的偏好、习惯和历史任务，点此查看我都记住了什么。',
+    usage: [
+      '我会显示目前已记住的关于你的信息',
+      '包括偏好、习惯、历史记录等',
+      '你可以纠正或补充信息',
+      '记忆越多，我的帮助越精准'
+    ],
+    examples: [
+      '"请显示完整记忆"',
+      '"记住我喜欢大字体显示"',
+      '"忘记我之前设置的自动化"'
+    ],
+    prompt: '请显示完整记忆，包括你目前记住的关于我的所有信息。'
+  }
+};
+
+function showTip(name) {
+  var c = tipContent[name];
+  if (!c) return;
+  var html = '';
+  html += '<h2>' + c.icon + ' ' + c.title + '</h2>';
+  html += '<p style="color:#a0c0e0;">' + c.desc + '</p>';
+
+  html += '<h3>如何使用</h3><ol>';
+  c.usage.forEach(function(s) {
+    html += '<li>' + s + '</li>';
+  });
+  html += '</ol>';
+
+  html += '<h3>示例对话</h3><ul>';
+  c.examples.forEach(function(s) {
+    html += '<li><span style="color:#ffd700;">' + s + '</span></li>';
+  });
+  html += '</ul>';
+
+  html += '<h3>提示语模板</h3>';
+  html += '<div class="modal-prompt">' + c.prompt.replace(/\n/g, '<br>') + '</div>';
+
+  html += '<div class="modal-btn-row">';
+  html += '<button class="modal-btn copy" onclick="copyFromModal(\'' + name + '\')">📋 复制提示语</button>';
+  html += '<button class="modal-btn close" onclick="closeModal()">关闭</button>';
+  html += '</div>';
+
+  document.getElementById('modalContent').innerHTML = html;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function copyFromModal(name) {
+  var text = tipContent[name].prompt;
+  copyToClipboard(text);
+  showToast('✅ 已复制！打开 WorkBuddy 粘贴发送即可');
+}
+
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('modalOverlay')) return;
+  document.getElementById('modalOverlay').classList.remove('show');
+}
+
+// 提示语模板（保留兼容旧函数）
 var tips = {
   'Word报告': '请帮我生成一份Word报告：\n主题：（请在此补充）\n内容要求：（请在此补充）\n请生成后保存到工作区。',
   '数据分析': '请帮我做数据分析和可视化：\n（请上传数据文件或描述数据内容）\n请分析并生成图表。',
@@ -422,14 +585,21 @@ function copyTip(name) {
 }
 
 function copyToClipboard(text) {
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(text);
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).catch(function() {
+      fallbackCopy(text);
+    });
   } else {
-    var ta = document.createElement('textarea');
-    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
-    document.body.appendChild(ta); ta.select();
-    document.execCommand('copy'); document.body.removeChild(ta);
+    fallbackCopy(text);
   }
+}
+
+function fallbackCopy(text) {
+  var ta = document.createElement('textarea');
+  ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); } catch(e) {}
+  document.body.removeChild(ta);
 }
 
 function showToast(msg) {
