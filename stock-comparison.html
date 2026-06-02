@@ -131,6 +131,45 @@ hr{border-color:#222;margin:16px 0}
 <div id="result"></div>
 
 <script>
+// ===== CORS 代理 =====
+// 部署到网页后，浏览器会拦截跨域请求，需要通过代理转发
+const CORS_PROXIES = [
+  'https://corsproxy.io/?',
+  'https://api.allorigins.win/raw?url=',
+  'https://proxy.cors.sh/'
+];
+let proxyIndex = 0;
+
+async function corsFetch(url, options = {}) {
+  // 先尝试直接请求（某些浏览器/扩展可能允许）
+  try {
+    const direct = await fetch(url, options);
+    if (direct.ok) return direct;
+  } catch(e) {
+    // 直接请求失败，走代理
+  }
+
+  // 走 CORS 代理
+  for (let i = 0; i < CORS_PROXIES.length; i++) {
+    const idx = (proxyIndex + i) % CORS_PROXIES.length;
+    const proxy = CORS_PROXIES[idx];
+    try {
+      const resp = await fetch(proxy + encodeURIComponent(url), {
+        ...options,
+        headers: { 'User-Agent': 'Mozilla/5.0' }
+      });
+      if (resp.ok) {
+        proxyIndex = idx; // 记住可用的代理
+        return resp;
+      }
+    } catch(e) {
+      // 这个代理不可用，试下一个
+    }
+  }
+
+  throw new Error('所有代理均不可用，请检查网络');
+}
+
 // ===== 市场识别 =====
 // A 股: 6位数字（600xxx上海 / 000xxx深圳 / 300xxx创业板 / 688xxx科创板）
 // 美股: 纯字母
@@ -158,7 +197,7 @@ async function fetchTencentData(code) {
   const symbol = code.trim();
 
   try {
-    const resp = await fetch(`https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=${tc},day,,,1,qfq`, {
+    const resp = await corsFetch(`https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=${tc},day,,,1,qfq`, {
       headers: { 'User-Agent': 'Mozilla/5.0' }
     });
     
@@ -229,10 +268,10 @@ async function fetchYahooData(symbol) {
   const s = symbol.toUpperCase().trim();
 
   const [chartRes, summaryRes] = await Promise.allSettled([
-    fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${s}?interval=1d&range=3mo`, {
+    corsFetch(`https://query1.finance.yahoo.com/v8/finance/chart/${s}?interval=1d&range=3mo`, {
       headers: { 'User-Agent': 'Mozilla/5.0' }
     }),
-    fetch(`https://query2.finance.yahoo.com/v10/finance/quoteSummary/${s}?modules=price,summaryDetail,defaultKeyStatistics,financialData,assetProfile,recommendationTrend`, {
+    corsFetch(`https://query2.finance.yahoo.com/v10/finance/quoteSummary/${s}?modules=price,summaryDetail,defaultKeyStatistics,financialData,assetProfile,recommendationTrend`, {
       headers: { 'User-Agent': 'Mozilla/5.0' }
     })
   ]);
