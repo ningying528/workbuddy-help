@@ -142,7 +142,7 @@ async function fetchYahooData(symbol) {
     fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${s}?interval=1d&range=3mo`, {
       headers: { 'User-Agent': 'Mozilla/5.0' }
     }),
-    fetch(`https://query2.finance.yahoo.com/v10/finance/quoteSummary/${s}?modules=price,summaryDetail,defaultKeyStatistics,financialData,assetProfile`, {
+    fetch(`https://query2.finance.yahoo.com/v10/finance/quoteSummary/${s}?modules=price,summaryDetail,defaultKeyStatistics,financialData,assetProfile,recommendationTrend`, {
       headers: { 'User-Agent': 'Mozilla/5.0' }
     })
   ]);
@@ -215,6 +215,21 @@ async function fetchYahooData(symbol) {
         data.shortRatio = ks.shortRatio?.raw;
         data.shortPercent = ks.shortPercentOfFloat?.raw;
         data.heldPercentInstitutions = ks.heldPercentInstitutions?.raw;
+
+        // 券商评级
+        const rt = r.recommendationTrend || {};
+        if (rt.trend && rt.trend.length > 0) {
+          const latest = rt.trend[0];
+          data.analystStrongBuy = latest.strongBuy || 0;
+          data.analystBuy = latest.buy || 0;
+          data.analystHold = latest.hold || 0;
+          data.analystSell = latest.sell || 0;
+          data.analystStrongSell = latest.strongSell || 0;
+          data.analystTotal = data.analystStrongBuy + data.analystBuy + data.analystHold + data.analystSell + data.analystStrongSell;
+        }
+        data.targetMean = fd.targetMeanPrice?.raw;
+        data.targetHigh = fd.targetHighPrice?.raw;
+        data.targetLow = fd.targetLowPrice?.raw;
       }
     } catch(e) { data.error = data.error || 'summary parse error'; }
   }
@@ -336,6 +351,17 @@ function score(dataA, dataB) {
     return { A: f(dataA.shortPercent), B: f(dataB.shortPercent) };
   }
 
+  // 9. 分析师共识 (买入比例越高越好)
+  function scoreAnalyst(aData, bData) {
+    function f(d) {
+      const total = d.analystTotal || 0;
+      if (total === 0) return 5;
+      const buyPct = ((d.analystStrongBuy || 0) + (d.analystBuy || 0)) / total;
+      return Math.min(10, Math.round(buyPct * 10 * 10) / 10);
+    }
+    return { A: f(dataA), B: f(dataB) };
+  }
+
   scores.pe = scorePE(dataA.pe, dataB.pe);
   scores.growth = scoreGrowth(dataA.revenueGrowth, dataB.revenueGrowth);
   scores.profit = scoreProfit(dataA.grossMargin, dataB.grossMargin, dataA.profitMargin, dataB.profitMargin);
@@ -344,8 +370,9 @@ function score(dataA, dataB) {
   scores.fcf = scoreFCF(dataA.freeCashflow, dataB.freeCashflow);
   scores.roe = scoreROE(dataA.roe, dataB.roe);
   scores.short = scoreShort(dataA.shortPercent, dataB.shortPercent);
+  scores.analyst = scoreAnalyst(dataA, dataB);
 
-  const dims = ['pe','growth','profit','finance','cap','fcf','roe','short'];
+  const dims = ['pe','growth','profit','finance','cap','fcf','roe','short','analyst'];
   scores.totalA = Math.round(dims.reduce((s, d) => s + scores[d].A, 0) * 10) / 10;
   scores.totalB = Math.round(dims.reduce((s, d) => s + scores[d].B, 0) * 10) / 10;
 
@@ -390,7 +417,7 @@ function render(dataA, dataB, scores, v) {
   const dimNames = {
     pe: '估值合理性', growth: '成长性', profit: '盈利能力', 
     finance: '财务稳健', cap: '市值规模', fcf: '现金流质量',
-    roe: '净资产回报', short: '市场情绪'
+    roe: '净资产回报', short: '市场情绪', analyst: '分析师共识'
   };
 
   let scoreHTML = '';
@@ -465,7 +492,7 @@ function render(dataA, dataB, scores, v) {
 
 <!-- 8维评分卡 -->
 <div class="card">
-  <h3 style="margin-top:0">📊 八维评分卡</h3>
+  <h3 style="margin-top:0">📊 九维评分卡</h3>
   <div class="score-row" style="border-bottom:2px solid #333;margin-bottom:4px">
     <span class="score-label" style="font-weight:bold">评分维度</span>
     <span class="score-vals">
@@ -483,6 +510,114 @@ function render(dataA, dataB, scores, v) {
       <span class="score-item" style="font-size:26px;color:${winB ? '#00d4ff' : '#888'}">${scores.totalB.toFixed(1)}</span>
     </span>
   </div>
+</div>
+
+<!-- 券商评测 -->
+<div class="card">
+  <h3 style="margin-top:0;color:#ffd700">🏦 券商评测（分析师共识）</h3>
+  ${(() => {
+    function analystBar(stock, symbol, color, data) {
+      const strongBuy = data.analystStrongBuy || 0;
+      const buy = data.analystBuy || 0;
+      const hold = data.analystHold || 0;
+      const sell = data.analystSell || 0;
+      const strongSell = data.analystStrongSell || 0;
+      const total = data.analystTotal || 0;
+      if (total === 0) return `<p style="font-size:17px;color:#888">暂无分析师数据</p>`;
+      
+      const buyPct = ((strongBuy + buy) / total * 100).toFixed(0);
+      const holdPct = (hold / total * 100).toFixed(0);
+      const sellPct = ((sell + strongSell) / total * 100).toFixed(0);
+      
+      let consensus = '';
+      let consensusColor = '';
+      if (buyPct >= 70) { consensus = '强烈看多'; consensusColor = '#4cff4c'; }
+      else if (buyPct >= 50) { consensus = '偏多'; consensusColor = '#a0ffa0'; }
+      else if (buyPct >= 30) { consensus = '中性偏多'; consensusColor = '#ffd700'; }
+      else if (sellPct >= 50) { consensus = '偏空'; consensusColor = '#ff6666'; }
+      else if (sellPct >= 30) { consensus = '中性偏空'; consensusColor = '#ffaa44'; }
+      else { consensus = '中性'; consensusColor = '#ffd700'; }
+      
+      let html = `<div style="text-align:center;margin-bottom:8px">
+        <span style="font-size:18px;font-weight:bold;color:${color}">${symbol} · 共 ${total} 位分析师</span><br>
+        <span style="font-size:14px;color:${consensusColor}">共识：${consensus}</span>
+      </div>`;
+      
+      // 评级分布条
+      html += `<div style="display:flex;height:28px;border-radius:6px;overflow:hidden;margin:6px 0">
+        ${strongBuy > 0 ? `<div style="width:${(strongBuy/total*100).toFixed(1)}%;background:#00cc44;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;color:#fff">${strongBuy}</div>` : ''}
+        ${buy > 0 ? `<div style="width:${(buy/total*100).toFixed(1)}%;background:#66dd88;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;color:#fff">${buy}</div>` : ''}
+        ${hold > 0 ? `<div style="width:${(hold/total*100).toFixed(1)}%;background:#888888;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;color:#fff">${hold}</div>` : ''}
+        ${sell > 0 ? `<div style="width:${(sell/total*100).toFixed(1)}%;background:#dd6666;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;color:#fff">${sell}</div>` : ''}
+        ${strongSell > 0 ? `<div style="width:${(strongSell/total*100).toFixed(1)}%;background:#cc2200;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;color:#fff">${strongSell}</div>` : ''}
+      </div>`;
+      
+      // 图例
+      html += `<div style="display:flex;flex-wrap:wrap;gap:6px;font-size:14px;color:#aaa;margin-bottom:4px">
+        <span style="color:#00cc44">强力买入 ${strongBuy}</span>
+        <span style="color:#66dd88">买入 ${buy}</span>
+        <span style="color:#888">持有 ${hold}</span>
+        <span style="color:#dd6666">卖出 ${sell}</span>
+        <span style="color:#cc2200">强力卖出 ${strongSell}</span>
+      </div>`;
+      
+      // 汇总
+      html += `<div style="display:flex;justify-content:space-around;font-size:18px;margin-top:2px">
+        <span><span style="color:#4cff4c;font-weight:bold">买入</span> ${buyPct}%</span>
+        <span><span style="color:#ffd700;font-weight:bold">持有</span> ${holdPct}%</span>
+        <span><span style="color:#ff4444;font-weight:bold">卖出</span> ${sellPct}%</span>
+      </div>`;
+      
+      return html;
+    }
+    
+    let section = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px">';
+    section += `<div style="background:#0f0f2a;border-radius:10px;padding:12px">${analystBar('A', dataA.symbol, '#ffd700', dataA)}</div>`;
+    section += `<div style="background:#0f0f2a;border-radius:10px;padding:12px">${analystBar('B', dataB.symbol, '#00d4ff', dataB)}</div>`;
+    section += '</div>';
+    
+    // 目标价对比
+    const hasTargetA = dataA.targetMean != null;
+    const hasTargetB = dataB.targetMean != null;
+    if (hasTargetA || hasTargetB) {
+      section += '<div style="background:#0f0f2a;border-radius:10px;padding:14px;margin-top:8px">';
+      section += '<p style="font-size:18px;font-weight:bold;color:#ffd700;text-align:center;margin-bottom:10px">🎯 目标价对比</p>';
+      section += '<div class="compare-grid">';
+      
+      // 表头
+      section += '<div style="text-align:center;font-size:15px;color:#888">目标价区间</div>';
+      section += '<div></div>';
+      section += '<div style="text-align:center;font-size:15px;color:#888">目标价区间</div>';
+      
+      // 目标价行
+      const tarA = hasTargetA ? `$${dataA.targetLow.toFixed(2)} ~ <b style="color:#ffd700;font-size:20px">$${dataA.targetMean.toFixed(2)}</b> ~ $${dataA.targetHigh.toFixed(2)}` : 'N/A';
+      const tarB = hasTargetB ? `$${dataB.targetLow.toFixed(2)} ~ <b style="color:#00d4ff;font-size:20px">$${dataB.targetMean.toFixed(2)}</b> ~ $${dataB.targetHigh.toFixed(2)}` : 'N/A';
+      section += `<div style="text-align:center;font-size:16px">${tarA}</div>`;
+      section += '<div style="text-align:center;font-size:15px;color:#888;font-weight:bold">目标价</div>';
+      section += `<div style="text-align:center;font-size:16px">${tarB}</div>`;
+      
+      // 上行空间
+      if (hasTargetA && dataA.price) {
+        const upsideA = ((dataA.targetMean - dataA.price) / dataA.price * 100).toFixed(1);
+        const upColorA = upsideA > 0 ? '#4cff4c' : '#ff4444';
+        const signA = upsideA > 0 ? '+' : '';
+        section += `<div style="text-align:center;font-size:18px;font-weight:bold;color:${upColorA}">${signA}${upsideA}% 上行空间</div>`;
+        section += '<div style="text-align:center;font-size:14px;color:#888">潜力</div>';
+      } else {
+        section += '<div></div><div></div>';
+      }
+      if (hasTargetB && dataB.price) {
+        const upsideB = ((dataB.targetMean - dataB.price) / dataB.price * 100).toFixed(1);
+        const upColorB = upsideB > 0 ? '#4cff4c' : '#ff4444';
+        const signB = upsideB > 0 ? '+' : '';
+        section += `<div style="text-align:center;font-size:18px;font-weight:bold;color:${upColorB}">${signB}${upsideB}% 上行空间</div>`;
+      }
+      
+      section += '</div></div>';
+    }
+    
+    return section;
+  })()}
 </div>
 
 <!-- 投资建议 -->
