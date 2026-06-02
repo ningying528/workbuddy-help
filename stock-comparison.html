@@ -19,11 +19,21 @@ h1{font-size:26px;text-align:center;color:#ffd700;margin:8px 0}
 .search-btn:hover{background:#ff5577}
 .search-btn:disabled{background:#555;cursor:not-allowed}
 
+/* API Key 提示横幅 */
+.key-banner{display:none;background:#1a0a00;border:1px solid #e94560;border-radius:10px;padding:10px 14px;margin:10px 0;text-align:center}
+.key-banner.show{display:block}
+.key-banner p{font-size:15px;color:#ffaa44;margin:6px 0}
+.key-banner input[type=text]{width:90%;max-width:420px;padding:10px 12px;font-size:15px;border:1px solid #e94560;border-radius:8px;background:#0a0a1a;color:#ffd700;margin:6px 0;text-align:center}
+.key-banner input[type=text]:focus{border-color:#ffd700;outline:none}
+.key-banner .btn-save-key{padding:8px 18px;background:#e94560;color:#fff;border:none;border-radius:8px;font-size:15px;cursor:pointer;margin:4px 4px}
+.key-banner .btn-skip{padding:8px 18px;background:transparent;border:1px solid #555;color:#aaa;border-radius:8px;font-size:15px;cursor:pointer;margin:4px 4px}
+.key-banner .status{font-size:13px;min-height:18px;margin-top:4px}
+
 .presets{margin:10px 0;display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 .preset-btn{padding:8px 16px;font-size:16px;background:#1a1a3a;border:1px solid #333;color:#00d4ff;border-radius:20px;cursor:pointer}
 .preset-btn:hover{background:#222255;border-color:#00d4ff}
 .preset-btn.cn{border-color:#e94560;color:#ff8888}
-.preset-group{font-size:14px;color:#888;width:100%;text-align:center;margin:4px 0 -2px}
+.tag-hint{font-size:13px;color:#ffaa44;width:100%;text-align:center;margin:2px 0}
 
 .loading{display:none;text-align:center;padding:20px;font-size:20px;color:#ffd700}
 .loading.show{display:block}
@@ -102,18 +112,25 @@ hr{border-color:#222;margin:16px 0}
 .settings-inner .btn-save{padding:8px 20px;background:#e94560;color:#fff;border:none;border-radius:8px;font-size:15px;cursor:pointer}
 .settings-inner .btn-close{padding:8px 20px;background:transparent;border:1px solid #555;color:#aaa;border-radius:8px;font-size:15px;cursor:pointer}
 .settings-inner .status-msg{text-align:center;font-size:14px;margin-top:8px;min-height:20px}
+
+/* 数据来源标签 */
+.src-tag{display:inline-block;font-size:11px;padding:1px 6px;border-radius:8px;margin-left:4px;vertical-align:middle}
+.src-tag.finnhub{background:#002244;color:#00aaff;border:1px solid #00aaff}
+.src-tag.yahoo{background:#1a0a1a;color:#ff8844;border:1px solid #ff8844}
+.src-tag.sina{background:#441100;color:#ff6644;border:1px solid #ff6644}
 </style>
 </head>
 <body>
 
 <button class="settings-btn" onclick="toggleSettings()" title="API 设置">⚙️</button>
 
+<!-- 设置面板 -->
 <div class="settings-panel" id="settingsPanel">
   <div class="settings-inner">
     <h3>⚙️ API 设置</h3>
     <p style="color:#aaa;font-size:14px;text-align:center;margin-bottom:12px">填入免费 API Key，手机端可直接获取数据</p>
     
-    <label style="color:#4cff4c;font-weight:bold">Finnhub API Key（美股数据）</label>
+    <label style="color:#4cff4c;font-weight:bold">Finnhub API Key（美股数据，推荐）</label>
     <input type="text" id="finnhubKey" placeholder="如: c4a5b3f0oprvd7ur2bgc8o8kkrv7ur2bgc...">
     <div class="hint">免费注册: <a href="https://finnhub.io/" target="_blank" style="color:#4cff4c">finnhub.io</a> → 注册 → 复制 API Key<br>免费版 60次/分钟，够用</div>
     
@@ -129,6 +146,19 @@ hr{border-color:#222;margin:16px 0}
   </div>
 </div>
 
+<!-- API Key 提示横幅（未设置时显示） -->
+<div class="key-banner" id="keyBanner">
+  <p style="font-weight:bold;font-size:16px">⚠️ 未设置 Finnhub API Key</p>
+  <p>美股数据需要 Key 才能稳定获取（Yahoo Finance 在手机端可能被拦截）</p>
+  <p style="color:#4cff4c;font-size:14px">✅ 免费获取：访问 <b>finnhub.io</b> 注册 → 复制 API Key → 粘贴下方</p>
+  <input type="text" id="bannerKeyInput" placeholder="粘贴 Finnhub API Key 到这里...">
+  <div>
+    <button class="btn-save-key" onclick="saveKeyFromBanner()">💾 保存并开始使用</button>
+    <button class="btn-skip" onclick="dismissBanner()">暂时跳过（美股可能失败）</button>
+  </div>
+  <div class="status" id="bannerStatus"></div>
+</div>
+
 <h1>📊 投资价值深度比较</h1>
 <p class="subtitle">支持 A 股 + 美股，输入代码自动识别市场</p>
 
@@ -140,6 +170,9 @@ hr{border-color:#222;margin:16px 0}
     <button class="search-btn" onclick="compare()" id="searchBtn">🔍 开始比较</button>
   </div>
 </div>
+
+<!-- 数据源状态指示 -->
+<div id="srcStatus" style="text-align:center;font-size:13px;color:#666;margin:4px 0;min-height:18px"></div>
 
 <!-- 美股快捷对比 -->
 <div class="presets">
@@ -170,7 +203,7 @@ hr{border-color:#222;margin:16px 0}
 <div id="result"></div>
 
 <script>
-// ===== 设置面板 =====
+// ===== 设置管理 =====
 let API_KEYS = { finnhub: '', sinaCookie: '' };
 
 function loadSettings() {
@@ -178,8 +211,11 @@ function loadSettings() {
     const saved = localStorage.getItem('stock_compare_keys');
     if (saved) API_KEYS = JSON.parse(saved);
   } catch(e) {}
-  document.getElementById('finnhubKey').value = API_KEYS.finnhub || '';
-  document.getElementById('sinaCookie').value = API_KEYS.sinaCookie || '';
+  // 同步到设置面板输入框
+  const fk = document.getElementById('finnhubKey');
+  const sc = document.getElementById('sinaCookie');
+  if (fk) fk.value = API_KEYS.finnhub || '';
+  if (sc) sc.value = API_KEYS.sinaCookie || '';
 }
 
 function saveSettings() {
@@ -189,15 +225,63 @@ function saveSettings() {
   API_KEYS.sinaCookie = cookie;
   localStorage.setItem('stock_compare_keys', JSON.stringify(API_KEYS));
   const msg = document.getElementById('settingsMsg');
-  msg.style.color = '#4cff4c';
-  msg.textContent = key ? '✅ Finnhub Key 已保存！美股数据可用。' : '已保存（未填写 Finnhub Key，将使用公开接口）';
+  if (msg) {
+    msg.style.color = '#4cff4c';
+    msg.textContent = key ? '✅ Finnhub Key 已保存！美股数据可用。' : '已保存（未填写 Finnhub Key，将使用公开接口）';
+  }
+  updateKeyBanner();
   setTimeout(() => toggleSettings(), 1200);
+}
+
+function saveKeyFromBanner() {
+  const keyInput = document.getElementById('bannerKeyInput');
+  const status = document.getElementById('bannerStatus');
+  if (!keyInput) return;
+  const key = keyInput.value.trim();
+  if (!key) {
+    status.style.color = '#ff4444';
+    status.textContent = '请先粘贴 API Key';
+    return;
+  }
+  API_KEYS.finnhub = key;
+  localStorage.setItem('stock_compare_keys', JSON.stringify(API_KEYS));
+  status.style.color = '#4cff4c';
+  status.textContent = '✅ 保存成功！正在刷新...';
+  updateKeyBanner();
+  setTimeout(() => { location.reload(); }, 800);
+}
+
+function dismissBanner() {
+  localStorage.setItem('stock_compare_banner_dismissed', '1');
+  updateKeyBanner();
+}
+
+function updateKeyBanner() {
+  const banner = document.getElementById('keyBanner');
+  if (!banner) return;
+  const dismissed = localStorage.getItem('stock_compare_banner_dismissed');
+  if (!API_KEYS.finnhub && !dismissed) {
+    banner.classList.add('show');
+  } else {
+    banner.classList.remove('show');
+  }
+  // 更新数据源状态
+  const srcStatus = document.getElementById('srcStatus');
+  if (srcStatus) {
+    if (API_KEYS.finnhub) {
+      srcStatus.innerHTML = '🟢 数据源：<span class="src-tag finnhub">Finnhub（已配置，支持CORS）</span>';
+    } else {
+      srcStatus.innerHTML = '🟡 数据源：<span class="src-tag yahoo">Yahoo Finance（可能被浏览器拦截，建议配置Finnhub Key）</span>';
+    }
+  }
 }
 
 function toggleSettings() {
   const panel = document.getElementById('settingsPanel');
-  panel.classList.toggle('show');
-  if (panel.classList.contains('show')) loadSettings();
+  if (panel) {
+    panel.classList.toggle('show');
+    if (panel.classList.contains('show')) loadSettings();
+  }
 }
 
 // ===== 市场识别 =====
@@ -213,6 +297,40 @@ function toSinaCode(code) {
   return 'sz' + c;
 }
 
+// ===== 通用 CORS 请求函数 =====
+// 尝试直连，失败则轮询多个 CORS 代理
+async function corsFetch(url, options = {}, proxyList = null) {
+  const defaultProxies = [
+    'https://corsproxy.io/?url=',
+    'https://api.allorigins.win/raw?url=',
+    'https://proxy.cors.sh/',
+    'https://corsproxy.cc/?',
+  ];
+  const proxies = proxyList || defaultProxies;
+
+  // 1. 尝试直连
+  try {
+    const resp = await fetch(url, { ...options, signal: AbortSignal.timeout(8000) });
+    if (resp.ok) return { response: resp, source: 'direct' };
+  } catch(e) {}
+
+  // 2. 尝试各代理
+  for (const proxy of proxies) {
+    try {
+      const sep = proxy.includes('?url=') ? '' : '?url=';
+      const proxyUrl = proxy + (sep ? encodeURIComponent(url) : encodeURIComponent(url));
+      const resp = await fetch(proxy + encodeURIComponent(url), {
+        ...options,
+        signal: AbortSignal.timeout(10000)
+      });
+      if (resp.ok) return { response: resp, source: 'proxy', proxy: proxy };
+    } catch(e) {}
+  }
+
+  // 3. 全部失败
+  return { response: null, source: 'failed' };
+}
+
 // ===== 数据获取 =====
 
 // --- A股：新浪财经 API（无需 Key） ---
@@ -221,12 +339,15 @@ async function fetchAStockData(code) {
   const symbol = code.trim();
   
   try {
-    const resp = await fetch(`https://hq.sinajs.cn/list=${sinaCode}`, {
-      headers: API_KEYS.sinaCookie ? { 'Cookie': API_KEYS.sinaCookie } : { 'Referer': 'https://finance.sina.com.cn/' }
-    });
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const fetchOpts = API_KEYS.sinaCookie
+      ? { headers: { 'Cookie': API_KEYS.sinaCookie, 'Referer': 'https://finance.sina.com.cn/' } }
+      : { headers: { 'Referer': 'https://finance.sina.com.cn/' } };
     
-    const text = await resp.text();
+    const result = await corsFetch(`https://hq.sinajs.cn/list=${sinaCode}`, fetchOpts);
+    if (!result.response) throw new Error('网络请求失败，请检查网络连接');
+    
+    const text = await result.response.text();
+    
     // 解析 GBK 编码
     let decoded;
     try {
@@ -277,31 +398,32 @@ async function fetchAStockData(code) {
       analystStrongBuy: 0, analystBuy: 0, analystHold: 0,
       analystSell: 0, analystStrongSell: 0, analystTotal: 0,
       targetMean: null, targetHigh: null, targetLow: null,
-      error: null
+      error: null,
+      dataSource: 'sina'
     };
   } catch(e) {
-    return { symbol, error: `A股数据获取失败: ${e.message}` };
+    return { symbol, error: `A股数据获取失败: ${e.message}`, market: 'CN' };
   }
 }
 
 // --- 美股：Finnhub API（需要 Key，支持 CORS） ---
 async function fetchUSStockDataFinnhub(symbol) {
   const s = symbol.toUpperCase().trim();
-  if (!API_KEYS.finnhub) return { symbol: s, error: '请点击右上角 ⚙️ 设置 Finnhub API Key', market: 'US' };
+  if (!API_KEYS.finnhub) return { symbol: s, error: 'NO_FINNHUB_KEY', market: 'US' };
   
   try {
-    // 基本行情
-    const quoteUrl = `https://finnhub.io/api/v1/quote?symbol=${s}&token=${API_KEYS.finnhub}`;
-    const profileUrl = `https://finnhub.io/api/v1/stock/profile2?symbol=${s}&token=${API_KEYS.finnhub}`;
-    const metricUrl = `https://finnhub.io/api/v1/stock/metric?symbol=${s}&metric=all&token=${API_KEYS.finnhub}`;
-    const recommendationUrl = `https://finnhub.io/api/v1/stock/recommendation?symbol=${s}&token=${API_KEYS.finnhub}`;
-    const priceTargetUrl = `https://finnhub.io/api/v1/stock/price-target?symbol=${s}&token=${API_KEYS.finnhub}`;
+    const base = 'https://finnhub.io/api/v1';
+    const tk = API_KEYS.finnhub;
     
     const [quoteRes, profileRes, metricRes, recRes, targetRes] = await Promise.allSettled([
-      fetch(quoteUrl), fetch(profileUrl), fetch(metricUrl), fetch(recommendationUrl), fetch(priceTargetUrl)
+      fetch(`${base}/quote?symbol=${s}&token=${tk}`),
+      fetch(`${base}/stock/profile2?symbol=${s}&token=${tk}`),
+      fetch(`${base}/stock/metric?symbol=${s}&metric=all&token=${tk}`),
+      fetch(`${base}/stock/recommendation?symbol=${s}&token=${tk}`),
+      fetch(`${base}/stock/price-target?symbol=${s}&token=${tk}`)
     ]);
     
-    const data = { symbol: s, market: 'US', error: null };
+    const data = { symbol: s, market: 'US', error: null, dataSource: 'finnhub' };
     
     // 行情
     if (quoteRes.status === 'fulfilled' && quoteRes.value.ok) {
@@ -372,48 +494,39 @@ async function fetchUSStockDataFinnhub(symbol) {
       }
     }
     
-    if (!data.price) data.error = '无法获取数据，请检查美股代码';
+    if (!data.price) data.error = '无法获取数据，请检查美股代码是否正确';
     return data;
   } catch(e) {
     return { symbol: s, error: `Finnhub 数据获取失败: ${e.message}`, market: 'US' };
   }
 }
 
-// 无 Finnhub Key 时的 Yahoo Finance 备用方案（需要 CORS 代理，手机端可能失败）
+// --- 美股：Yahoo Finance 备用方案 ---
 async function fetchUSStockDataYahoo(symbol) {
   const s = symbol.toUpperCase().trim();
-  const CORS_PROXIES = [
-    'https://corsproxy.io/?',
-    'https://api.allorigins.win/raw?url=',
-  ];
-  
-  async function tryFetch(url) {
-    // 直接请求
-    try {
-      const r = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
-      if (r.ok) return r;
-    } catch(e) {}
-    // 代理
-    for (const proxy of CORS_PROXIES) {
-      try {
-        const r = await fetch(proxy + encodeURIComponent(url), { headers: { 'User-Agent': 'Mozilla/5.0' } });
-        if (r.ok) return r;
-      } catch(e) {}
-    }
-    return null;
-  }
   
   try {
-    const [chartRes, summaryRes] = await Promise.allSettled([
-      tryFetch(`https://query1.finance.yahoo.com/v8/finance/chart/${s}?interval=1d&range=3mo`),
-      tryFetch(`https://query2.finance.yahoo.com/v10/finance/quoteSummary/${s}?modules=price,summaryDetail,defaultKeyStatistics,financialData,assetProfile,recommendationTrend`)
+    const headers = {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+      'Accept': 'application/json',
+      'Accept-Language': 'en-US,en;q=0.9',
+      'Referer': 'https://finance.yahoo.com/'
+    };
+
+    const chartUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${s}?interval=1d&range=3mo`;
+    const summaryUrl = `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${s}?modules=price,summaryDetail,defaultKeyStatistics,financialData,assetProfile,recommendationTrend`;
+
+    const [chartResult, summaryResult] = await Promise.allSettled([
+      corsFetch(chartUrl, { headers }),
+      corsFetch(summaryUrl, { headers })
     ]);
-    
-    const data = { symbol: s, market: 'US', error: null };
-    
-    if (chartRes.status === 'fulfilled' && chartRes.value) {
+
+    const data = { symbol: s, market: 'US', error: null, dataSource: 'yahoo' };
+
+    // 处理图表数据
+    if (chartResult.source !== 'failed' && chartResult.response) {
       try {
-        const json = await chartRes.value.json();
+        const json = await chartResult.response.json();
         const result = json?.chart?.result?.[0];
         if (result) {
           const meta = result.meta;
@@ -425,12 +538,13 @@ async function fetchUSStockDataYahoo(symbol) {
           data.low = meta.regularMarketDayLow;
           data.currency = meta.currency || 'USD';
         }
-      } catch(e) {}
+      } catch(e) { console.warn('Chart parse error:', e); }
     }
-    
-    if (summaryRes.status === 'fulfilled' && summaryRes.value) {
+
+    // 处理概要数据
+    if (summaryResult.source !== 'failed' && summaryResult.response) {
       try {
-        const json = await summaryRes.value.json();
+        const json = await summaryResult.response.json();
         const r = json?.quoteSummary?.result?.[0];
         if (r) {
           const p = r.price || {};
@@ -438,29 +552,29 @@ async function fetchUSStockDataYahoo(symbol) {
           const ks = r.defaultKeyStatistics || {};
           const fd = r.financialData || {};
           const ap = r.assetProfile || {};
-          
-          data.name = p.shortName || p.longName || s;
-          data.marketCap = p.marketCap?.raw || ks.marketCap?.raw;
-          data.pe = sd.trailingPE?.raw || ks.trailingPE?.raw;
-          data.forwardPE = sd.forwardPE?.raw || ks.forwardPE?.raw;
-          data.pb = p.priceToBook?.raw || ks.priceToBook?.raw;
-          data.eps = sd.trailingEps?.raw || ks.trailingEps?.raw;
-          data.beta = ks.beta?.raw;
-          data.dividendYield = sd.dividendYield?.raw;
-          data.roe = fd.returnOnEquity?.raw;
-          data.roa = fd.returnOnAssets?.raw;
-          data.revenueGrowth = fd.revenueGrowth?.raw;
-          data.earningsGrowth = fd.earningsGrowth?.raw;
-          data.grossMargin = fd.grossMargins?.raw;
-          data.profitMargin = fd.profitMargins?.raw;
-          data.totalCash = fd.totalCash?.raw;
-          data.totalDebt = fd.totalDebt?.raw;
-          data.freeCashflow = fd.freeCashflow?.raw;
-          data.operatingCashflow = fd.operatingCashflow?.raw;
-          data.totalRevenue = fd.totalRevenue?.raw;
-          data.sector = ap.sector;
-          data.industry = ap.industry;
-          
+
+          data.name = data.name || p.shortName || p.longName || s;
+          data.marketCap = data.marketCap || p.marketCap?.raw || ks.marketCap?.raw;
+          data.pe = data.pe || sd.trailingPE?.raw || ks.trailingPE?.raw;
+          data.forwardPE = data.forwardPE || sd.forwardPE?.raw || ks.forwardPE?.raw;
+          data.pb = data.pb || p.priceToBook?.raw || ks.priceToBook?.raw;
+          data.eps = data.eps || sd.trailingEps?.raw || ks.trailingEps?.raw;
+          data.beta = data.beta || ks.beta?.raw;
+          data.dividendYield = data.dividendYield || sd.dividendYield?.raw;
+          data.roe = data.roe || fd.returnOnEquity?.raw;
+          data.roa = data.roa || fd.returnOnAssets?.raw;
+          data.revenueGrowth = data.revenueGrowth || fd.revenueGrowth?.raw;
+          data.earningsGrowth = data.earningsGrowth || fd.earningsGrowth?.raw;
+          data.grossMargin = data.grossMargin || fd.grossMargins?.raw;
+          data.profitMargin = data.profitMargin || fd.profitMargins?.raw;
+          data.totalCash = data.totalCash || fd.totalCash?.raw;
+          data.totalDebt = data.totalDebt || fd.totalDebt?.raw;
+          data.freeCashflow = data.freeCashflow || fd.freeCashflow?.raw;
+          data.operatingCashflow = data.operatingCashflow || fd.operatingCashflow?.raw;
+          data.totalRevenue = data.totalRevenue || fd.totalRevenue?.raw;
+          data.sector = data.sector || ap.sector;
+          data.industry = data.industry || ap.industry;
+
           const rt = r.recommendationTrend || {};
           if (rt.trend && rt.trend.length > 0) {
             const latest = rt.trend[0];
@@ -471,19 +585,19 @@ async function fetchUSStockDataYahoo(symbol) {
             data.analystStrongSell = latest.strongSell || 0;
             data.analystTotal = data.analystStrongBuy + data.analystBuy + data.analystHold + data.analystSell + data.analystStrongSell;
           }
-          data.targetMean = fd.targetMeanPrice?.raw;
-          data.targetHigh = fd.targetHighPrice?.raw;
-          data.targetLow = fd.targetLowPrice?.raw;
+          data.targetMean = data.targetMean || fd.targetMeanPrice?.raw;
+          data.targetHigh = data.targetHigh || fd.targetHighPrice?.raw;
+          data.targetLow = data.targetLow || fd.targetLowPrice?.raw;
         }
-      } catch(e) {}
+      } catch(e) { console.warn('Summary parse error:', e); }
     }
-    
+
     if (!data.price && !data.name) {
-      data.error = '无法获取数据（Yahoo Finance 被浏览器拦截）。请点击右上角 ⚙️ 填入 Finnhub API Key。';
+      data.error = 'NO_YAHOO_DATA: 无法从 Yahoo Finance 获取数据（可能需要 Finnhub Key）';
     }
     return data;
   } catch(e) {
-    return { symbol: s, error: `数据获取失败: ${e.message}`, market: 'US' };
+    return { symbol: s, error: `Yahoo Finance 获取失败: ${e.message}`, market: 'US' };
   }
 }
 
@@ -496,13 +610,11 @@ async function fetchStockData(symbol) {
     if (API_KEYS.finnhub) {
       const data = await fetchUSStockDataFinnhub(symbol);
       if (!data.error) return data;
-      // Finnhub 失败，尝试 Yahoo
       console.warn('Finnhub failed, trying Yahoo:', data.error);
     }
-    return await fetchUSStockDataYahoo(symbol);
   }
+    return await fetchUSStockDataYahoo(symbol);
 }
-
 // ===== 格式化 =====
 function fmt(num, decimals = 2) {
   if (num == null || isNaN(num)) return 'N/A';
@@ -723,6 +835,14 @@ function render(dataA, dataB, scores, v) {
   const missingNote = (isCnA || isCnB) ? 
     '<div class="note-cn">⚠️ A股部分财务数据（营收增速/毛利率/ROE/现金流等）需扩展数据源，暂仅展示行情&PE&市值对比。标*维度为默认5分。</div>' : '';
 
+  // 数据源标签
+  const srcTagA = dataA.dataSource === 'finnhub' ? '<span class="src-tag finnhub">Finnhub</span>' :
+                   dataA.dataSource === 'sina' ? '<span class="src-tag sina">新浪</span>' :
+                   dataA.dataSource === 'yahoo' ? '<span class="src-tag yahoo">Yahoo</span>' : '';
+  const srcTagB = dataB.dataSource === 'finnhub' ? '<span class="src-tag finnhub">Finnhub</span>' :
+                   dataB.dataSource === 'sina' ? '<span class="src-tag sina">新浪</span>' :
+                   dataB.dataSource === 'yahoo' ? '<span class="src-tag yahoo">Yahoo</span>' : '';
+
   const marketTagA = dataA.market === 'CN' ? '<span class="tag mkt cn">A股</span>' : '<span class="tag mkt us">美股</span>';
   const marketTagB = dataB.market === 'CN' ? '<span class="tag mkt cn">A股</span>' : '<span class="tag mkt us">美股</span>';
 
@@ -731,9 +851,9 @@ ${missingNote}
 
 <div class="card">
   <div class="compare-grid">
-    <div style="text-align:center;font-size:20px;color:#ffd700;font-weight:bold">${dataA.symbol}${marketTagA}</div>
+    <div style="text-align:center;font-size:20px;color:#ffd700;font-weight:bold">${dataA.symbol}${marketTagA}${srcTagA}</div>
     <div style="text-align:center;font-size:14px;color:#888">比较维度</div>
-    <div style="text-align:center;font-size:20px;color:#00d4ff;font-weight:bold">${dataB.symbol}${marketTagB}</div>
+    <div style="text-align:center;font-size:20px;color:#00d4ff;font-weight:bold">${dataB.symbol}${marketTagB}${srcTagB}</div>
 
     <div style="text-align:center">
       <span class="big-price yellow">${showPrice(dataA)}</span><br>
@@ -799,33 +919,33 @@ ${(() => {
       <p style="font-size:15px;color:#ffaa44;text-align:center;padding:8px;background:#1a0a00;border-radius:8px">A股券商评级数据开发中，暂显示 N/A。<br>美股请填入 Finnhub API Key 查看。</p>
     </div>`;
   }
-  
+
   function analystBar(data, color) {
     const total = data.analystTotal || 0;
     if (total === 0) return '<p style="font-size:17px;color:#888;text-align:center">暂无分析师数据</p>';
-    
+
     const strongBuy = data.analystStrongBuy || 0;
     const buy = data.analystBuy || 0;
     const hold = data.analystHold || 0;
     const sell = data.analystSell || 0;
     const strongSell = data.analystStrongSell || 0;
-    
+
     const buyPct = ((strongBuy + buy) / total * 100).toFixed(0);
     const holdPct = (hold / total * 100).toFixed(0);
     const sellPct = ((sell + strongSell) / total * 100).toFixed(0);
-    
+
     let consensus = '', consensusColor = '';
     if (buyPct >= 70) { consensus = '强烈看多'; consensusColor = '#4cff4c'; }
     else if (buyPct >= 50) { consensus = '偏多'; consensusColor = '#a0ffa0'; }
     else if (buyPct >= 30) { consensus = '中性偏多'; consensusColor = '#ffd700'; }
     else if (sellPct >= 50) { consensus = '偏空'; consensusColor = '#ff6666'; }
     else { consensus = '中性'; consensusColor = '#ffd700'; }
-    
+
     let html = `<div style="text-align:center;margin-bottom:8px">
       <span style="font-size:17px;font-weight:bold;color:${color}">${data.symbol} · ${total} 位分析师</span><br>
       <span style="font-size:14px;color:${consensusColor}">共识：${consensus}</span>
     </div>`;
-    
+
     html += `<div style="display:flex;height:28px;border-radius:6px;overflow:hidden;margin:6px 0">
       ${strongBuy > 0 ? `<div style="width:${(strongBuy/total*100).toFixed(1)}%;background:#00cc44;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;color:#fff">${strongBuy}</div>` : ''}
       ${buy > 0 ? `<div style="width:${(buy/total*100).toFixed(1)}%;background:#66dd88;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;color:#fff">${buy}</div>` : ''}
@@ -833,7 +953,7 @@ ${(() => {
       ${sell > 0 ? `<div style="width:${(sell/total*100).toFixed(1)}%;background:#dd6666;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;color:#fff">${sell}</div>` : ''}
       ${strongSell > 0 ? `<div style="width:${(strongSell/total*100).toFixed(1)}%;background:#cc2200;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;color:#fff">${strongSell}</div>` : ''}
     </div>`;
-    
+
     html += `<div style="display:flex;flex-wrap:wrap;gap:6px;font-size:14px;color:#aaa;margin-bottom:4px">
       <span style="color:#00cc44">强力买入 ${strongBuy}</span>
       <span style="color:#66dd88">买入 ${buy}</span>
@@ -841,28 +961,28 @@ ${(() => {
       <span style="color:#dd6666">卖出 ${sell}</span>
       <span style="color:#cc2200">强力卖出 ${strongSell}</span>
     </div>`;
-    
+
     html += `<div style="display:flex;justify-content:space-around;font-size:18px;margin-top:2px">
       <span><span style="color:#4cff4c;font-weight:bold">买入</span> ${buyPct}%</span>
       <span><span style="color:#ffd700;font-weight:bold">持有</span> ${holdPct}%</span>
       <span><span style="color:#ff4444;font-weight:bold">卖出</span> ${sellPct}%</span>
     </div>`;
-    
+
     return html;
   }
-  
+
   let section = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px">';
   section += `<div style="background:#0f0f2a;border-radius:10px;padding:12px">${analystBar(dataA, '#ffd700')}</div>`;
   section += `<div style="background:#0f0f2a;border-radius:10px;padding:12px">${analystBar(dataB, '#00d4ff')}</div>`;
   section += '</div>';
-  
+
   const hasTargetA = dataA.targetMean != null;
   const hasTargetB = dataB.targetMean != null;
   if (hasTargetA || hasTargetB) {
     section += '<div style="background:#0f0f2a;border-radius:10px;padding:14px;margin-top:8px">';
     section += '<p style="font-size:18px;font-weight:bold;color:#ffd700;text-align:center;margin-bottom:10px">🎯 目标价对比</p>';
     section += '<div class="compare-grid">';
-    
+
     const symA = dataA.currency === 'CNY' ? '¥' : '$';
     const symB = dataB.currency === 'CNY' ? '¥' : '$';
     const tarA = hasTargetA ? `${symA}${dataA.targetLow.toFixed(2)} ~ <b style="color:#ffd700;font-size:20px">${symA}${dataA.targetMean.toFixed(2)}</b> ~ ${symA}${dataA.targetHigh.toFixed(2)}` : 'N/A';
@@ -870,7 +990,7 @@ ${(() => {
     section += `<div style="text-align:center;font-size:16px">${tarA}</div>`;
     section += '<div style="text-align:center;font-size:15px;color:#888;font-weight:bold">目标价</div>';
     section += `<div style="text-align:center;font-size:16px">${tarB}</div>`;
-    
+
     if (hasTargetA && dataA.price) {
       const upsideA = ((dataA.targetMean - dataA.price) / dataA.price * 100).toFixed(1);
       const upColorA = upsideA > 0 ? '#4cff4c' : '#ff4444';
@@ -884,7 +1004,7 @@ ${(() => {
       const upColorB = upsideB > 0 ? '#4cff4c' : '#ff4444';
       section += `<div style="text-align:center;font-size:18px;font-weight:bold;color:${upColorB}">${upsideB > 0 ? '+' : ''}${upsideB}% 上行空间</div>`;
     }
-    
+
     section += '</div></div>';
   }
   return section;
@@ -896,7 +1016,7 @@ ${(() => {
   ${v.reasons.length > 0 ? v.reasons.map(r => 
     `<p class="verdict-text">🔑 <b style="color:${r.stock==='A'?'#ffd700':'#00d4ff'}">${r.stock==='A'?dataA.symbol:dataB.symbol}</b> 胜出：${r.text}</p>`
   ).join('') : '<p class="verdict-text gray">两只股票各有所长，建议结合行业趋势和个人风险偏好判断</p>'}
-  
+
   <div style="margin-top:12px;padding:12px;background:#0a0a1a;border-radius:10px">
     <p style="font-size:18px;line-height:1.8">
       <b style="color:#ffd700">${dataA.symbol}</b>：${scores.totalA >= scores.totalB ? '<span class="tag buy">综合更优</span>' : (scores.totalA >= scores.totalB - 3 ? '<span class="tag hold">差距不大</span>' : '<span class="tag sell">估值偏贵</span>')}
@@ -914,75 +1034,97 @@ ${(() => {
 </div>
   `;
 
-  document.getElementById('result').innerHTML = html;
+  const resultEl = document.getElementById('result');
+  if (resultEl) resultEl.innerHTML = html;
 }
 
 // ===== 主流程 =====
 function quickCompare(a, b) {
-  document.getElementById('tickerA').value = a;
-  document.getElementById('tickerB').value = b;
+  const ta = document.getElementById('tickerA');
+  const tb = document.getElementById('tickerB');
+  if (ta) ta.value = a;
+  if (tb) tb.value = b;
   compare();
 }
 
 async function compare() {
-  const codeA = document.getElementById('tickerA').value.trim();
-  const codeB = document.getElementById('tickerB').value.trim();
-  
+  const codeA = document.getElementById('tickerA')?.value?.trim();
+  const codeB = document.getElementById('tickerB')?.value?.trim();
+
   if (!codeA || !codeB) {
     showError('请输入两只股票的代码');
     return;
   }
-  
+
   showLoading(true);
   hideError();
-  document.getElementById('result').innerHTML = '';
-  
+  const resultEl = document.getElementById('result');
+  if (resultEl) resultEl.innerHTML = '';
+
   try {
     const [dataA, dataB] = await Promise.all([
       fetchStockData(codeA),
       fetchStockData(codeB)
     ]);
-    
-    if (dataA.error && dataB.error) {
-      showError(`${dataA.error}\n\n${dataB.error}`);
-      showLoading(false);
-      return;
+
+    // 处理错误
+    let errorMsg = '';
+    if (dataA.error && dataA.error !== 'NO_FINNHUB_KEY') {
+      errorMsg += `${dataA.symbol}: ${dataA.error}\n`;
     }
-    if (dataA.error) {
-      showError(`${dataA.symbol}: ${dataA.error}`);
-      // 仍然显示 dataB
+    if (dataB.error && dataB.error !== 'NO_FINNHUB_KEY') {
+      errorMsg += `${dataB.symbol}: ${dataB.error}\n`;
     }
-    if (dataB.error) {
-      showError(`${dataB.symbol}: ${dataB.error}`);
+
+    // 特殊处理：没有 Finnhub Key 且 Yahoo 也失败
+    if (dataA.error === 'NO_FINNHUB_KEY' || dataB.error === 'NO_FINNHUB_KEY') {
+      errorMsg = '📌 提示：未配置 Finnhub API Key，美股数据可能无法获取。\n\n请点击右上角 ⚙️ 填入免费 Finnhub Key，或在此页面顶部横幅中粘贴 Key。\n\n获取方式：访问 finnhub.io → 注册（免费）→ 复制 API Key';
+    } else if (errorMsg.includes('NO_YAHOO_DATA')) {
+      errorMsg = '📌 Yahoo Finance 数据获取失败（可能被浏览器 CORS 策略拦截）。\n\n✅ 解决方案：点击右上角 ⚙️ 填入 Finnhub API Key（免费注册 finnhub.io）';
     }
-    
-    const scores = score(dataA, dataB);
-    const v = verdict(dataA, dataB, scores);
-    render(dataA, dataB, scores, v);
+
+    if (errorMsg) {
+      showError(errorMsg);
+      // 如果至少有一个成功，仍然渲染
+      if (dataA.price || dataB.price) {
+        const scores = score(dataA, dataB);
+        const v = verdict(dataA, dataB, scores);
+        render(dataA, dataB, scores, v);
+      }
+    } else {
+      const scores = score(dataA, dataB);
+      const v = verdict(dataA, dataB, scores);
+      render(dataA, dataB, scores, v);
+    }
   } catch(e) {
     showError('数据获取失败: ' + e.message);
   }
-  
+
   showLoading(false);
 }
 
 function showLoading(show) {
-  document.getElementById('loading').classList.toggle('show', show);
-  document.getElementById('searchBtn').disabled = show;
+  const el = document.getElementById('loading');
+  const btn = document.getElementById('searchBtn');
+  if (el) el.classList.toggle('show', show);
+  if (btn) btn.disabled = show;
 }
 
 function showError(msg) {
   const el = document.getElementById('error');
+  if (!el) return;
   el.textContent = msg;
   el.classList.add('show');
 }
 
 function hideError() {
-  document.getElementById('error').classList.remove('show');
+  const el = document.getElementById('error');
+  if (el) el.classList.remove('show');
 }
 
-// 页面加载时读取设置
+// ===== 页面初始化 =====
 loadSettings();
+updateKeyBanner();
 </script>
 </body>
 </html>
