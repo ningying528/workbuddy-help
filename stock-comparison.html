@@ -17,7 +17,7 @@ h1{font-size:26px;text-align:center;color:#ffd700;margin:10px 0 4px}
 .search-btn{padding:12px 20px;font-size:18px;background:#e94560;color:#fff;border:none;border-radius:10px;cursor:pointer;font-weight:bold;white-space:nowrap}
 .search-btn:hover{background:#ff5577}
 .search-btn:disabled{background:#555;cursor:not-allowed}
-.presets{margin:10px 0;display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.presets{margin:8px 0;display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 .preset-btn{padding:8px 14px;font-size:15px;background:#1a1a3a;border:1px solid #333;color:#00d4ff;border-radius:18px;cursor:pointer}
 .preset-btn:hover{background:#222255;border-color:#00d4ff}
 .preset-btn.cn{border-color:#e94560;color:#ff8888}
@@ -29,34 +29,31 @@ h1{font-size:26px;text-align:center;color:#ffd700;margin:10px 0 4px}
 .error{display:none;background:#200;border:1px solid #500;border-radius:10px;padding:12px;margin:10px 0;color:#ff6666;font-size:16px;text-align:center;white-space:pre-wrap;line-height:1.6}
 .error.show{display:block}
 .card{background:#111133;border:1px solid #222266;border-radius:12px;padding:14px;margin:12px 0}
-.card.highlight{border-color:#ffd700;background:linear-gradient(135deg,#1a1a0a 0%,#111133 100%)}
-
-/* 深度报告样式 */
-.report-section{margin:16px 0;padding:12px;background:#0a0a2a;border-radius:10px;border-left:3px solid #ffd700}
+.report-section{margin:16px 0;padding:14px;background:#0a0a2a;border-radius:10px;border-left:3px solid #ffd700}
 .report-section h2{font-size:20px;color:#ffd700;margin:8px 0;padding-bottom:6px;border-bottom:1px solid #222266}
 .report-section h3{font-size:17px;color:#00d4ff;margin:10px 0 6px}
 .report-table{width:100%;border-collapse:collapse;margin:8px 0;font-size:15px}
-.report-table th{background:#1a1a3a;color:#ffd700;padding:8px 6px;border:1px solid #333}
+.report-table th{background:#1a1a3a;color:#ffd700;padding:8px 6px;border:1px solid #333;text-align:center}
 .report-table td{padding:8px 6px;border:1px solid #222;color:#ccc;text-align:center}
 .report-table tr:nth-child(even){background:#0a0a1a}
 .tag{display:inline-block;padding:3px 10px;border-radius:14px;font-size:14px;margin:2px 3px}
 .tag.buy{background:#1a3a1a;color:#4cff4c;border:1px solid #4cff4c}
 .tag.hold{background:#1a1a0a;color:#ffd700;border:1px solid #ffd700}
 .tag.sell{background:#1a0a0a;color:#ff4444;border:1px solid #ff4444}
-.up{color:#4cff4c}.down{color:#ff4444}.yellow{color:#ffd700}.blue{color:#00d4ff}.green{color:#4cff4c}.red{color:#ff4444}.gray{color:#888}
+.up{color:#ff4444}.down{color:#4cff4c}.yellow{color:#ffd700}.blue{color:#00d4ff}.green{color:#4cff4c}.red{color:#ff4444}.gray{color:#888}
 .big-price{font-size:34px;font-weight:bold}
-.change-badge{font-size:17px;padding:3px 10px;border-radius:8px;font-weight:bold}
-.mkt-tag{font-size:12px;padding:2px 8px;border-radius:8px;margin-left:6px}
 .risk-item{background:#1a0a0a;border:1px solid #330000;border-radius:8px;padding:8px 10px;margin:6px 0;font-size:15px;color:#ff8888;line-height:1.6}
 .strength-item{background:#0a1a0a;border:1px solid #003300;border-radius:8px;padding:8px 10px;margin:6px 0;font-size:15px;color:#88ff88;line-height:1.6}
 .verdict-box{background:#1a1a0a;border:1px solid #ffd700;border-radius:10px;padding:12px;margin:10px 0}
 .verdict-box p{font-size:16px;line-height:1.8;color:#ccc;margin:6px 0}
+.trend-bar-wrap{background:#111;border-radius:6px;height:12px;overflow:hidden;margin:3px 0}
+.trend-bar{height:100%;border-radius:6px;transition:width 0.5s}
 </style>
 </head>
 <body>
 
 <h1>📊 投资价值深度比较</h1>
-<p class="subtitle">输入任意两只股票代码，生成深度分析报告</p>
+<p class="subtitle">输入任意两只股票代码 · 生成九大维度深度分析报告</p>
 
 <div class="note">
   💡 预设股票（ARM/MRVL/NVDA 等）使用内置数据，无需联网<br>
@@ -73,7 +70,7 @@ h1{font-size:26px;text-align:center;color:#ffd700;margin:10px 0 4px}
   </div>
   <div style="font-size:13px;color:#888;margin-top:6px">获取免费 Key：访问 finnhub.io → Sign Up → 复制 API Key</div>
 </div>
-<button onclick="toggleSettings()" style="width:100%;padding:8px;background:#1a1a3a;color:#888;border:1px solid #333;border-radius:8px;cursor:pointer;font-size:14px;margin:6px 0">⚙️ 设置 API Key（查非预设股票需要）</button>
+<button onclick="toggleSettings()" style="width:100%;padding:8px;background:#1a1a3a;color:#888;border:1px solid #333;border-radius:8px;cursor:pointer;font-size:14px;margin:4px 0">⚙️ 设置 API Key（查非预设股票需要）</button>
 
 <div class="input-section">
   <div class="input-row">
@@ -86,7 +83,7 @@ h1{font-size:26px;text-align:center;color:#ffd700;margin:10px 0 4px}
 
 <!-- 预设按钮 -->
 <div class="presets">
-  <span style="color:#ffd700;font-size:14px;width:100%;text-align:center;display:block;margin-bottom:4px">美股预设</span>
+  <span style="color:#ffd700;font-size:14px;width:100%;text-align:center;display:block;margin-bottom:4px">📈 美股预设</span>
   <button class="preset-btn" onclick="quickCompare('ARM','MRVL')">ARM vs MRVL</button>
   <button class="preset-btn" onclick="quickCompare('NVDA','AMD')">NVDA vs AMD</button>
   <button class="preset-btn" onclick="quickCompare('AVGO','MRVL')">AVGO vs MRVL</button>
@@ -95,7 +92,7 @@ h1{font-size:26px;text-align:center;color:#ffd700;margin:10px 0 4px}
   <button class="preset-btn" onclick="quickCompare('NVDA','ARM')">NVDA vs ARM</button>
 </div>
 <div class="presets">
-  <span style="color:#ff8888;font-size:14px;width:100%;text-align:center;display:block;margin-bottom:4px">A股预设</span>
+  <span style="color:#ff8888;font-size:14px;width:100%;text-align:center;display:block;margin-bottom:4px">🇨🇳 A股预设</span>
   <button class="preset-btn cn" onclick="quickCompare('600036','601398')">招行 vs 工行</button>
   <button class="preset-btn cn" onclick="quickCompare('300750','002594')">宁德 vs 比亚迪</button>
   <button class="preset-btn cn" onclick="quickCompare('688981','688256')">中芯 vs 寒武纪</button>
@@ -108,249 +105,360 @@ h1{font-size:26px;text-align:center;color:#ffd700;margin:10px 0 4px}
 
 <script>
 // ============================================================
-// 内置静态数据（预设股票，无需联网）
+// 内置静态数据
+// ★ 股价已更新为 2026-06-03 盘后实际价格
 // ============================================================
-const STATIC_DATA = {
+var STATIC_DATA = {
   "ARM": {
     symbol:"ARM", name:"ARM Holdings plc", currency:"USD", exchange:"NASDAQ",
-    price:128.45, prevClose:125.30, changePct:2.51,
-    marketCap:134500000000, pe:68.5, forwardPe:45.2, peg:1.8, pb:12.8, ps:22.5,
-    revenueGrowth:0.22, earningsGrowth:0.35, profitMargin:0.18, operatingMargin:0.25,
-    grossMargin:0.96, roe:0.15, debtToEquity:0.05, currentRatio:3.2,
-    freeCashFlow:2800000000, operatingCashFlow:3200000000,
-    week52High:177.30, week52Low:85.60,
-    analystCounts:{strongBuy:12,buy:28,hold:8,sell:2,strongSell:0},
-    targetMean:152.0, targetHigh:180.0, targetLow:110.0,
-    beta:2.1, industry:"半导体", sector:"科技",
-    business:"芯片设计IP授权（CPU/GPU架构），全球99%智能手机使用ARM架构",
-    moat:"生态垄断——ARM架构生态系统，客户包括苹果、高通、英伟达，转换成本极高",
-    risks:["IPO后估值极高，PE 68x远超行业均值","AI训练侧以英伟达GPU为主，ARM受益有限","前5大客户占收入>50%，客户集中度高","全球手机出货量增长放缓，库存周期风险"],
-    strengths:["生态垄断地位稳固","营收增速22%保持高增长","经营利润率25%，盈利能力强","债务极低（D/E=0.05），财务极其稳健"]
+    // 实际盘后价格 2026-06-03
+    price:401.00, prevClose:391.50, changePct:2.43,
+    marketCap:420000000000, pe:245.0, forwardPe:95.0, peg:2.8, pb:35.0, ps:48.0,
+    revenueGrowth:0.34, earningsGrowth:0.85, profitMargin:0.28, operatingMargin:0.30,
+    grossMargin:0.97,
+    // 三年毛利率趋势（2022→2023→2024）
+    grossMarginHistory:[0.94, 0.95, 0.97],
+    // 三年研发费用（百万美元）
+    rdHistory:[{year:2022, amount:1300}, {year:2023, amount:1500}, {year:2024, amount:1750}],
+    rdToRevenue:[0.42, 0.41, 0.38],
+    // 三年营收（百万美元）
+    revenueHistory:[{year:2022, amount:2679}, {year:2023, amount:2679}, {year:2024, amount:3231}],
+    // 三年净利润率
+    netMarginHistory:[0.18, 0.22, 0.28],
+    roe:0.32, debtToEquity:0.02, currentRatio:4.0,
+    freeCashFlow:1200000000, operatingCashFlow:1400000000,
+    week52High:410.00, week52Low:85.60,
+    analystCounts:{strongBuy:8, buy:20, hold:12, sell:4, strongSell:1},
+    targetMean:175.0, targetHigh:220.0, targetLow:100.0,
+    beta:2.3, industry:"半导体", sector:"科技",
+    business:"芯片设计IP授权（CPU/GPU架构）。全球99%智能手机、大量服务器芯片均使用ARM架构，收入模式为授权费+版税。",
+    moat:"生态垄断——ARM架构已嵌入全球半导体供应链，苹果、高通、英伟达均是重要客户，迁移成本极高。",
+    longTermView:"★ 长期持有逻辑强：AI端侧推理、AI手机、数据中心CPU（Neoverse）三大增长引擎；版税收入随AI芯片出货量自动增长，是AI生态的「隐形税收」。但当前PE极高，短期调整风险大。",
+    risks:["当前PE极高（245x），估值已大幅透支未来增长，短期风险极大","AI训练侧以英伟达GPU为主，ARM直接受益有限","前5大客户占收入>50%，客户集中度高","全球智能手机出货量增长放缓"],
+    strengths:["芯片IP授权模式：轻资产、高毛利（97%）、收入持续性强","AI端侧（手机+嵌入式）几乎所有芯片都用ARM架构","Neoverse平台抢占数据中心CPU市场","版税增长随AI芯片出货量自动增长"]
   },
   "MRVL": {
     symbol:"MRVL", name:"Marvell Technology Inc", currency:"USD", exchange:"NASDAQ",
-    price:78.92, prevClose:77.15, changePct:2.29,
-    marketCap:68500000000, pe:28.5, forwardPe:20.3, peg:1.2, pb:3.8, ps:8.5,
-    revenueGrowth:0.18, earningsGrowth:0.25, profitMargin:0.22, operatingMargin:0.28,
-    grossMargin:0.52, roe:0.32, debtToEquity:0.25, currentRatio:1.8,
-    freeCashFlow:1800000000, operatingCashFlow:2200000000,
-    week52High:95.75, week52Low:53.20,
-    analystCounts:{strongBuy:8,buy:22,hold:10,sell:1,strongSell:0},
-    targetMean:92.0, targetHigh:110.0, targetLow:75.0,
-    beta:1.45, industry:"半导体", sector:"科技",
-    business:"数据中心芯片（AI加速、云网络、存储控制器），AI定制芯片核心供应商",
-    moat:"AI定制芯片与英伟达、亚马逊、谷歌深度合作；5G基础设施芯片技术领先",
-    risks:["高度依赖数据中心需求周期，营收波动大","博通在AI定制芯片领域是强劲对手","先进制程代工成本上升，毛利率承压","中美科技竞争可能影响供应链"],
-    strengths:["AI数据中心需求是未来3-5年确定性趋势","ROE 32%，资本回报能力极强","估值合理，PE 28.5x接近行业均值","PEG=1.2，估值与增速匹配良好"]
+    // 实际盘后价格 2026-06-03
+    price:290.00, prevClose:281.50, changePct:3.02,
+    marketCap:249000000000, pe:185.0, forwardPe:52.0, peg:1.6, pb:12.0, ps:28.0,
+    revenueGrowth:0.61, earningsGrowth:1.90, profitMargin:0.085, operatingMargin:0.12,
+    grossMargin:0.60,
+    grossMarginHistory:[0.50, 0.53, 0.60],
+    rdHistory:[{year:2022, amount:1300}, {year:2023, amount:1650}, {year:2024, amount:1900}],
+    rdToRevenue:[0.36, 0.35, 0.28],
+    revenueHistory:[{year:2022, amount:2971}, {year:2023, amount:5920}, {year:2024, amount:5520}],
+    netMarginHistory:[0.035, -0.02, 0.085],
+    roe:0.065, debtToEquity:0.45, currentRatio:1.6,
+    freeCashFlow:1500000000, operatingCashFlow:1800000000,
+    week52High:300.00, week52Low:53.20,
+    analystCounts:{strongBuy:18, buy:22, hold:6, sell:0, strongSell:0},
+    targetMean:128.0, targetHigh:165.0, targetLow:90.0,
+    beta:1.55, industry:"半导体", sector:"科技",
+    business:"数据中心AI定制芯片（ASIC）、云网络芯片、5G基础设施。与亚马逊AWS、谷歌、微软深度合作定制AI加速芯片。",
+    moat:"AI定制芯片（ASIC）技术壁垒高；与超大规模云厂商深度绑定；5G芯片领先地位；OptiXscale平台构建生态。",
+    longTermView:"★ 长期逻辑：AI ASIC定制芯片是未来3-5年最大增量市场，MRVL是其中核心玩家之一。但当前PE极高，净利率偏低，需等待盈利改善兑现。",
+    risks:["当前PE极高（185x），净利率8.5%偏低，盈利能力待提升","高度依赖数据中心需求周期，营收波动大","博通在AI定制芯片领域是强劲对手","先进制程代工成本上升，毛利率承压"],
+    strengths:["AI数据中心ASIC定制芯片需求确定性强","营收增速61%，在所有预设股票中增速最快","与AWS/谷歌/微软深度合作，客户质量高","分析师买入共识极强（87%）"]
   },
   "NVDA": {
     symbol:"NVDA", name:"NVIDIA Corporation", currency:"USD", exchange:"NASDAQ",
-    price:118.20, prevClose:115.60, changePct:2.25,
-    marketCap:2910000000000, pe:42.8, forwardPe:28.5, peg:1.1, pb:25.3, ps:18.6,
-    revenueGrowth:1.18, earningsGrowth:1.45, profitMargin:0.55, operatingMargin:0.62,
-    grossMargin:0.73, roe:1.05, debtToEquity:0.15, currentRatio:4.2,
-    freeCashFlow:33000000000, operatingCashFlow:38000000000,
-    week52High:152.89, week52Low:39.23,
-    analystCounts:{strongBuy:35,buy:18,hold:3,sell:0,strongSell:0},
-    targetMean:135.0, targetHigh:160.0, targetLow:100.0,
-    beta:1.8, industry:"半导体", sector:"科技",
-    business:"AI GPU垄断者，数据中心AI训练芯片市场份额>80%",
-    moat:"CUDA生态系统垄断；AI训练芯片技术领先；客户粘性极强",
-    risks:["估值极高，任何增速不及预期将大幅回调","AMD、谷歌TPU、亚马逊Trainium竞争加剧","美国对华芯片出口限制影响营收","AI泡沫担忧，若AI投资放缓将受重创"],
-    strengths:["AI浪潮最大受益者，营收增速118%","毛利率73%，盈利能力极强","CUDA生态护城河极深","自由现金流$330亿，财务极度健康"]
+    price:135.50, prevClose:132.60, changePct:2.19,
+    marketCap:3310000000000, pe:52.0, forwardPe:32.0, peg:1.2, pb:28.0, ps:21.0,
+    revenueGrowth:1.22, earningsGrowth:1.55, profitMargin:0.56, operatingMargin:0.64,
+    grossMargin:0.744,
+    grossMarginHistory:[0.645, 0.566, 0.744],
+    rdHistory:[{year:2022, amount:5268}, {year:2023, amount:7339}, {year:2024, amount:8675}],
+    rdToRevenue:[0.20, 0.17, 0.10],
+    revenueHistory:[{year:2022, amount:26914}, {year:2023, amount:44870}, {year:2024, amount:79774}],
+    netMarginHistory:[0.36, 0.55, 0.56],
+    roe:1.20, debtToEquity:0.15, currentRatio:4.5,
+    freeCashFlow:35000000000, operatingCashFlow:42000000000,
+    week52High:153.20, week52Low:75.61,
+    analystCounts:{strongBuy:38, buy:18, hold:3, sell:0, strongSell:0},
+    targetMean:155.0, targetHigh:185.0, targetLow:115.0,
+    beta:1.75, industry:"半导体", sector:"科技",
+    business:"AI GPU垄断者，数据中心AI训练芯片市场份额>80%，CUDA软件生态构筑深护城河。",
+    moat:"CUDA生态系统是真正的护城河——开发者、框架、工具链高度依赖，迁移成本极高。",
+    longTermView:"★ AI时代最大基础设施受益者。Blackwell架构供不应求，数据中心资本开支持续增加。但股价已大幅上涨，需关注AMD/Google TPU/Amazon Trainium的竞争进展。",
+    risks:["估值仍偏高，营收增速任何放缓将引发大幅回调","AMD MI300X/MI350快速追赶，市场份额有被蚕食风险","美国对华芯片出口限制影响营收（中国占比~20%）","若AI投资周期见顶，GPU需求将大幅下滑"],
+    strengths:["AI训练芯片绝对垄断地位（>80%市场份额）","毛利率74.4%，净利润率56%，盈利能力极强","CUDA生态护城河极深，开发者粘性极高","自由现金流$350亿，财务极健康"]
   },
   "AMD": {
     symbol:"AMD", name:"Advanced Micro Devices", currency:"USD", exchange:"NASDAQ",
     price:168.50, prevClose:164.80, changePct:2.25,
     marketCap:272000000000, pe:38.5, forwardPe:25.2, peg:1.5, pb:4.2, ps:6.8,
-    revenueGrowth:0.14, earningsGrowth:0.22, profitMargin:0.16, operatingMargin:0.22,
-    grossMargin:0.48, roe:0.28, debtToEquity:0.18, currentRatio:2.5,
+    revenueGrowth:0.24, earningsGrowth:0.35, profitMargin:0.085, operatingMargin:0.16,
+    grossMargin:0.505,
+    grossMarginHistory:[0.44, 0.46, 0.505],
+    rdHistory:[{year:2022, amount:4530}, {year:2023, amount:5059}, {year:2024, amount:5873}],
+    rdToRevenue:[0.19, 0.21, 0.22],
+    revenueHistory:[{year:2022, amount:23601}, {year:2023, amount:22680}, {year:2024, amount:25785}],
+    netMarginHistory:[0.125, 0.016, 0.085],
+    roe:0.028, debtToEquity:0.18, currentRatio:2.5,
     freeCashFlow:4500000000, operatingCashFlow:5500000000,
     week52High:227.30, week52Low:93.12,
-    analystCounts:{strongBuy:15,buy:25,hold:6,sell:1,strongSell:0},
+    analystCounts:{strongBuy:15, buy:25, hold:6, sell:1, strongSell:0},
     targetMean:195.0, targetHigh:230.0, targetLow:150.0,
     beta:1.65, industry:"半导体", sector:"科技",
-    business:"CPU（挑战英特尔）、GPU（挑战英伟达AI芯片）",
-    moat:"x86 CPU技术；MI300X AI芯片挑战英伟达；收购赛灵思获得FPGA能力",
-    risks:["在AI GPU市场远落后于英伟达","英特尔在CPU市场仍具竞争力","MI300X产能受限，供应跟不上需求","中国区营收占比高，地缘政治风险"],
-    strengths:["AI芯片MI300X快速放量","CPU市场份额持续提升","赛灵思FPGA业务协同效应强","估值相对英伟达更合理"]
+    business:"CPU（持续抢夺英特尔份额）+GPU（MI300X/350系列AI芯片挑战英伟达）",
+    moat:"x86 CPU技术积累；MI300X系列AI芯片快速追赶；ROCm开源生态逐步完善",
+    longTermView:"★ AI芯片市场第二梯队的最强候选者。若ROCm生态成熟，有望获得10-20%的AI GPU市场份额。但挑战英伟达难度极大。",
+    risks:["在AI GPU市场远落后于英伟达，差距仍大","ROCm软件生态薄弱是核心劣势","中国区营收占比高，地缘政治风险","英特尔在CPU市场仍具竞争力"],
+    strengths:["AI芯片MI300X快速放量，市场份额持续提升","CPU市场份额持续提升，英特尔丢失份额","赛灵思FPGA业务协同效应强","相对英伟达估值更合理（PEG 1.5）"]
   },
   "AVGO": {
     symbol:"AVGO", name:"Broadcom Inc.", currency:"USD", exchange:"NASDAQ",
     price:1685.20, prevClose:1650.80, changePct:2.08,
     marketCap:785000000000, pe:32.5, forwardPe:22.8, peg:1.4, pb:14.2, ps:12.5,
-    revenueGrowth:0.42, earningsGrowth:0.38, profitMargin:0.48, operatingMargin:0.55,
-    grossMargin:0.68, roe:0.85, debtToEquity:0.95, currentRatio:1.5,
+    revenueGrowth:0.44, earningsGrowth:0.38, profitMargin:0.38, operatingMargin:0.52,
+    grossMargin:0.681,
+    grossMarginHistory:[0.612, 0.638, 0.681],
+    rdHistory:[{year:2022, amount:4915}, {year:2023, amount:5328}, {year:2024, amount:9308}],
+    rdToRevenue:[0.19, 0.19, 0.19],
+    revenueHistory:[{year:2022, amount:33203}, {year:2023, amount:35819}, {year:2024, amount:51574}],
+    netMarginHistory:[0.32, 0.36, 0.38],
+    roe:0.85, debtToEquity:0.95, currentRatio:1.5,
     freeCashFlow:19000000000, operatingCashFlow:22000000000,
     week52High:1854.50, week52Low:990.12,
-    analystCounts:{strongBuy:10,buy:20,hold:5,sell:0,strongSell:0},
-    targetMean:1780.0, targetHigh:1950.0, targetLow:1500.0,
+    analystCounts:{strongBuy:10, buy:20, hold:5, sell:0, strongSell:0},
+    targetMean:1850.0, targetHigh:2000.0, targetLow:1500.0,
     beta:1.1, industry:"半导体", sector:"科技",
-    business:"半导体（AIASIC定制芯片、网络芯片）+ 基础设施软件（VMware）",
-    moat:"AI ASIC定制芯片技术领先；收购VMware后软件业务稳定现金流；多元化的客户群",
-    risks:["债务水平高（D/E=0.95）","VMware整合风险","AI ASIC市场博通是主要玩家，但竞争加剧","股价极高（$1685），散户参与门槛高"],
-    strengths:["AI ASIC定制芯片与谷歌、Meta深度合作","软件业务提供稳定现金流","毛利率68%，盈利能力极强","ROE 85%，资本回报能力惊人"]
+    business:"半导体（AI ASIC定制芯片/网络芯片）+ 基础设施软件（VMware收购后）",
+    moat:"AI ASIC定制芯片技术领先；VMware软件业务高粘性；客户群多元化；稳定现金流",
+    longTermView:"★ 稳健型AI受益者。AI ASIC定制芯片（为谷歌、Meta设计TPU/定制芯片）增长确定性强；VMware整合后现金流大幅提升。适合追求稳健的投资者。",
+    risks:["债务水平高（D/E=0.95）","VMware整合风险（企业规模极大）","AI ASIC市场竞争加剧（MRVL、英伟达）","股价极高，散户参与门槛高"],
+    strengths:["AI ASIC定制芯片与谷歌、Meta深度合作","VMware软件业务提供稳定现金流","毛利率68%，盈利能力极强","ROE 85%，资本回报能力惊人"]
   },
   "MSFT": {
     symbol:"MSFT", name:"Microsoft Corporation", currency:"USD", exchange:"NASDAQ",
-    price:415.60, prevClose:411.20, changePct:1.07,
-    marketCap:3090000000000, pe:35.2, forwardPe:28.5, peg:2.1, pb:11.5, ps:12.8,
-    revenueGrowth:0.15, earningsGrowth:0.20, profitMargin:0.36, operatingMargin:0.42,
-    grossMargin:0.69, roe:0.42, debtToEquity:0.35, currentRatio:1.8,
+    price:452.80, prevClose:448.20, changePct:1.03,
+    marketCap:3370000000000, pe:35.2, forwardPe:28.5, peg:2.1, pb:11.5, ps:12.8,
+    revenueGrowth:0.17, earningsGrowth:0.22, profitMargin:0.365, operatingMargin:0.445,
+    grossMargin:0.694,
+    grossMarginHistory:[0.678, 0.689, 0.694],
+    rdHistory:[{year:2022, amount:24512}, {year:2023, amount:27195}, {year:2024, amount:29510}],
+    rdToRevenue:[0.12, 0.12, 0.13],
+    revenueHistory:[{year:2022, amount:198270}, {year:2023, amount:211915}, {year:2024, amount:245122}],
+    netMarginHistory:[0.363, 0.341, 0.365],
+    roe:0.42, debtToEquity:0.35, currentRatio:1.8,
     freeCashFlow:82000000000, operatingCashFlow:95000000000,
     week52High:468.35, week52Low:309.45,
-    analystCounts:{strongBuy:20,buy:15,hold:3,sell:0,strongSell:0},
-    targetMean:450.0, targetHigh:490.0, targetLow:380.0,
+    analystCounts:{strongBuy:20, buy:15, hold:3, sell:0, strongSell:0},
+    targetMean:510.0, targetHigh:560.0, targetLow:430.0,
     beta:0.88, industry:"软件", sector:"科技",
-    business:"云计算（Azure）、办公软件（Office 365）、AI（OpenAI合作伙伴）、Windows",
-    moat:"Azure云计算市场份额第二；Office 365企业粘性极强；与OpenAI深度绑定",
-    risks:["Azure增速放缓，竞争来自谷歌云和AWS","AI投资巨大，短期压制利润率","反垄断监管风险（全球范围）","Windows业务增长见顶"],
-    strengths:["AI Copilot商业化进展顺利","Azure增速虽放缓但仍保持增长","Office 365企业续约率高，现金流稳定","自由现金流$820亿，分红+回购能力强"]
+    business:"Azure云计算 + Office 365 + AI Copilot（OpenAI战略合作伙伴）+ Windows/Xbox",
+    moat:"Azure与OpenAI的深度整合；Office 365企业粘性极强；GitHub Copilot行业领先",
+    longTermView:"★ AI商业化落地最稳健的大盘科技股。Copilot系列产品全面渗透企业，Azure AI增速领先。估值相对合理，适合长期持有。",
+    risks:["Azure增速若放缓，估值承压","AI投资巨大，短期压制利润率","反垄断监管（全球）","Windows业务增长见顶"],
+    strengths:["AI Copilot商业化进展顺利","Azure增速保持强劲","Office 365企业续约率极高","自由现金流$820亿，财务极稳健"]
   },
   "GOOGL": {
     symbol:"GOOGL", name:"Alphabet Inc. Class A", currency:"USD", exchange:"NASDAQ",
     price:178.30, prevClose:175.60, changePct:1.54,
     marketCap:2210000000000, pe:24.5, forwardPe:18.8, peg:1.6, pb:6.8, ps:6.2,
     revenueGrowth:0.14, earningsGrowth:0.28, profitMargin:0.26, operatingMargin:0.29,
-    grossMargin:0.58, roe:0.28, debtToEquity:0.08, currentRatio:2.8,
+    grossMargin:0.58,
+    grossMarginHistory:[0.534, 0.555, 0.58],
+    rdHistory:[{year:2022, amount:39500}, {year:2023, amount:45427}, {year:2024, amount:49557}],
+    rdToRevenue:[0.13, 0.14, 0.14],
+    revenueHistory:[{year:2022, amount:282836}, {year:2023, amount:307394}, {year:2024, amount:350018}],
+    netMarginHistory:[0.21, 0.24, 0.26],
+    roe:0.28, debtToEquity:0.08, currentRatio:2.8,
     freeCashFlow:70000000000, operatingCashFlow:84000000000,
     week52High:195.20, week52Low:129.40,
-    analystCounts:{strongBuy:18,buy:22,hold:5,sell:0,strongSell:0},
-    targetMean:195.0, targetHigh:215.0, targetLow:160.0,
+    analystCounts:{strongBuy:18, buy:22, hold:5, sell:0, strongSell:0},
+    targetMean:200.0, targetHigh:220.0, targetLow:165.0,
     beta:1.05, industry:"互联网服务", sector:"科技",
-    business:"搜索引擎（Google）、云计算（GCP）、YouTube、AI（DeepMind、Gemini）",
-    moat:"搜索垄断（全球份额>90%）；YouTube广告生态；GCP增速超Azure和AWS",
-    risks:["搜索广告市场被AI聊天机器人分流风险","反垄断诉讼风险（美国DOJ、欧盟）","AI竞赛中Gemini落后于GPT","云计算市场份额仍远低于AWS和Azure"],
-    strengths:["AI Overview（搜索AI化）商业化潜力大","GCP增速超竞争对手","YouTube Shorts对抗TikTok效果显著","估值相对便宜（PE 24.5x，科技股中较低）"]
+    business:"Google搜索 + YouTube + GCP云 + DeepMind/Gemini AI",
+    moat:"搜索垄断（全球份额>90%）；YouTube生态；GCP增速超竞争对手",
+    longTermView:"★ 估值最便宜的顶级科技股。PE 24.5x在同类中最低，AI Overview重塑搜索商业化，GCP增速强劲。Waymo自动驾驶是潜在大机会。",
+    risks:["搜索广告被AI聊天机器人分流风险","反垄断诉讼（美国DOJ判决不利）","Gemini AI落后OpenAI/Claude","GCP市场份额仍远低于AWS/Azure"],
+    strengths:["科技七巨头中估值最合理（PE最低）","GCP增速>28%，超越竞争对手","DeepMind研究实力深厚","自由现金流$700亿，大规模回购"]
   },
   "AAPL": {
     symbol:"AAPL", name:"Apple Inc.", currency:"USD", exchange:"NASDAQ",
     price:192.80, prevClose:190.50, changePct:1.21,
     marketCap:2950000000000, pe:30.5, forwardPe:26.8, peg:2.8, pb:45.2, ps:8.2,
-    revenueGrowth:-0.03, earningsGrowth:0.05, profitMargin:0.26, operatingMargin:0.30,
-    grossMargin:0.44, roe:1.52, debtToEquity:1.25, currentRatio:0.92,
+    revenueGrowth:0.04, earningsGrowth:0.08, profitMargin:0.265, operatingMargin:0.305,
+    grossMargin:0.461,
+    grossMarginHistory:[0.433, 0.442, 0.461],
+    rdHistory:[{year:2022, amount:26251}, {year:2023, amount:29902}, {year:2024, amount:31370}],
+    rdToRevenue:[0.073, 0.076, 0.078],
+    revenueHistory:[{year:2022, amount:394328}, {year:2023, amount:383285}, {year:2024, amount:391035}],
+    netMarginHistory:[0.253, 0.262, 0.265],
+    roe:1.52, debtToEquity:1.25, currentRatio:0.92,
     freeCashFlow:89000000000, operatingCashFlow:110000000000,
     week52High:237.49, week52Low:164.21,
-    analystCounts:{strongBuy:8,buy:15,hold:12,sell:2,strongSell:0},
-    targetMean:205.0, targetHigh:230.0, targetLow:170.0,
+    analystCounts:{strongBuy:8, buy:15, hold:12, sell:2, strongSell:0},
+    targetMean:215.0, targetHigh:240.0, targetLow:175.0,
     beta:1.22, industry:"消费电子", sector:"科技",
-    business:"iPhone、Mac、iPad、可穿戴设备、服务（App Store、iCloud、Apple Music）",
-    moat:"iOS生态系统；品牌溢价；服务业务高毛利且续约率高",
-    risks:["iPhone营收占比过高，增长见顶","中国市场竞争加剧（华为复苏）","硬件创新放缓，AI功能落后于竞争对手","服务业务增速放缓"],
-    strengths:["iOS生态用户粘性极强","服务业务毛利率>70%","强大的品牌和定价能力","回购力度大，股东回报高"]
+    business:"iPhone + Mac + iPad + 服务业务（App Store/iCloud/Apple Music/Apple TV+）",
+    moat:"iOS生态用户粘性极强；服务业务高毛利率（>70%）；强大品牌溢价",
+    longTermView:"★ 稳定现金流+大规模回购的价值型持有标的。Apple Intelligence（AI）能否提振iPhone换机是关键催化剂。",
+    risks:["iPhone营收增长见顶（占营收50%+）","中国市场竞争加剧（华为复苏）","AI功能落后于安卓竞争对手","服务业务反垄断压力"],
+    strengths:["自由现金流$890亿，每年大规模回购","服务业务高速增长且毛利率>70%","iOS生态粘性最强","品牌溢价无人能及"]
   },
   // ---- A股 ----
   "600036": {
     symbol:"600036", name:"招商银行", currency:"CNY", exchange:"SSE",
     price:38.52, prevClose:38.20, changePct:0.84,
     marketCap:971000000000, pe:6.2, pb:0.85, ps:2.8,
-    roe:0.142, profitMargin:0.385, grossMargin:null, revenueGrowth:null, earningsGrowth:null,
+    roe:0.142, profitMargin:0.385, grossMargin:null, revenueGrowth:0.05, earningsGrowth:0.05,
+    grossMarginHistory:[null, null, null],
+    rdHistory:[{year:2022,amount:0},{year:2023,amount:0},{year:2024,amount:0}],
+    rdToRevenue:[null, null, null],
+    revenueHistory:[{year:2022,amount:344000},{year:2023,amount:339000},{year:2024,amount:356000}],
+    netMarginHistory:[0.375, 0.380, 0.385],
     week52High:42.80, week52Low:28.50,
-    analystCounts:{strongBuy:5,buy:12,hold:3,sell:0,strongSell:0},
+    analystCounts:{strongBuy:5, buy:12, hold:3, sell:0, strongSell:0},
     targetMean:44.5, targetHigh:50.0, targetLow:38.0,
     beta:0.85, industry:"银行", sector:"金融",
     business:"零售银行龙头，信用卡、财富管理、零售贷款市场份额领先",
     moat:"零售银行品牌优势；信用卡市场份额第一；财富管理客户基础雄厚",
-    risks:["净息差收窄压力","房地产贷款不良率上升风险","财富管理业务竞争加剧","经济下行周期不良贷款率上升"],
-    strengths:["零售银行龙头地位稳固","ROE 14.2%，银行业领先","PB 0.85x，估值极低","不良贷款率控制在行业较低水平"]
+    longTermView:"★ A股银行中ROE最高、基本面最稳的标的。低估值（PB 0.85x）+ 高股息（~4%）适合防御配置。",
+    risks:["净息差收窄压力","房地产贷款不良率上升","财富管理竞争加剧","经济下行不良贷款率上升"],
+    strengths:["零售银行龙头，ROE 14.2%行业领先","PB 0.85x估值极低","不良贷款率控制优秀","分红稳定，股息率~4%"]
   },
   "601398": {
     symbol:"601398", name:"工商银行", currency:"CNY", exchange:"SSE",
     price:6.15, prevClose:6.12, changePct:0.49,
     marketCap:2190000000000, pe:5.8, pb:0.62, ps:2.1,
-    roe:0.108, profitMargin:0.402, grossMargin:null, revenueGrowth:null, earningsGrowth:null,
+    roe:0.108, profitMargin:0.402, grossMargin:null, revenueGrowth:0.02, earningsGrowth:0.02,
+    grossMarginHistory:[null, null, null],
+    rdHistory:[{year:2022,amount:0},{year:2023,amount:0},{year:2024,amount:0}],
+    rdToRevenue:[null, null, null],
+    revenueHistory:[{year:2022,amount:920000},{year:2023,amount:892000},{year:2024,amount:910000}],
+    netMarginHistory:[0.395, 0.400, 0.402],
     week52High:6.85, week52Low:4.82,
-    analystCounts:{strongBuy:2,buy:8,hold:5,sell:0,strongSell:0},
+    analystCounts:{strongBuy:2, buy:8, hold:5, sell:0, strongSell:0},
     targetMean:6.8, targetHigh:7.5, targetLow:6.0,
     beta:0.65, industry:"银行", sector:"金融",
     business:"全球最大商业银行，公司银行、零售银行、投资银行全覆盖",
-    moat:"规模优势；网点覆盖最广；系统重要性银行地位",
-    risks:["净息差持续收窄","不良贷款率上升压力","房地产和地方政府融资平台风险"],
-    strengths:["全球最大商业银行，系统重要性","分红率高，股息率>5%","估值极低，PB 0.62x"]
+    moat:"规模优势；网点覆盖最广；系统重要性银行",
+    longTermView:"★ 超低估值（PB 0.62x）防御性持有。高股息（>5%）是吸引力所在。",
+    risks:["净息差持续收窄","不良贷款率上升压力","房地产和城投平台风险"],
+    strengths:["全球最大商业银行，系统重要性","分红率高，股息率>5%","PB 0.62x估值极低"]
   },
   "300750": {
     symbol:"300750", name:"宁德时代", currency:"CNY", exchange:"SZSE",
     price:215.60, prevClose:212.30, changePct:1.55,
     marketCap:943000000000, pe:28.5, pb:4.8, ps:2.5,
     roe:0.168, profitMargin:0.082, grossMargin:0.22, revenueGrowth:0.22, earningsGrowth:0.35,
+    grossMarginHistory:[0.195, 0.228, 0.22],
+    rdHistory:[{year:2022,amount:15500},{year:2023,amount:18500},{year:2024,amount:22000}],
+    rdToRevenue:[0.055, 0.058, 0.062],
+    revenueHistory:[{year:2022,amount:328600},{year:2023,amount:402000},{year:2024,amount:365000}],
+    netMarginHistory:[0.072, 0.105, 0.082],
     week52High:268.50, week52Low:152.30,
-    analystCounts:{strongBuy:10,buy:18,hold:4,sell:0,strongSell:0},
+    analystCounts:{strongBuy:10, buy:18, hold:4, sell:0, strongSell:0},
     targetMean:245.0, targetHigh:280.0, targetLow:190.0,
     beta:1.35, industry:"电池", sector:"工业",
     business:"全球最大动力电池供应商，储能电池市场份额领先",
     moat:"电池技术领先；规模效应；与特斯拉、宝马等深度绑定",
-    risks:["比亚迪自主研发电池，客户流失风险","锂价波动影响毛利率","海外扩张面临地缘政治风险","固态电池技术迭代风险"],
-    strengths:["全球动力电池市场份额第一","储能业务快速增长","技术迭代领先（麒麟电池、凝聚态电池）"]
+    longTermView:"★ 全球动力电池龙头，储能+出海是第二增长曲线。但要关注比亚迪自研电池带来的客户流失压力。",
+    risks:["比亚迪自研电池，客户流失","锂价波动影响毛利率","海外扩张地缘政治风险","固态电池技术迭代风险"],
+    strengths:["全球动力电池市场份额第一","储能业务快速增长","麒麟电池/凝聚态电池技术领先","研发投入持续加大"]
   },
   "002594": {
     symbol:"002594", name:"比亚迪", currency:"CNY", exchange:"SZSE",
     price:285.40, prevClose:280.60, changePct:1.71,
     marketCap:831000000000, pe:32.8, pb:5.2, ps:1.8,
     roe:0.158, profitMargin:0.048, grossMargin:0.18, revenueGrowth:0.42, earningsGrowth:0.80,
+    grossMarginHistory:[0.158, 0.168, 0.18],
+    rdHistory:[{year:2022,amount:20228},{year:2023,amount:35670},{year:2024,amount:40200}],
+    rdToRevenue:[0.060, 0.062, 0.063],
+    revenueHistory:[{year:2022,amount:424000},{year:2023,amount:602000},{year:2024,amount:777000}],
+    netMarginHistory:[0.025, 0.050, 0.048],
     week52High:345.20, week52Low:195.60,
-    analystCounts:{strongBuy:8,buy:15,hold:3,sell:0,strongSell:0},
+    analystCounts:{strongBuy:8, buy:15, hold:3, sell:0, strongSell:0},
     targetMean:320.0, targetHigh:360.0, targetLow:260.0,
     beta:1.25, industry:"汽车", sector:"消费品",
-    business:"新能源汽车（乘用车、商用车）、动力电池（弗迪电池）、半导体（比亚迪半导体）",
+    business:"新能源汽车（乘用车+商用车）+ 弗迪电池 + 比亚迪半导体",
     moat:"垂直整合（自研电池、芯片、电机）；成本优势；DM-i混动技术领先",
-    risks:["海外扩张面临贸易壁垒（欧盟、美国）","毛利率低于特斯拉","高端品牌（仰望、腾势）市场接受度待验证"],
-    strengths:["新能源汽车销量全球第一","垂直整合带来的成本优势","出海增速快，东南亚、欧洲市场拓展顺利"]
+    longTermView:"★ 中国新能源汽车全球化的核心标的。东南亚、欧洲市场拓展顺利，但海外贸易壁垒是最大变量。",
+    risks:["欧盟、美国关税壁垒","毛利率偏低（18%）且承压","高端品牌待验证","竞争加剧（小米、华为赛力斯）"],
+    strengths:["全球新能源汽车销量第一","垂直整合成本优势","出海增速快","研发投入行业第一"]
   },
   "688981": {
     symbol:"688981", name:"中芯国际", currency:"CNY", exchange:"SSE",
     price:52.80, prevClose:51.60, changePct:2.33,
     marketCap:421000000000, pe:65.2, pb:3.2, ps:8.5,
     roe:0.048, profitMargin:0.125, grossMargin:0.18, revenueGrowth:0.18, earningsGrowth:-0.15,
+    grossMarginHistory:[0.338, 0.192, 0.18],
+    rdHistory:[{year:2022,amount:1357},{year:2023,amount:1773},{year:2024,amount:1800}],
+    rdToRevenue:[0.092, 0.092, 0.082],
+    revenueHistory:[{year:2022,amount:7273},{year:2023,amount:6322},{year:2024,amount:8034}],
+    netMarginHistory:[0.336, 0.078, 0.125],
     week52High:68.50, week52Low:32.20,
-    analystCounts:{strongBuy:3,buy:8,hold:6,sell:1,strongSell:0},
+    analystCounts:{strongBuy:3, buy:8, hold:6, sell:1, strongSell:0},
     targetMean:58.0, targetHigh:68.0, targetLow:45.0,
     beta:1.55, industry:"半导体", sector:"科技",
     business:"中国大陆最大晶圆代工厂，28nm及以上成熟制程为主",
-    moat:"中国大陆晶圆代工龙头；国产替代受益者；政府支持",
-    risks:["先进制程（7nm以下）受美国设备禁运限制","产能利用率波动大","毛利率受压（设备折旧成本高）","人才流失风险"],
-    strengths:["国产替代最大受益者","28nm及以上成熟制程需求稳定","政府补贴和资金支持力度大"]
+    moat:"国产替代受益者；政府大力支持；中国大陆晶圆代工龙头",
+    longTermView:"★ 国产替代核心标的，政策驱动逻辑强。但先进制程受限，成熟制程产能利用率是核心关注点。",
+    risks:["先进制程受美国设备禁运限制","产能利用率波动","毛利率受压","人才流失风险"],
+    strengths:["国产替代最大受益者","28nm成熟制程需求稳定","政府补贴力度大"]
   },
   "688256": {
     symbol:"688256", name:"寒武纪", currency:"CNY", exchange:"SSE",
     price:188.50, prevClose:182.30, changePct:3.40,
     marketCap:78500000000, pe:-1, pb:8.5, ps:25.2,
     roe:-0.085, profitMargin:-0.42, grossMargin:0.65, revenueGrowth:0.85, earningsGrowth:null,
+    grossMarginHistory:[0.60, 0.63, 0.65],
+    rdHistory:[{year:2022,amount:1540},{year:2023,amount:1920},{year:2024,amount:2100}],
+    rdToRevenue:[null, null, null],
+    revenueHistory:[{year:2022,amount:720},{year:2023,amount:1020},{year:2024,amount:1150}],
+    netMarginHistory:[-1.2, -0.85, -0.42],
     week52High:245.60, week52Low:78.30,
-    analystCounts:{strongBuy:2,buy:5,hold:4,sell:1,strongSell:0},
+    analystCounts:{strongBuy:2, buy:5, hold:4, sell:1, strongSell:0},
     targetMean:165.0, targetHigh:210.0, targetLow:120.0,
     beta:1.8, industry:"半导体", sector:"科技",
-    business:"AI芯片设计（云端训练/推理芯片、边缘计算芯片）",
-    moat:"国产AI芯片先行者；与中科院计算所深度合作；国产替代概念",
-    risks:["尚未盈利，PE为负","营收高度依赖少数大客户（政府、国企）","英伟达CUDA生态难以撼动","研发支出高，短期难以盈利"],
-    strengths:["AI芯片国产替代核心标的","营收增速85%，高速增长","毛利率65%，产品附加值高"]
+    business:"AI芯片设计（云端训练/推理+边缘计算），国产AI芯片先行者",
+    moat:"国产AI芯片先行者；与中科院计算所深度合作；国产替代概念极强",
+    longTermView:"★ 国产AI芯片替代的概念标的，但仍亏损，高风险高弹性品种。",
+    risks:["尚未盈利，高度依赖政府客户","英伟达CUDA生态难以撼动","研发支出高，短期难盈利","估值极高（PS 25x）"],
+    strengths:["AI芯片国产替代核心标的","营收增速85%","毛利率65%，产品附加值高"]
   },
   "600519": {
     symbol:"600519", name:"贵州茅台", currency:"CNY", exchange:"SSE",
     price:1528.00, prevClose:1520.50, changePct:0.49,
     marketCap:1920000000000, pe:28.5, pb:8.2, ps:12.5,
-    roe:0.285, profitMargin:0.485, grossMargin:0.91, revenueGrowth:0.16, earningsGrowth:0.18,
+    roe:0.285, profitMargin:0.485, grossMargin:0.92, revenueGrowth:0.16, earningsGrowth:0.18,
+    grossMarginHistory:[0.905, 0.915, 0.92],
+    rdHistory:[{year:2022,amount:0},{year:2023,amount:0},{year:2024,amount:0}],
+    rdToRevenue:[null, null, null],
+    revenueHistory:[{year:2022,amount:127900},{year:2023,amount:151200},{year:2024,amount:175000}],
+    netMarginHistory:[0.472, 0.478, 0.485],
     week52High:1780.0, week52Low:1245.0,
-    analystCounts:{strongBuy:12,buy:15,hold:3,sell:0,strongSell:0},
+    analystCounts:{strongBuy:12, buy:15, hold:3, sell:0, strongSell:0},
     targetMean:1650.0, targetHigh:1800.0, targetLow:1450.0,
     beta:0.55, industry:"白酒", sector:"消费品",
-    business:"高端白酒（飞天茅台）生产与销售，中国白酒行业龙头",
+    business:"高端白酒（飞天茅台），中国白酒行业第一品牌",
     moat:"品牌壁垒极高；产能稀缺性；定价权极强；社交属性",
-    risks:["宏观经济下行影响高端消费","年轻人白酒消费习惯改变","渠道库存周期风险","管理层变动风险"],
-    strengths:["品牌壁垒无人能及","毛利率91%，盈利能力极强","定价权强，提价能力强","ROE 28.5%，资本回报能力极强"]
+    longTermView:"★ A股最强消费护城河。毛利率92%、净利率48.5%，典型的消费垄断标的。长期持有分红复利逻辑强。",
+    risks:["宏观经济下行影响高端消费","年轻人白酒消费习惯改变","渠道库存周期","管理层变动"],
+    strengths:["毛利率92%，盈利能力无可比拟","定价权极强，持续提价","ROE 28.5%，资本回报极强","分红稳定，股息率~2%"]
   },
   "000858": {
     symbol:"000858", name:"五粮液", currency:"CNY", exchange:"SZSE",
     price:138.20, prevClose:137.50, changePct:0.51,
     marketCap:536000000000, pe:18.5, pb:4.2, ps:5.8,
     roe:0.225, profitMargin:0.365, grossMargin:0.76, revenueGrowth:0.08, earningsGrowth:0.10,
+    grossMarginHistory:[0.74, 0.75, 0.76],
+    rdHistory:[{year:2022,amount:0},{year:2023,amount:0},{year:2024,amount:0}],
+    rdToRevenue:[null, null, null],
+    revenueHistory:[{year:2022,amount:73941},{year:2023,amount:83249},{year:2024,amount:90000}],
+    netMarginHistory:[0.350, 0.360, 0.365],
     week52High:168.50, week52Low:108.20,
-    analystCounts:{strongBuy:5,buy:10,hold:4,sell:0,strongSell:0},
+    analystCounts:{strongBuy:5, buy:10, hold:4, sell:0, strongSell:0},
     targetMean:155.0, targetHigh:170.0, targetLow:130.0,
     beta:0.70, industry:"白酒", sector:"消费品",
-    business:"高端白酒（五粮液）生产与销售，中国白酒行业第二",
+    business:"高端白酒（五粮液），中国浓香型白酒第一品牌",
     moat:"品牌历史悠久；浓香型白酒龙头；渠道网络广泛",
-    risks:["高端白酒市场竞争加剧","茅台价格下压影响五粮液定价","渠道库存周期","年轻人消费习惯改变"],
-    strengths:["高端白酒市场稳固","估值相对茅台更合理（PE 18.5x vs 28.5x）","分红率高，股息率>3%","ROE 22.5%，盈利能力强"]
+    longTermView:"★ 茅台的性价比替代选择，估值更合理（PE 18.5x vs 茅台28.5x），分红率高。",
+    risks:["高端白酒竞争加剧","茅台价格下压影响五粮液定价","渠道库存周期","年轻人消费习惯改变"],
+    strengths:["相对茅台估值更合理（PE 18.5x）","毛利率76%，盈利能力强","ROE 22.5%","分红率高，股息率>3%"]
   }
 };
 
@@ -364,15 +472,15 @@ function detectMarket(code) {
 function fmtNum(num, decimals) {
   if (num == null || isNaN(num)) return 'N/A';
   var abs = Math.abs(num);
-  if (abs >= 1e12) return (num / 1e12).toFixed(decimals || 2) + '万亿';
-  if (abs >= 1e8) return (num / 1e8).toFixed(decimals || 2) + '亿';
-  if (abs >= 1e4) return (num / 1e4).toFixed(decimals || 2) + '万';
-  return num.toFixed(decimals || 2);
+  if (abs >= 1e12) return (num / 1e12).toFixed(decimals||2) + '万亿';
+  if (abs >= 1e8) return (num / 1e8).toFixed(decimals||2) + '亿';
+  if (abs >= 1e4) return (num / 1e4).toFixed(decimals||2) + '万';
+  return num.toFixed(decimals||2);
 }
 
 function fmtPct(num) {
   if (num == null || isNaN(num)) return 'N/A';
-  return (num > 0 ? '+' : '') + (num * 100).toFixed(2) + '%';
+  return (num > 0 ? '+' : '') + (num * 100).toFixed(1) + '%';
 }
 
 function fmtPrice(num, currency) {
@@ -384,6 +492,7 @@ function fmtPrice(num, currency) {
   return sym + num.toFixed(2);
 }
 
+// 股价涨跌颜色（中国惯例：涨红跌绿）
 function colorClass(num) {
   if (num == null || isNaN(num)) return 'gray';
   return num >= 0 ? 'up' : 'down';
@@ -410,50 +519,64 @@ function toggleSettings() {
 }
 
 // ============================================================
-// 评分引擎（9维）
+// 评分引擎（九维）
 // ============================================================
 function score(dataA, dataB) {
   var s = {
-    pe: {A:0,B:0}, growth: {A:0,B:0}, profit: {A:0,B:0},
-    finance: {A:0,B:0}, cap: {A:0,B:0}, fcf: {A:0,B:0},
-    roe: {A:0,B:0}, analyst: {A:0,B:0}, valuation: {A:0,B:0}
+    pe:{A:0,B:0}, growth:{A:0,B:0}, profit:{A:0,B:0},
+    finance:{A:0,B:0}, fcf:{A:0,B:0}, roe:{A:0,B:0},
+    analyst:{A:0,B:0}, valuation:{A:0,B:0}, trend:{A:0,B:0}
   };
 
-  // PE评分（越低越好，上限50）
-  s.pe.A = dataA.pe > 0 ? Math.max(0, Math.min(10, 10 - (dataA.pe - 10) / 5)) : 5;
-  s.pe.B = dataB.pe > 0 ? Math.max(0, Math.min(10, 10 - (dataB.pe - 10) / 5)) : 5;
+  // PE评分（科技股：PE>100视为高增长，不是简单越低越好）
+  function scPE(d) {
+    if (!d.pe || d.pe <= 0) return 4;
+    var g = d.revenueGrowth || 0;
+    // 用PEG逻辑：PE / (增速*100)，越低越合理
+    if (d.peg && d.peg > 0) return d.peg < 1 ? 9 : d.peg < 1.5 ? 7 : d.peg < 2 ? 5 : d.peg < 3 ? 4 : 2;
+    // 没有PEG用增长调整后的PE
+    var adjPE = d.pe / (1 + g * 5); // 高增长打折
+    return adjPE < 20 ? 9 : adjPE < 40 ? 7 : adjPE < 60 ? 5 : adjPE < 100 ? 4 : 2;
+  }
+  s.pe.A = scPE(dataA);
+  s.pe.B = scPE(dataB);
 
-  // 成长性
-  function scG(g) { return g == null ? 5 : Math.min(10, Math.max(0, g * 40)); }
+  // 成长性（营收增速）
+  function scG(g) { return g == null ? 5 : Math.min(10, Math.max(0, g * 30 + 3)); }
   s.growth.A = scG(dataA.revenueGrowth);
   s.growth.B = scG(dataB.revenueGrowth);
 
-  // 盈利能力
-  function scP(pm, om) { return Math.min(10, Math.max(0, (pm||0)*20 + (om||0)*15)); }
-  s.profit.A = scP(dataA.profitMargin, dataA.operatingMargin);
-  s.profit.B = scP(dataB.profitMargin, dataB.operatingMargin);
-
-  // 财务稳健
-  function scF(fcf, d2e) {
-    if (!fcf && !d2e) return 5;
-    var score = 5;
-    if (fcf > 1e10) score += 3; else if (fcf > 1e9) score += 2; else if (fcf > 0) score += 1;
-    if (d2e && d2e < 0.3) score += 2; else if (d2e && d2e < 0.6) score += 1;
-    return Math.min(10, score);
+  // 盈利能力（毛利率+净利率）
+  function scP(gm, pm) {
+    var v = (gm != null ? gm * 12 : 5) + (pm != null ? pm * 18 : 3);
+    return Math.min(10, Math.max(0, v));
   }
-  s.finance.A = scF(dataA.freeCashFlow, dataA.debtToEquity);
-  s.finance.B = scF(dataB.freeCashFlow, dataB.debtToEquity);
+  s.profit.A = scP(dataA.grossMargin, dataA.profitMargin);
+  s.profit.B = scP(dataB.grossMargin, dataB.profitMargin);
 
-  // 现金流质量
+  // 财务稳健（D/E + 流动比率）
+  function scF(d2e, cr) {
+    var v = 5;
+    if (d2e != null) v += d2e < 0.1 ? 3 : d2e < 0.3 ? 2 : d2e < 0.6 ? 1 : d2e < 1.0 ? 0 : -1;
+    if (cr != null) v += cr > 3 ? 2 : cr > 2 ? 1 : cr > 1 ? 0 : -1;
+    return Math.min(10, Math.max(1, v));
+  }
+  s.finance.A = scF(dataA.debtToEquity, dataA.currentRatio);
+  s.finance.B = scF(dataB.debtToEquity, dataB.currentRatio);
+
+  // 现金流
   function scFCF(fcf) {
     if (!fcf) return 5;
-    if (fcf > 1e10) return 9; if (fcf > 1e9) return 7; if (fcf > 0) return 5; return 2;
+    return fcf > 5e10 ? 10 : fcf > 1e10 ? 9 : fcf > 5e9 ? 8 : fcf > 1e9 ? 6 : fcf > 0 ? 4 : 2;
   }
   s.fcf.A = scFCF(dataA.freeCashFlow);
   s.fcf.B = scFCF(dataB.freeCashFlow);
 
   // ROE
-  function scROE(r) { return r == null ? 5 : Math.min(10, Math.max(0, r * 30)); }
+  function scROE(r) {
+    if (r == null) return 5;
+    return r > 0.5 ? 10 : r > 0.3 ? 9 : r > 0.2 ? 8 : r > 0.1 ? 6 : r > 0.05 ? 4 : r > 0 ? 2 : 1;
+  }
   s.roe.A = scROE(dataA.roe);
   s.roe.B = scROE(dataB.roe);
 
@@ -462,22 +585,55 @@ function score(dataA, dataB) {
     var ac = d.analystCounts; if (!ac) return 5;
     var total = (ac.strongBuy||0)+(ac.buy||0)+(ac.hold||0)+(ac.sell||0)+(ac.strongSell||0);
     if (total === 0) return 5;
-    return Math.min(10, ((ac.strongBuy||0)+(ac.buy||0))/total * 10);
+    var buyRatio = ((ac.strongBuy||0)+(ac.buy||0)) / total;
+    var strongBuyBonus = (ac.strongBuy||0) / total * 2;
+    return Math.min(10, buyRatio * 8 + strongBuyBonus + 1);
   }
   s.analyst.A = scAn(dataA);
   s.analyst.B = scAn(dataB);
 
-  // 估值合理性（PEG）
-  function scV(pe, peg) {
-    if (peg && peg > 0) return peg < 1 ? 9 : peg < 1.5 ? 7 : peg < 2 ? 5 : 3;
-    if (pe && pe > 0) return pe < 15 ? 9 : pe < 25 ? 7 : pe < 35 ? 5 : 3;
+  // 估值合理性（科技股用指数折现逻辑）
+  function scV(d) {
+    if (d.peg && d.peg > 0) {
+      return d.peg < 0.8 ? 10 : d.peg < 1.2 ? 8 : d.peg < 1.8 ? 6 : d.peg < 2.5 ? 4 : 2;
+    }
+    if (d.pe && d.pe > 0 && d.revenueGrowth > 0) {
+      var peg = d.pe / (d.revenueGrowth * 100);
+      return peg < 1 ? 9 : peg < 1.5 ? 7 : peg < 2 ? 5 : peg < 3 ? 3 : 2;
+    }
+    if (d.pe && d.pe > 0) return d.pe < 15 ? 9 : d.pe < 25 ? 7 : d.pe < 40 ? 5 : 3;
     return 5;
   }
-  s.valuation.A = scV(dataA.pe, dataA.peg);
-  s.valuation.B = scV(dataB.pe, dataB.peg);
+  s.valuation.A = scV(dataA);
+  s.valuation.B = scV(dataB);
 
-  // 总分
-  var dims = ['pe','growth','profit','finance','fcf','roe','analyst','valuation'];
+  // 成长趋势（三年营收/毛利率/研发趋势）
+  function scTrend(d) {
+    var v = 5;
+    // 毛利率趋势
+    if (d.grossMarginHistory && d.grossMarginHistory[2] != null && d.grossMarginHistory[0] != null) {
+      var gmTrend = d.grossMarginHistory[2] - d.grossMarginHistory[0];
+      if (gmTrend > 0.03) v += 1.5; else if (gmTrend > 0) v += 0.5; else if (gmTrend < -0.05) v -= 1.5; else if (gmTrend < 0) v -= 0.5;
+    }
+    // 营收趋势（近3年是否持续增长）
+    if (d.revenueHistory && d.revenueHistory.length >= 3) {
+      var r = d.revenueHistory;
+      var grow1 = r[1].amount > r[0].amount;
+      var grow2 = r[2].amount > r[1].amount;
+      if (grow1 && grow2) v += 2; else if (grow2) v += 1; else if (!grow1 && !grow2) v -= 2;
+    }
+    // 净利率趋势
+    if (d.netMarginHistory && d.netMarginHistory.length >= 3) {
+      var nmTrend = d.netMarginHistory[2] - d.netMarginHistory[0];
+      if (nmTrend > 0.05) v += 1.5; else if (nmTrend > 0) v += 0.5; else if (nmTrend < -0.1) v -= 1.5;
+    }
+    return Math.min(10, Math.max(1, v));
+  }
+  s.trend.A = scTrend(dataA);
+  s.trend.B = scTrend(dataB);
+
+  // 总分（9维）
+  var dims = ['pe','growth','profit','finance','fcf','roe','analyst','valuation','trend'];
   s.totalA = 0; s.totalB = 0;
   for (var i = 0; i < dims.length; i++) {
     s.totalA += s[dims[i]].A;
@@ -489,28 +645,24 @@ function score(dataA, dataB) {
 }
 
 // ============================================================
-// 深度报告生成（核心！）
+// 深度报告生成
 // ============================================================
 function generateDeepReport(dataA, dataB, scores) {
   var isCnA = dataA.market === 'CN';
   var isCnB = dataB.market === 'CN';
-  var symA = isCnA ? '¥' : '$';
-  var symB = isCnB ? '¥' : '$';
 
   // 上行空间
-  var upsideA = dataA.targetMean && dataA.price ? (dataA.targetMean / dataA.price - 1) : null;
-  var upsideB = dataB.targetMean && dataB.price ? (dataB.targetMean / dataB.price - 1) : null;
+  var upsideA = dataA.targetMean && dataA.price ? ((dataA.targetMean / dataA.price - 1) * 100) : null;
+  var upsideB = dataB.targetMean && dataB.price ? ((dataB.targetMean / dataB.price - 1) * 100) : null;
 
-  // 评分维度中文名
   var dimNames = {
-    pe:'估值合理性(PE)', growth:'成长性', profit:'盈利能力',
-    finance:'财务稳健', fcf:'现金流', roe:'ROE回报',
-    analyst:'分析师共识', valuation:'估值(PEG)'
+    pe:'估值(PE/PEG)', growth:'营收成长性', profit:'盈利能力',
+    finance:'财务稳健', fcf:'现金流质量', roe:'ROE回报率',
+    analyst:'分析师共识', valuation:'估值合理性', trend:'成长趋势'
   };
 
-  // 胜出统计
+  var dims = ['pe','growth','profit','finance','fcf','roe','analyst','valuation','trend'];
   var winA = 0, winB = 0;
-  var dims = ['pe','growth','profit','finance','fcf','roe','analyst','valuation'];
   for (var i = 0; i < dims.length; i++) {
     if (scores[dims[i]].A > scores[dims[i]].B) winA++;
     else if (scores[dims[i]].B > scores[dims[i]].A) winB++;
@@ -518,198 +670,277 @@ function generateDeepReport(dataA, dataB, scores) {
 
   var html = '';
 
-  // ========== 一、核心结论 ==========
+  // ===== 一、核心结论 =====
   html += '<div class="report-section">';
-  html += '<h2>一、核心结论（先说重点）</h2>';
+  html += '<h2>一、核心结论</h2>';
   html += '<table class="report-table">';
   html += '<tr><th>维度</th><th>' + dataA.symbol + ' (' + dataA.name + ')</th><th>' + dataB.symbol + ' (' + dataB.name + ')</th><th>胜出</th></tr>';
 
   for (var i = 0; i < dims.length; i++) {
     var d = dims[i];
-    var aVal = '-', bVal = '-';
-    // 显示关键指标值
-    if (d === 'pe') { aVal = dataA.pe ? dataA.pe.toFixed(1)+'x' : 'N/A'; bVal = dataB.pe ? dataB.pe.toFixed(1)+'x' : 'N/A'; }
+    var aVal = 'N/A', bVal = 'N/A';
+    if (d === 'pe') { aVal = dataA.pe > 0 ? dataA.pe.toFixed(0)+'x' : 'N/A'; bVal = dataB.pe > 0 ? dataB.pe.toFixed(0)+'x' : 'N/A'; }
     else if (d === 'growth') { aVal = dataA.revenueGrowth != null ? fmtPct(dataA.revenueGrowth) : 'N/A'; bVal = dataB.revenueGrowth != null ? fmtPct(dataB.revenueGrowth) : 'N/A'; }
-    else if (d === 'profit') { aVal = dataA.profitMargin != null ? fmtPct(dataA.profitMargin) : 'N/A'; bVal = dataB.profitMargin != null ? fmtPct(dataB.profitMargin) : 'N/A'; }
-    else if (d === 'finance') { aVal = dataA.debtToEquity != null ? dataA.debtToEquity.toFixed(2) : 'N/A'; bVal = dataB.debtToEquity != null ? dataB.debtToEquity.toFixed(2) : 'N/A'; }
+    else if (d === 'profit') { aVal = (dataA.grossMargin != null ? fmtPct(dataA.grossMargin)+'毛利' : '') + (dataA.profitMargin != null ? ' ' + fmtPct(dataA.profitMargin)+'净利' : ''); bVal = (dataB.grossMargin != null ? fmtPct(dataB.grossMargin)+'毛利' : '') + (dataB.profitMargin != null ? ' ' + fmtPct(dataB.profitMargin)+'净利' : ''); }
+    else if (d === 'finance') { aVal = dataA.debtToEquity != null ? 'D/E '+dataA.debtToEquity.toFixed(2) : 'N/A'; bVal = dataB.debtToEquity != null ? 'D/E '+dataB.debtToEquity.toFixed(2) : 'N/A'; }
     else if (d === 'fcf') { aVal = dataA.freeCashFlow ? fmtNum(dataA.freeCashFlow) : 'N/A'; bVal = dataB.freeCashFlow ? fmtNum(dataB.freeCashFlow) : 'N/A'; }
     else if (d === 'roe') { aVal = dataA.roe != null ? fmtPct(dataA.roe) : 'N/A'; bVal = dataB.roe != null ? fmtPct(dataB.roe) : 'N/A'; }
-    else if (d === 'analyst') { aVal = dataA.analystCounts ? (dataA.analystCounts.strongBuy+dataA.analystCounts.buy)+'/'+Object.values(dataA.analystCounts).reduce(function(s,v){return s+v},0) : 'N/A'; bVal = dataB.analystCounts ? (dataB.analystCounts.strongBuy+dataB.analystCounts.buy)+'/'+Object.values(dataB.analystCounts).reduce(function(s,v){return s+v},0) : 'N/A'; }
-    else if (d === 'valuation') { aVal = dataA.peg ? 'PEG '+dataA.peg.toFixed(1) : (dataA.pe ? 'PE '+dataA.pe.toFixed(1) : 'N/A'); bVal = dataB.peg ? 'PEG '+dataB.peg.toFixed(1) : (dataB.pe ? 'PE '+dataB.pe.toFixed(1) : 'N/A'); }
+    else if (d === 'analyst') {
+      var acA = dataA.analystCounts; var acB = dataB.analystCounts;
+      if (acA) { var tA = Object.values(acA).reduce(function(s,v){return s+v},0); aVal = (acA.strongBuy+acA.buy)+'/'+tA+'买'; }
+      if (acB) { var tB = Object.values(acB).reduce(function(s,v){return s+v},0); bVal = (acB.strongBuy+acB.buy)+'/'+tB+'买'; }
+    }
+    else if (d === 'valuation') { aVal = dataA.peg ? 'PEG '+dataA.peg.toFixed(1) : (dataA.pe > 0 ? 'PE '+dataA.pe.toFixed(0) : 'N/A'); bVal = dataB.peg ? 'PEG '+dataB.peg.toFixed(1) : (dataB.pe > 0 ? 'PE '+dataB.pe.toFixed(0) : 'N/A'); }
+    else if (d === 'trend') {
+      function trendDesc(dd) {
+        if (!dd.revenueHistory || dd.revenueHistory.length < 3) return 'N/A';
+        var r = dd.revenueHistory;
+        var g1 = ((r[1].amount/r[0].amount - 1)*100).toFixed(0);
+        var g2 = ((r[2].amount/r[1].amount - 1)*100).toFixed(0);
+        var sign1 = g1 >= 0 ? '+' : '';
+        var sign2 = g2 >= 0 ? '+' : '';
+        return r[0].year+'→'+r[1].year+':'+sign1+g1+'%<br>'+r[1].year+'→'+r[2].year+':'+sign2+g2+'%';
+      }
+      aVal = trendDesc(dataA); bVal = trendDesc(dataB);
+    }
 
-    var winner = scores[d].A > scores[d].B ? dataA.symbol : scores[d].B > scores[d].A ? dataB.symbol : '=';
-    var winnerColor = scores[d].A > scores[d].B ? 'style="color:#ffd700;font-weight:bold"' : scores[d].B > scores[d].A ? 'style="color:#00d4ff;font-weight:bold"' : '';
-    html += '<tr><td>' + dimNames[d] + '</td><td>' + aVal + '</td><td>' + bVal + '</td><td ' + winnerColor + '>' + winner + '</td></tr>';
+    var winner = scores[d].A > scores[d].B ? dataA.symbol : scores[d].B > scores[d].A ? dataB.symbol : '—';
+    var wc = scores[d].A > scores[d].B ? 'style="color:#ffd700;font-weight:bold"' : scores[d].B > scores[d].A ? 'style="color:#00d4ff;font-weight:bold"' : '';
+    html += '<tr><td>' + dimNames[d] + '<br><small style="color:#666">' + scores[d].A.toFixed(1) + ' / ' + scores[d].B.toFixed(1) + '</small></td><td>' + aVal + '</td><td>' + bVal + '</td><td '+wc+'>' + winner + '</td></tr>';
   }
-
-  // 总分行
-  html += '<tr style="background:#1a1a0a"><td><b>综合总分</b></td><td><b style="color:' + (scores.totalA >= scores.totalB ? '#ffd700' : '#888') + '">' + scores.totalA.toFixed(1) + '</b></td><td><b style="color:' + (scores.totalB >= scores.totalA ? '#00d4ff' : '#888') + '">' + scores.totalB.toFixed(1) + '</b></td><td><b style="color:#ffd700">' + (scores.totalA > scores.totalB ? dataA.symbol : scores.totalB > scores.totalA ? dataB.symbol : '平局') + '</b></td></tr>';
+  // 总分
+  html += '<tr style="background:#1a1a0a"><td><b>综合总分</b></td><td><b style="color:' + (scores.totalA >= scores.totalB ? '#ffd700' : '#aaa') + '">' + scores.totalA.toFixed(1) + '</b></td><td><b style="color:' + (scores.totalB >= scores.totalA ? '#00d4ff' : '#aaa') + '">' + scores.totalB.toFixed(1) + '</b></td><td><b>' + (scores.totalA > scores.totalB ? '<span style="color:#ffd700">'+dataA.symbol+'</span>' : scores.totalB > scores.totalA ? '<span style="color:#00d4ff">'+dataB.symbol+'</span>' : '平局') + '</b></td></tr>';
   html += '</table>';
 
-  // 结论文字
+  // 三年毛利率对比
+  html += '<h3 style="margin-top:14px">📊 三年毛利率趋势</h3>';
+  html += '<table class="report-table"><tr><th>年份</th><th>' + dataA.symbol + ' 毛利率</th><th>' + dataB.symbol + ' 毛利率</th></tr>';
+  var gmYears = [2022, 2023, 2024];
+  for (var y = 0; y < 3; y++) {
+    var gmA = dataA.grossMarginHistory ? dataA.grossMarginHistory[y] : null;
+    var gmB = dataB.grossMarginHistory ? dataB.grossMarginHistory[y] : null;
+    var arrowA = '', arrowB = '';
+    if (y > 0) {
+      var prevA = dataA.grossMarginHistory ? dataA.grossMarginHistory[y-1] : null;
+      var prevB = dataB.grossMarginHistory ? dataB.grossMarginHistory[y-1] : null;
+      if (gmA != null && prevA != null) arrowA = gmA > prevA ? ' <span class="up">▲</span>' : gmA < prevA ? ' <span class="down">▼</span>' : ' —';
+      if (gmB != null && prevB != null) arrowB = gmB > prevB ? ' <span class="up">▲</span>' : gmB < prevB ? ' <span class="down">▼</span>' : ' —';
+    }
+    html += '<tr><td>' + gmYears[y] + '</td><td>' + (gmA != null ? (gmA*100).toFixed(1)+'%' + arrowA : 'N/A') + '</td><td>' + (gmB != null ? (gmB*100).toFixed(1)+'%' + arrowB : 'N/A') + '</td></tr>';
+  }
+  html += '</table>';
+
+  // 三年研发费用对比
+  html += '<h3 style="margin-top:14px">🔬 三年研发费用趋势</h3>';
+  html += '<table class="report-table"><tr><th>年份</th><th>' + dataA.symbol + ' 研发费用</th><th>' + dataA.symbol + ' 研发/营收</th><th>' + dataB.symbol + ' 研发费用</th><th>' + dataB.symbol + ' 研发/营收</th></tr>';
+  for (var y = 0; y < 3; y++) {
+    var rdA = dataA.rdHistory ? dataA.rdHistory[y] : null;
+    var rdB = dataB.rdHistory ? dataB.rdHistory[y] : null;
+    var rdRatioA = dataA.rdToRevenue ? dataA.rdToRevenue[y] : null;
+    var rdRatioB = dataB.rdToRevenue ? dataB.rdToRevenue[y] : null;
+    html += '<tr><td>' + (rdA ? rdA.year : gmYears[y]) + '</td>';
+    html += '<td>' + (rdA && rdA.amount > 0 ? '$' + fmtNum(rdA.amount * 1e6) : rdA ? 'N/A' : 'N/A') + '</td>';
+    html += '<td>' + (rdRatioA != null ? (rdRatioA*100).toFixed(1)+'%' : 'N/A') + '</td>';
+    html += '<td>' + (rdB && rdB.amount > 0 ? (dataB.currency === 'CNY' ? '¥' : '$') + fmtNum(rdB.amount * 1e6) : rdB ? 'N/A' : 'N/A') + '</td>';
+    html += '<td>' + (rdRatioB != null ? (rdRatioB*100).toFixed(1)+'%' : 'N/A') + '</td></tr>';
+  }
+  html += '</table>';
+
+  // 结论
   var winner = scores.totalA > scores.totalB + 2 ? 'A' : scores.totalB > scores.totalA + 2 ? 'B' : 'tie';
   html += '<div class="verdict-box" style="margin-top:12px">';
-  if (winner === 'A') {
-    html += '<p>🏆 <b style="color:#ffd700">' + dataA.symbol + '</b> 综合评分更高（' + scores.totalA.toFixed(1) + ' vs ' + scores.totalB.toFixed(1) + '），在 <b>' + winA + '</b> 个维度胜出。</p>';
-  } else if (winner === 'B') {
-    html += '<p>🏆 <b style="color:#00d4ff">' + dataB.symbol + '</b> 综合评分更高（' + scores.totalB.toFixed(1) + ' vs ' + scores.totalA.toFixed(1) + '），在 <b>' + winB + '</b> 个维度胜出。</p>';
-  } else {
-    html += '<p>⚖️ 两只股票综合评分接近（' + scores.totalA.toFixed(1) + ' vs ' + scores.totalB.toFixed(1) + '），各有优势，难以简单判断优劣。</p>';
-  }
+  if (winner === 'A') html += '<p>🏆 <b style="color:#ffd700">' + dataA.symbol + '</b> 综合评分更高（' + scores.totalA.toFixed(1) + ' vs ' + scores.totalB.toFixed(1) + '），在 ' + winA + '/9 维度胜出。</p>';
+  else if (winner === 'B') html += '<p>🏆 <b style="color:#00d4ff">' + dataB.symbol + '</b> 综合评分更高（' + scores.totalB.toFixed(1) + ' vs ' + scores.totalA.toFixed(1) + '），在 ' + winB + '/9 维度胜出。</p>';
+  else html += '<p>⚖️ 两只股票综合评分接近（' + scores.totalA.toFixed(1) + ' vs ' + scores.totalB.toFixed(1) + '），各有优势。</p>';
 
-  // 关键发现
-  html += '<p><b>关键发现：</b>';
   var findings = [];
-  if (dataA.pe && dataB.pe && Math.abs(dataA.pe - dataB.pe) / Math.max(dataA.pe, dataB.pe) > 0.3) {
-    findings.push('估值差异显著——' + (dataA.pe < dataB.pe ? dataA.symbol + ' PE ' + dataA.pe.toFixed(1) + 'x 更便宜' : dataB.symbol + ' PE ' + dataB.pe.toFixed(1) + 'x 更便宜'));
+  if (dataA.pe > 0 && dataB.pe > 0 && Math.abs(dataA.pe - dataB.pe) / Math.max(dataA.pe, dataB.pe) > 0.3) {
+    findings.push('估值差距显著：' + (dataA.pe < dataB.pe ? dataA.symbol : dataB.symbol) + ' PE更低');
   }
-  if (dataA.revenueGrowth != null && dataB.revenueGrowth != null && Math.abs(dataA.revenueGrowth - dataB.revenueGrowth) > 0.1) {
+  if (dataA.revenueGrowth != null && dataB.revenueGrowth != null) {
     findings.push((dataA.revenueGrowth > dataB.revenueGrowth ? dataA.symbol : dataB.symbol) + ' 营收增速更快（' + fmtPct(Math.max(dataA.revenueGrowth, dataB.revenueGrowth)) + '）');
   }
-  if (dataA.roe != null && dataB.roe != null && Math.abs(dataA.roe - dataB.roe) > 0.1) {
-    findings.push((dataA.roe > dataB.roe ? dataA.symbol : dataB.symbol) + ' ROE更高（' + fmtPct(Math.max(dataA.roe, dataB.roe)) + '）');
+  if (dataA.grossMargin != null && dataB.grossMargin != null && Math.abs(dataA.grossMargin - dataB.grossMargin) > 0.1) {
+    findings.push((dataA.grossMargin > dataB.grossMargin ? dataA.symbol : dataB.symbol) + ' 毛利率更高（' + fmtPct(Math.max(dataA.grossMargin, dataB.grossMargin)) + '）');
   }
-  if (findings.length === 0) findings.push('两只股票各有优劣，需结合投资目标和风险偏好选择');
-  html += findings.join('；') + '。</p>';
+  if (findings.length > 0) html += '<p><b>关键发现：</b>' + findings.join('；') + '。</p>';
   html += '</div></div>';
 
-  // ========== 二、公司定位对比 ==========
+  // ===== 二、公司定位 =====
   html += '<div class="report-section">';
   html += '<h2>二、公司定位对比</h2>';
   html += '<table class="report-table">';
   html += '<tr><th>项目</th><th>' + dataA.symbol + '</th><th>' + dataB.symbol + '</th></tr>';
   html += '<tr><td>公司名称</td><td>' + dataA.name + '</td><td>' + dataB.name + '</td></tr>';
   html += '<tr><td>行业</td><td>' + (dataA.industry||'N/A') + '</td><td>' + (dataB.industry||'N/A') + '</td></tr>';
-  html += '<tr><td>交易所</td><td>' + (isCnA ? '中国A股' : dataA.exchange) + '</td><td>' + (isCnB ? '中国A股' : dataB.exchange) + '</td></tr>';
-  html += '<tr><td>市值</td><td>' + (dataA.marketCap ? symA + fmtNum(dataA.marketCap) : 'N/A') + '</td><td>' + (dataB.marketCap ? symB + fmtNum(dataB.marketCap) : 'N/A') + '</td></tr>';
-  html += '<tr><td>当前股价</td><td><span class="' + colorClass(dataA.changePct) + '">' + fmtPrice(dataA.price, dataA.currency) + ' (' + (dataA.changePct != null ? (dataA.changePct > 0 ? '+' : '') + dataA.changePct.toFixed(2) + '%' : 'N/A') + ')</span></td><td><span class="' + colorClass(dataB.changePct) + '">' + fmtPrice(dataB.price, dataB.currency) + ' (' + (dataB.changePct != null ? (dataB.changePct > 0 ? '+' : '') + dataB.changePct.toFixed(2) + '%' : 'N/A') + ')</span></td></tr>';
-  html += '<tr><td>52周高/低</td><td>' + (dataA.week52High ? fmtPrice(dataA.week52High, dataA.currency) + ' / ' + fmtPrice(dataA.week52Low, dataA.currency) : 'N/A') + '</td><td>' + (dataB.week52High ? fmtPrice(dataB.week52High, dataB.currency) + ' / ' + fmtPrice(dataB.week52Low, dataB.currency) : 'N/A') + '</td></tr>';
+  html += '<tr><td>交易所</td><td>' + (isCnA ? '中国A股' : (dataA.exchange||'NASDAQ')) + '</td><td>' + (isCnB ? '中国A股' : (dataB.exchange||'NASDAQ')) + '</td></tr>';
+  html += '<tr><td>市值</td><td>' + (dataA.marketCap ? (dataA.currency==='CNY'?'¥':'$') + fmtNum(dataA.marketCap) : 'N/A') + '</td><td>' + (dataB.marketCap ? (dataB.currency==='CNY'?'¥':'$') + fmtNum(dataB.marketCap) : 'N/A') + '</td></tr>';
+
+  // ★ 股价显示（使用实际最新价格，注明数据日期）
+  var priceA = '<span class="' + colorClass(dataA.changePct) + '">' + fmtPrice(dataA.price, dataA.currency);
+  if (dataA.changePct != null) priceA += ' (' + (dataA.changePct > 0 ? '+' : '') + dataA.changePct.toFixed(2) + '%)';
+  priceA += '</span>';
+  var priceB = '<span class="' + colorClass(dataB.changePct) + '">' + fmtPrice(dataB.price, dataB.currency);
+  if (dataB.changePct != null) priceB += ' (' + (dataB.changePct > 0 ? '+' : '') + dataB.changePct.toFixed(2) + '%)';
+  priceB += '</span>';
+  html += '<tr><td>当前股价<br><small style="color:#666">2026-06-03盘后</small></td><td>' + priceA + '</td><td>' + priceB + '</td></tr>';
+  html += '<tr><td>52周高/低</td><td>' + (dataA.week52High ? fmtPrice(dataA.week52High, dataA.currency)+' / '+fmtPrice(dataA.week52Low, dataA.currency) : 'N/A') + '</td><td>' + (dataB.week52High ? fmtPrice(dataB.week52High, dataB.currency)+' / '+fmtPrice(dataB.week52Low, dataB.currency) : 'N/A') + '</td></tr>';
   html += '</table>';
 
   if (dataA.business || dataB.business) {
     html += '<h3>业务定位</h3>';
-    html += '<p style="color:#ccc;line-height:1.8">' + dataA.symbol + '：' + (dataA.business||'数据不足') + '</p>';
-    html += '<p style="color:#ccc;line-height:1.8">' + dataB.symbol + '：' + (dataB.business||'数据不足') + '</p>';
+    html += '<p style="color:#ccc;line-height:1.8"><b style="color:#ffd700">' + dataA.symbol + '：</b>' + (dataA.business||'N/A') + '</p>';
+    html += '<p style="color:#ccc;line-height:1.8"><b style="color:#00d4ff">' + dataB.symbol + '：</b>' + (dataB.business||'N/A') + '</p>';
   }
   if (dataA.moat || dataB.moat) {
     html += '<h3>护城河</h3>';
-    html += '<p style="color:#ccc;line-height:1.8">' + dataA.symbol + '：' + (dataA.moat||'数据不足') + '</p>';
-    html += '<p style="color:#ccc;line-height:1.8">' + dataB.symbol + '：' + (dataB.moat||'数据不足') + '</p>';
+    html += '<p style="color:#ccc;line-height:1.8"><b style="color:#ffd700">' + dataA.symbol + '：</b>' + (dataA.moat||'N/A') + '</p>';
+    html += '<p style="color:#ccc;line-height:1.8"><b style="color:#00d4ff">' + dataB.symbol + '：</b>' + (dataB.moat||'N/A') + '</p>';
+  }
+  // 长期持有逻辑
+  if (dataA.longTermView || dataB.longTermView) {
+    html += '<h3>长期持有逻辑</h3>';
+    if (dataA.longTermView) html += '<p style="color:#ccc;line-height:1.8;background:#0a0a1a;border-radius:8px;padding:10px;margin:4px 0"><b style="color:#ffd700">' + dataA.symbol + '：</b>' + dataA.longTermView + '</p>';
+    if (dataB.longTermView) html += '<p style="color:#ccc;line-height:1.8;background:#0a0a1a;border-radius:8px;padding:10px;margin:4px 0"><b style="color:#00d4ff">' + dataB.symbol + '：</b>' + dataB.longTermView + '</p>';
   }
   html += '</div>';
 
-  // ========== 三、财务数据对比 ==========
+  // ===== 三、财务数据 =====
   html += '<div class="report-section">';
   html += '<h2>三、财务数据对比</h2>';
   html += '<table class="report-table">';
   html += '<tr><th>指标</th><th>' + dataA.symbol + '</th><th>' + dataB.symbol + '</th><th>对比</th></tr>';
 
-  function addRow(label, valA, valB, lowerBetter) {
-    var aStr = valA != null ? valA : 'N/A';
-    var bStr = valB != null ? valB : 'N/A';
+  function addRow(label, aStr, bStr, aRaw, bRaw, lowerBetter) {
     var cmp = '';
-    if (valA != null && valB != null) {
-      if (lowerBetter) cmp = valA < valB ? '✅A优' : valB < valA ? '✅B优' : '=';
-      else cmp = valA > valB ? '✅A优' : valB > valA ? '✅B优' : '=';
+    if (aRaw != null && bRaw != null && !isNaN(aRaw) && !isNaN(bRaw)) {
+      if (lowerBetter) cmp = aRaw < bRaw ? '✅ A优' : bRaw < aRaw ? '✅ B优' : '=';
+      else cmp = aRaw > bRaw ? '✅ A优' : bRaw > aRaw ? '✅ B优' : '=';
     }
-    html += '<tr><td>' + label + '</td><td>' + aStr + '</td><td>' + bStr + '</td><td>' + cmp + '</td></tr>';
+    html += '<tr><td>' + label + '</td><td>' + (aStr||'N/A') + '</td><td>' + (bStr||'N/A') + '</td><td>' + cmp + '</td></tr>';
   }
 
-  addRow('股价', fmtPrice(dataA.price, dataA.currency), fmtPrice(dataB.price, dataB.currency), false);
-  addRow('PE (TTM)', dataA.pe ? dataA.pe.toFixed(1)+'x' : 'N/A', dataB.pe ? dataB.pe.toFixed(1)+'x' : 'N/A', false);
-  addRow('远期PE', dataA.forwardPe ? dataA.forwardPe.toFixed(1)+'x' : 'N/A', dataB.forwardPe ? dataB.forwardPe.toFixed(1)+'x' : 'N/A', false);
-  addRow('PEG', dataA.peg ? dataA.peg.toFixed(1) : 'N/A', dataB.peg ? dataB.peg.toFixed(1) : 'N/A', false);
-  addRow('PB', dataA.pb ? dataA.pb.toFixed(1)+'x' : 'N/A', dataB.pb ? dataB.pb.toFixed(1)+'x' : 'N/A', false);
-  addRow('PS', dataA.ps ? dataA.ps.toFixed(1)+'x' : 'N/A', dataB.ps ? dataB.ps.toFixed(1)+'x' : 'N/A', false);
-  addRow('营收增速', dataA.revenueGrowth != null ? fmtPct(dataA.revenueGrowth) : 'N/A', dataB.revenueGrowth != null ? fmtPct(dataB.revenueGrowth) : 'N/A', true);
-  addRow('净利润增速', dataA.earningsGrowth != null ? fmtPct(dataA.earningsGrowth) : 'N/A', dataB.earningsGrowth != null ? fmtPct(dataB.earningsGrowth) : 'N/A', true);
-  addRow('毛利率', dataA.grossMargin != null ? fmtPct(dataA.grossMargin) : 'N/A', dataB.grossMargin != null ? fmtPct(dataB.grossMargin) : 'N/A', true);
-  addRow('净利率', dataA.profitMargin != null ? fmtPct(dataA.profitMargin) : 'N/A', dataB.profitMargin != null ? fmtPct(dataB.profitMargin) : 'N/A', true);
-  addRow('经营利润率', dataA.operatingMargin != null ? fmtPct(dataA.operatingMargin) : 'N/A', dataB.operatingMargin != null ? fmtPct(dataB.operatingMargin) : 'N/A', true);
-  addRow('ROE', dataA.roe != null ? fmtPct(dataA.roe) : 'N/A', dataB.roe != null ? fmtPct(dataB.roe) : 'N/A', true);
-  addRow('债务/权益', dataA.debtToEquity != null ? dataA.debtToEquity.toFixed(2) : 'N/A', dataB.debtToEquity != null ? dataB.debtToEquity.toFixed(2) : 'N/A', false);
-  addRow('流动比率', dataA.currentRatio != null ? dataA.currentRatio.toFixed(2) : 'N/A', dataB.currentRatio != null ? dataB.currentRatio.toFixed(2) : 'N/A', true);
-  addRow('自由现金流', dataA.freeCashFlow ? fmtNum(dataA.freeCashFlow) : 'N/A', dataB.freeCashFlow ? fmtNum(dataB.freeCashFlow) : 'N/A', true);
-  addRow('Beta', dataA.beta != null ? dataA.beta.toFixed(2) : 'N/A', dataB.beta != null ? dataB.beta.toFixed(2) : 'N/A', false);
+  addRow('股价（盘后）', fmtPrice(dataA.price, dataA.currency), fmtPrice(dataB.price, dataB.currency), null, null, false);
+  addRow('PE (TTM)', dataA.pe > 0 ? dataA.pe.toFixed(0)+'x' : 'N/A', dataB.pe > 0 ? dataB.pe.toFixed(0)+'x' : 'N/A', null, null, false);
+  addRow('远期PE', dataA.forwardPe ? dataA.forwardPe.toFixed(0)+'x' : 'N/A', dataB.forwardPe ? dataB.forwardPe.toFixed(0)+'x' : 'N/A', null, null, false);
+  addRow('PEG', dataA.peg ? dataA.peg.toFixed(1) : 'N/A', dataB.peg ? dataB.peg.toFixed(1) : 'N/A', dataA.peg, dataB.peg, true);
+  addRow('PB', dataA.pb ? dataA.pb.toFixed(1)+'x' : 'N/A', dataB.pb ? dataB.pb.toFixed(1)+'x' : 'N/A', null, null, false);
+  addRow('PS', dataA.ps ? dataA.ps.toFixed(1)+'x' : 'N/A', dataB.ps ? dataB.ps.toFixed(1)+'x' : 'N/A', null, null, false);
+  html += '<tr style="background:#0f0f2a"><td colspan="4" style="text-align:left;padding:8px 6px;color:#ffd700;font-size:13px">── 盈利能力 ──</td></tr>';
+  addRow('毛利率', dataA.grossMargin != null ? fmtPct(dataA.grossMargin) : 'N/A', dataB.grossMargin != null ? fmtPct(dataB.grossMargin) : 'N/A', dataA.grossMargin, dataB.grossMargin, false);
+  addRow('净利润率', dataA.profitMargin != null ? fmtPct(dataA.profitMargin) : 'N/A', dataB.profitMargin != null ? fmtPct(dataB.profitMargin) : 'N/A', dataA.profitMargin, dataB.profitMargin, false);
+  addRow('经营利润率', dataA.operatingMargin != null ? fmtPct(dataA.operatingMargin) : 'N/A', dataB.operatingMargin != null ? fmtPct(dataB.operatingMargin) : 'N/A', dataA.operatingMargin, dataB.operatingMargin, false);
+  html += '<tr style="background:#0f0f2a"><td colspan="4" style="text-align:left;padding:8px 6px;color:#ffd700;font-size:13px">── 成长性 ──</td></tr>';
+  addRow('营收增速(YoY)', dataA.revenueGrowth != null ? fmtPct(dataA.revenueGrowth) : 'N/A', dataB.revenueGrowth != null ? fmtPct(dataB.revenueGrowth) : 'N/A', dataA.revenueGrowth, dataB.revenueGrowth, false);
+  addRow('净利润增速', dataA.earningsGrowth != null ? fmtPct(dataA.earningsGrowth) : 'N/A', dataB.earningsGrowth != null ? fmtPct(dataB.earningsGrowth) : 'N/A', dataA.earningsGrowth, dataB.earningsGrowth, false);
+  html += '<tr style="background:#0f0f2a"><td colspan="4" style="text-align:left;padding:8px 6px;color:#ffd700;font-size:13px">── 财务健康 ──</td></tr>';
+  addRow('ROE', dataA.roe != null ? fmtPct(dataA.roe) : 'N/A', dataB.roe != null ? fmtPct(dataB.roe) : 'N/A', dataA.roe, dataB.roe, false);
+  addRow('债务/权益(D/E)', dataA.debtToEquity != null ? dataA.debtToEquity.toFixed(2) : 'N/A', dataB.debtToEquity != null ? dataB.debtToEquity.toFixed(2) : 'N/A', dataA.debtToEquity, dataB.debtToEquity, true);
+  addRow('流动比率', dataA.currentRatio != null ? dataA.currentRatio.toFixed(2) : 'N/A', dataB.currentRatio != null ? dataB.currentRatio.toFixed(2) : 'N/A', dataA.currentRatio, dataB.currentRatio, false);
+  addRow('自由现金流', dataA.freeCashFlow ? fmtNum(dataA.freeCashFlow) : 'N/A', dataB.freeCashFlow ? fmtNum(dataB.freeCashFlow) : 'N/A', dataA.freeCashFlow, dataB.freeCashFlow, false);
+  addRow('Beta', dataA.beta != null ? dataA.beta.toFixed(2) : 'N/A', dataB.beta != null ? dataB.beta.toFixed(2) : 'N/A', null, null, false);
 
   html += '</table></div>';
 
-  // ========== 四、估值分析 ==========
+  // ===== 四、估值分析（科技股指数增长逻辑）=====
   html += '<div class="report-section">';
   html += '<h2>四、估值分析</h2>';
+  html += '<p style="color:#888;font-size:13px;margin-bottom:10px">💡 科技高成长股用指数折现逻辑：若年增速 g%，N年后利润=当前×(1+g%)^N；合理PE需折现该增长序列。对于>50%增速的公司，当前高PE可能是合理的。</p>';
 
-  function valuationSection(data, sym, color) {
+  function valuationDetail(d, clr) {
     html += '<div style="background:#0a0a1a;border:1px solid #222;border-radius:10px;padding:12px;margin:8px 0">';
-    html += '<h3 style="color:' + color + '">' + sym + ' 估值分析</h3>';
-    if (data.pe) {
-      var peLevel = data.pe > 50 ? '极高' : data.pe > 30 ? '偏高' : data.pe > 15 ? '合理' : '极低';
-      html += '<p>PE ' + data.pe.toFixed(1) + 'x —— 估值<b>' + peLevel + '</b>';
-      if (data.peg) html += '｜ PEG ' + data.peg.toFixed(1) + '（' + (data.peg < 1 ? '低估' : data.peg < 1.5 ? '合理' : '偏高') + '）';
+    html += '<div style="font-size:17px;font-weight:bold;color:' + clr + ';margin-bottom:8px">' + d.symbol + '</div>';
+    if (d.pe > 0) {
+      var lv = d.pe > 150 ? '极高' : d.pe > 80 ? '很高' : d.pe > 40 ? '偏高' : d.pe > 20 ? '合理' : '偏低';
+      html += '<p>PE ' + d.pe.toFixed(0) + 'x — 当前估值<b>' + lv + '</b>';
+      if (d.forwardPe) html += '，远期PE ' + d.forwardPe.toFixed(0) + 'x';
       html += '</p>';
     }
-    if (data.targetMean) {
-      var upside = (data.targetMean / data.price - 1) * 100;
-      html += '<p>机构目标价均值 <b>' + fmtPrice(data.targetMean, data.currency) + '</b>，上行空间 <b class="' + (upside > 0 ? 'up' : 'down') + '">' + fmtPct(upside/100) + '</b>';
-      if (data.targetHigh && data.targetLow) {
-        html += '<br>目标价区间：' + fmtPrice(data.targetLow, data.currency) + ' ~ ' + fmtPrice(data.targetHigh, data.currency);
-      }
-      html += '</p>';
+    if (d.peg) {
+      html += '<p>PEG ' + d.peg.toFixed(1) + '（' + (d.peg < 1 ? '低估' : d.peg < 1.5 ? '合理' : d.peg < 2.5 ? '偏高' : '高估') + '）</p>';
+    } else if (d.pe > 0 && d.revenueGrowth > 0) {
+      var implPeg = d.pe / (d.revenueGrowth * 100);
+      html += '<p>隐含PEG ≈ ' + implPeg.toFixed(1) + '（' + (implPeg < 1 ? '估值低' : implPeg < 1.5 ? '估值合理' : implPeg < 2.5 ? '偏高' : '高估') + '）</p>';
     }
-    // PEG 判断
-    if (data.pe && data.revenueGrowth) {
-      var impliedPeg = data.pe / (data.revenueGrowth * 100);
-      html += '<p>隐含PEG ≈ ' + impliedPeg.toFixed(1) + '（PE / 营收增速%），';
-      html += impliedPeg < 1 ? '估值偏低' : impliedPeg < 1.5 ? '估值合理' : '估值偏高';
+    // 指数增长分析：用当前PE算，增速g%下，5年后理论PE
+    if (d.pe > 0 && d.revenueGrowth > 0) {
+      var g = d.revenueGrowth;
+      var profitGrowth5Y = Math.pow(1 + g, 5);
+      var pe5Y = d.pe / profitGrowth5Y;
+      html += '<p>📈 指数增长测试：若营收维持 <b>' + fmtPct(g) + '</b> 年增速，5年后利润是现在的 <b>' + profitGrowth5Y.toFixed(1) + 'x</b>，届时有效PE约 <b>' + pe5Y.toFixed(0) + 'x</b>（' + (pe5Y < 20 ? '届时估值合理' : pe5Y < 35 ? '届时估值尚可' : '届时仍偏贵，增速需更快') + '）</p>';
+    }
+    if (d.targetMean && d.price) {
+      var ups = (d.targetMean / d.price - 1) * 100;
+      html += '<p>机构目标价 <b>' + fmtPrice(d.targetMean, d.currency) + '</b>，上行空间 <b class="' + (ups > 0 ? 'up' : 'down') + '">' + (ups > 0 ? '+' : '') + ups.toFixed(1) + '%</b>';
+      if (d.targetHigh && d.targetLow) html += '<br>区间：' + fmtPrice(d.targetLow, d.currency) + ' ~ ' + fmtPrice(d.targetHigh, d.currency);
       html += '</p>';
     }
     html += '</div>';
   }
 
-  valuationSection(dataA, dataA.symbol, '#ffd700');
-  valuationSection(dataB, dataB.symbol, '#00d4ff');
+  valuationDetail(dataA, '#ffd700');
+  valuationDetail(dataB, '#00d4ff');
 
-  // 估值对比结论
-  if (dataA.pe && dataB.pe) {
-    html += '<div class="verdict-box" style="margin-top:8px">';
-    html += '<p><b>估值对比结论：</b>';
+  if (dataA.pe > 0 && dataB.pe > 0) {
+    html += '<div class="verdict-box">';
+    html += '<p><b>估值对比：</b>';
     if (dataA.peg && dataB.peg) {
-      html += dataA.peg < dataB.peg ? dataA.symbol + ' 的 PEG 更低（' + dataA.peg.toFixed(1) + ' vs ' + dataB.peg.toFixed(1) + '），估值更有效。' : dataB.peg < dataA.peg ? dataB.symbol + ' 的 PEG 更低（' + dataB.peg.toFixed(1) + ' vs ' + dataA.peg.toFixed(1) + '），估值更有效。' : '两只股票 PEG 相近，估值效率相当。';
-    } else if (dataA.pe && dataB.pe) {
-      html += dataA.pe < dataB.pe * 0.7 ? dataA.symbol + ' PE 明显更低（' + dataA.pe.toFixed(1) + 'x vs ' + dataB.pe.toFixed(1) + 'x），估值更安全。' : dataB.pe < dataA.pe * 0.7 ? dataB.symbol + ' PE 明显更低（' + dataB.pe.toFixed(1) + 'x vs ' + dataA.pe.toFixed(1) + 'x），估值更安全。' : '两只股票 PE 相近，估值水平相当。';
+      if (dataA.peg < dataB.peg) html += dataA.symbol + ' PEG(' + dataA.peg.toFixed(1) + ') 低于 ' + dataB.symbol + ' PEG(' + dataB.peg.toFixed(1) + ')，估值效率更高。';
+      else if (dataB.peg < dataA.peg) html += dataB.symbol + ' PEG(' + dataB.peg.toFixed(1) + ') 低于 ' + dataA.symbol + ' PEG(' + dataA.peg.toFixed(1) + ')，估值效率更高。';
+      else html += '两者PEG相近，估值效率相当。';
+    } else {
+      html += '需综合考量增速与估值匹配度。';
     }
     html += '</p></div>';
   }
   html += '</div>';
 
-  // ========== 五、分析师共识 ==========
+  // ===== 五、分析师共识 =====
   html += '<div class="report-section">';
   html += '<h2>五、分析师共识</h2>';
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
 
-  function analystDetail(data, color) {
-    var ac = data.analystCounts;
-    if (!ac) { html += '<div style="background:#0a0a1a;border-radius:10px;padding:12px"><p style="color:#888">暂无分析师数据</p></div>'; return; }
+  function analystDetail(d, clr) {
+    var ac = d.analystCounts;
+    if (!ac) { html += '<div style="background:#0a0a1a;border-radius:10px;padding:12px"><p style="color:#888">暂无数据</p></div>'; return; }
     var total = (ac.strongBuy||0)+(ac.buy||0)+(ac.hold||0)+(ac.sell||0)+(ac.strongSell||0);
-    if (total === 0) { html += '<div style="background:#0a0a1a;border-radius:10px;padding:12px"><p style="color:#888">暂无分析师数据</p></div>'; return; }
-
+    if (total === 0) { html += '<div style="background:#0a0a1a;border-radius:10px;padding:12px"><p style="color:#888">暂无数据</p></div>'; return; }
     var buyPct = ((ac.strongBuy||0)+(ac.buy||0)) / total * 100;
-    var consensus = buyPct >= 70 ? '强烈看多' : buyPct >= 50 ? '偏多' : buyPct >= 30 ? '中性' : '偏空';
-    var consensusColor = buyPct >= 70 ? '#4cff4c' : buyPct >= 50 ? '#a0ffa0' : buyPct >= 30 ? '#ffd700' : '#ff6666';
+    var cns = buyPct >= 75 ? '强烈看多' : buyPct >= 55 ? '偏多' : buyPct >= 35 ? '中性' : '偏空';
+    var cnsColor = buyPct >= 75 ? '#4cff4c' : buyPct >= 55 ? '#a8ffa8' : buyPct >= 35 ? '#ffd700' : '#ff6666';
 
     html += '<div style="background:#0a0a1a;border:1px solid #222;border-radius:10px;padding:12px">';
-    html += '<div style="text-align:center;margin-bottom:8px"><span style="font-size:17px;font-weight:bold;color:' + color + '">' + data.symbol + '</span> · <span style="color:#aaa">' + total + '位分析师</span></div>';
-    html += '<div style="text-align:center;margin-bottom:8px"><span style="font-size:15px;color:' + consensusColor + ';font-weight:bold">' + consensus + '</span> · 买入共识 ' + buyPct.toFixed(0) + '%</div>';
+    html += '<div style="text-align:center;margin-bottom:6px"><span style="font-size:17px;font-weight:bold;color:' + clr + '">' + d.symbol + '</span> · <span style="color:#aaa">' + total + '位分析师</span></div>';
+    html += '<div style="text-align:center;margin-bottom:8px"><span style="color:' + cnsColor + ';font-weight:bold">' + cns + '</span> · 买入共识 ' + buyPct.toFixed(0) + '%</div>';
 
     // 评级条
-    var parts = [];
-    if (ac.strongBuy > 0) parts.push('<span style="background:#00cc44;padding:2px 6px;border-radius:4px;font-size:12px;color:#fff">' + ac.strongBuy + '强买</span>');
-    if (ac.buy > 0) parts.push('<span style="background:#66dd88;padding:2px 6px;border-radius:4px;font-size:12px;color:#fff">' + ac.buy + '买入</span>');
-    if (ac.hold > 0) parts.push('<span style="background:#888;padding:2px 6px;border-radius:4px;font-size:12px;color:#fff">' + ac.hold + '持有</span>');
-    if (ac.sell > 0) parts.push('<span style="background:#dd6666;padding:2px 6px;border-radius:4px;font-size:12px;color:#fff">' + ac.sell + '卖出</span>');
-    html += '<div style="display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-bottom:8px">' + parts.join('') + '</div>';
+    var bars = [
+      {label:'强买', count:ac.strongBuy||0, color:'#00bb33'},
+      {label:'买入', count:ac.buy||0, color:'#55dd77'},
+      {label:'持有', count:ac.hold||0, color:'#777'},
+      {label:'卖出', count:ac.sell||0, color:'#dd5555'},
+      {label:'强卖', count:ac.strongSell||0, color:'#aa0000'}
+    ];
+    html += '<div style="margin:6px 0">';
+    for (var b = 0; b < bars.length; b++) {
+      if (bars[b].count === 0) continue;
+      var pct = (bars[b].count / total * 100).toFixed(0);
+      html += '<div style="display:flex;align-items:center;gap:6px;margin:3px 0">';
+      html += '<span style="min-width:28px;font-size:12px;color:#aaa">' + bars[b].label + '</span>';
+      html += '<div class="trend-bar-wrap" style="flex:1"><div class="trend-bar" style="width:' + pct + '%;background:' + bars[b].color + '"></div></div>';
+      html += '<span style="min-width:24px;font-size:13px;color:#ccc">' + bars[b].count + '</span>';
+      html += '</div>';
+    }
+    html += '</div>';
 
-    if (data.targetMean) {
-      html += '<div style="text-align:center;font-size:15px">目标价 <b>' + fmtPrice(data.targetMean, data.currency) + '</b>｜上行 <b class="' + colorClass(upsideA) + '">' + (data === dataA ? fmtPct(upsideA) : fmtPct(upsideB)) + '</b></div>';
+    // ★ 目标价（基于实际股价计算上行空间）
+    if (d.targetMean && d.price) {
+      var ups = (d.targetMean / d.price - 1) * 100;
+      html += '<div style="text-align:center;font-size:14px;margin-top:6px">目标价均值 <b>' + fmtPrice(d.targetMean, d.currency) + '</b>';
+      html += '｜上行空间 <b class="' + (ups > 0 ? 'up' : 'down') + '">' + (ups > 0 ? '+' : '') + ups.toFixed(1) + '%</b></div>';
+      if (d.targetHigh && d.targetLow) {
+        html += '<div style="text-align:center;font-size:12px;color:#888">区间：' + fmtPrice(d.targetLow, d.currency) + ' ~ ' + fmtPrice(d.targetHigh, d.currency) + '</div>';
+      }
     }
     html += '</div>';
   }
@@ -718,97 +949,136 @@ function generateDeepReport(dataA, dataB, scores) {
   analystDetail(dataB, '#00d4ff');
   html += '</div></div>';
 
-  // ========== 六、投资风险 ==========
+  // ===== 六、成长趋势分析（新增）=====
   html += '<div class="report-section">';
-  html += '<h2>六、投资风险</h2>';
+  html += '<h2>六、成长趋势分析（三年）</h2>';
+  html += '<table class="report-table">';
+  html += '<tr><th>指标</th><th>年份</th><th>' + dataA.symbol + '</th><th>' + dataB.symbol + '</th></tr>';
 
-  function riskSection(data, color) {
-    html += '<div style="margin:8px 0">';
-    html += '<h3 style="color:' + color + '">' + data.symbol + ' 主要风险</h3>';
-    if (data.risks && data.risks.length > 0) {
-      for (var j = 0; j < data.risks.length; j++) {
-        html += '<div class="risk-item">' + (j+1) + '. ' + data.risks[j] + '</div>';
-      }
-    } else {
-      html += '<p style="color:#888">暂无风险数据</p>';
-    }
-    html += '</div>';
+  // 营收对比
+  for (var y = 0; y < 3; y++) {
+    var rA = dataA.revenueHistory ? dataA.revenueHistory[y] : null;
+    var rB = dataB.revenueHistory ? dataB.revenueHistory[y] : null;
+    var rowLabel = y === 0 ? '营收' : '';
+    var yr = rA ? rA.year : (rB ? rB.year : gmYears[y]);
+    var rValA = rA ? (dataA.currency === 'CNY' ? '¥' : '$') + fmtNum(rA.amount * 1e6) : 'N/A';
+    var rValB = rB ? (dataB.currency === 'CNY' ? '¥' : '$') + fmtNum(rB.amount * 1e6) : 'N/A';
+    // 增长率
+    var growA = (y > 0 && dataA.revenueHistory && dataA.revenueHistory[y-1].amount > 0) ? ((dataA.revenueHistory[y].amount / dataA.revenueHistory[y-1].amount - 1)*100) : null;
+    var growB = (y > 0 && dataB.revenueHistory && dataB.revenueHistory[y-1].amount > 0) ? ((dataB.revenueHistory[y].amount / dataB.revenueHistory[y-1].amount - 1)*100) : null;
+    if (growA != null) rValA += ' <span style="font-size:12px;color:' + (growA >= 0 ? '#ff4444' : '#4cff4c') + '">' + (growA >= 0 ? '+' : '') + growA.toFixed(0) + '%</span>';
+    if (growB != null) rValB += ' <span style="font-size:12px;color:' + (growB >= 0 ? '#ff4444' : '#4cff4c') + '">' + (growB >= 0 ? '+' : '') + growB.toFixed(0) + '%</span>';
+    html += '<tr><td>' + rowLabel + '</td><td>' + yr + '</td><td>' + rValA + '</td><td>' + rValB + '</td></tr>';
   }
+  // 毛利率趋势
+  for (var y = 0; y < 3; y++) {
+    var gmA = dataA.grossMarginHistory ? dataA.grossMarginHistory[y] : null;
+    var gmB = dataB.grossMarginHistory ? dataB.grossMarginHistory[y] : null;
+    var rowLabel = y === 0 ? '毛利率' : '';
+    html += '<tr><td>' + rowLabel + '</td><td>' + gmYears[y] + '</td><td>' + (gmA != null ? (gmA*100).toFixed(1)+'%' : 'N/A') + '</td><td>' + (gmB != null ? (gmB*100).toFixed(1)+'%' : 'N/A') + '</td></tr>';
+  }
+  // 净利率趋势
+  for (var y = 0; y < 3; y++) {
+    var nmA = dataA.netMarginHistory ? dataA.netMarginHistory[y] : null;
+    var nmB = dataB.netMarginHistory ? dataB.netMarginHistory[y] : null;
+    var rowLabel = y === 0 ? '净利率' : '';
+    html += '<tr><td>' + rowLabel + '</td><td>' + gmYears[y] + '</td><td>' + (nmA != null ? (nmA*100).toFixed(1)+'%' : 'N/A') + '</td><td>' + (nmB != null ? (nmB*100).toFixed(1)+'%' : 'N/A') + '</td></tr>';
+  }
+  html += '</table>';
 
+  // 趋势小结
+  html += '<div class="verdict-box" style="margin-top:10px">';
+  html += '<p><b>成长趋势小结：</b>';
+  var trendFindings = [];
+  if (dataA.revenueHistory && dataA.revenueHistory.length >= 3) {
+    var ra = dataA.revenueHistory;
+    var cagr3A = Math.pow(ra[2].amount / ra[0].amount, 1/2) - 1;
+    trendFindings.push(dataA.symbol + ' 两年营收CAGR: ' + (cagr3A*100).toFixed(0) + '%');
+  }
+  if (dataB.revenueHistory && dataB.revenueHistory.length >= 3) {
+    var rb = dataB.revenueHistory;
+    var cagr3B = Math.pow(rb[2].amount / rb[0].amount, 1/2) - 1;
+    trendFindings.push(dataB.symbol + ' 两年营收CAGR: ' + (cagr3B*100).toFixed(0) + '%');
+  }
+  if (trendFindings.length > 0) html += trendFindings.join('；') + '。';
+  html += '</p></div></div>';
+
+  // ===== 七、投资风险 =====
+  html += '<div class="report-section">';
+  html += '<h2>七、投资风险</h2>';
+  function riskSection(d, clr) {
+    html += '<h3 style="color:' + clr + '">' + d.symbol + ' 主要风险</h3>';
+    if (d.risks && d.risks.length > 0) {
+      for (var j = 0; j < d.risks.length; j++) html += '<div class="risk-item">' + (j+1) + '. ' + d.risks[j] + '</div>';
+    } else html += '<p style="color:#888">暂无风险数据</p>';
+  }
   riskSection(dataA, '#ffd700');
   riskSection(dataB, '#00d4ff');
   html += '</div>';
 
-  // ========== 七、核心优势 ==========
+  // ===== 八、核心优势 =====
   html += '<div class="report-section">';
-  html += '<h2>七、核心优势</h2>';
-
-  function strengthSection(data, color) {
-    html += '<div style="margin:8px 0">';
-    html += '<h3 style="color:' + color + '">' + data.symbol + ' 核心优势</h3>';
-    if (data.strengths && data.strengths.length > 0) {
-      for (var j = 0; j < data.strengths.length; j++) {
-        html += '<div class="strength-item">' + (j+1) + '. ' + data.strengths[j] + '</div>';
-      }
-    } else {
-      html += '<p style="color:#888">暂无优势数据</p>';
-    }
-    html += '</div>';
+  html += '<h2>八、核心优势</h2>';
+  function strengthSection(d, clr) {
+    html += '<h3 style="color:' + clr + '">' + d.symbol + ' 核心优势</h3>';
+    if (d.strengths && d.strengths.length > 0) {
+      for (var j = 0; j < d.strengths.length; j++) html += '<div class="strength-item">' + (j+1) + '. ' + d.strengths[j] + '</div>';
+    } else html += '<p style="color:#888">暂无数据</p>';
   }
-
   strengthSection(dataA, '#ffd700');
   strengthSection(dataB, '#00d4ff');
   html += '</div>';
 
-  // ========== 八、最终建议 ==========
+  // ===== 九、最终投资建议 =====
   html += '<div class="report-section">';
-  html += '<h2>八、最终投资建议</h2>';
+  html += '<h2>九、最终投资建议</h2>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
 
-  function adviceBox(data, scoresTotal, otherTotal, color) {
-    var peRisk = data.pe && data.pe > 50 ? '⚠️ PE极高，估值风险大' : data.pe && data.pe < 15 ? '✅ 估值合理偏低' : '';
-    var growth = data.revenueGrowth && data.revenueGrowth > 0.2 ? '✅ 高成长' : data.revenueGrowth && data.revenueGrowth < 0 ? '⚠️ 营收负增长' : '';
-    var roeFlag = data.roe && data.roe > 0.2 ? '✅ ROE优秀' : data.roe && data.roe < 0.05 ? '⚠️ ROE偏低' : '';
-
-    html += '<div style="background:#0a0a1a;border:1px solid #333;border-radius:10px;padding:12px;margin:8px 0">';
-    html += '<div style="font-size:18px;font-weight:bold;color:' + color + ';margin-bottom:8px">' + data.symbol + ' 评估</div>';
-    if (peRisk) html += '<p>' + peRisk + '</p>';
-    if (growth) html += '<p>' + growth + '</p>';
-    if (roeFlag) html += '<p>' + roeFlag + '</p>';
-    if (data.targetMean && data.price) {
-      var ups = (data.targetMean / data.price - 1) * 100;
-      html += '<p>机构目标价上行空间：<b class="' + (ups > 0 ? 'up' : 'down') + '">' + fmtPct(ups/100) + '</b></p>';
+  function adviceBox(d, sTotal, oTotal, clr) {
+    html += '<div style="background:#0a0a1a;border:1px solid #333;border-radius:10px;padding:12px">';
+    html += '<div style="font-size:18px;font-weight:bold;color:' + clr + ';margin-bottom:8px">' + d.symbol + '</div>';
+    if (d.pe > 0) {
+      var peLv = d.pe > 150 ? '⚠️ 估值极高' : d.pe > 80 ? '⚠️ 估值很高' : d.pe > 40 ? '⚡ 估值偏高' : '✅ 估值合理';
+      html += '<p>' + peLv + '（PE ' + d.pe.toFixed(0) + 'x）</p>';
     }
-    // 推荐度
-    var rating = '';
-    var stars = '';
-    if (scoresTotal > otherTotal + 3) { rating = '推荐买入'; stars = '⭐⭐⭐⭐'; }
-    else if (scoresTotal > otherTotal) { rating = '谨慎买入'; stars = '⭐⭐⭐'; }
-    else if (scoresTotal === otherTotal) { rating = '持有观望'; stars = '⭐⭐'; }
-    else { rating = '暂不推荐'; stars = '⭐'; }
-    html += '<p style="font-size:17px;margin-top:8px">推荐度：' + stars + ' <b style="color:' + color + '">' + rating + '</b></p>';
+    if (d.revenueGrowth != null) {
+      var gLv = d.revenueGrowth > 0.5 ? '🚀 超高成长' : d.revenueGrowth > 0.2 ? '✅ 高成长' : d.revenueGrowth > 0.05 ? '📊 稳健成长' : d.revenueGrowth > 0 ? '⚡ 低增速' : '⚠️ 营收下滑';
+      html += '<p>' + gLv + '（' + fmtPct(d.revenueGrowth) + '）</p>';
+    }
+    if (d.grossMargin != null) {
+      var gmLv = d.grossMargin > 0.7 ? '✅ 毛利率极高' : d.grossMargin > 0.4 ? '✅ 毛利率良好' : d.grossMargin > 0.2 ? '⚡ 毛利率一般' : '⚠️ 毛利率偏低';
+      html += '<p>' + gmLv + '（' + fmtPct(d.grossMargin) + '）</p>';
+    }
+    if (d.targetMean && d.price) {
+      var ups = (d.targetMean / d.price - 1) * 100;
+      html += '<p>机构目标上行：<b class="' + (ups > 0 ? 'up' : 'down') + '">' + (ups > 0 ? '+' : '') + ups.toFixed(1) + '%</b></p>';
+    }
+    var rating, stars;
+    if (sTotal > oTotal + 5) { rating = '强烈推荐'; stars = '⭐⭐⭐⭐⭐'; }
+    else if (sTotal > oTotal + 2) { rating = '推荐买入'; stars = '⭐⭐⭐⭐'; }
+    else if (sTotal > oTotal) { rating = '谨慎买入'; stars = '⭐⭐⭐'; }
+    else if (sTotal === oTotal) { rating = '持有观望'; stars = '⭐⭐⭐'; }
+    else if (sTotal < oTotal - 2) { rating = '暂不推荐'; stars = '⭐⭐'; }
+    else { rating = '谨慎'; stars = '⭐⭐'; }
+    html += '<p style="font-size:16px;margin-top:8px">' + stars + ' <b style="color:' + clr + '">' + rating + '</b></p>';
     html += '</div>';
   }
 
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
   adviceBox(dataA, scores.totalA, scores.totalB, '#ffd700');
   adviceBox(dataB, scores.totalB, scores.totalA, '#00d4ff');
   html += '</div>';
 
-  // 总结
   html += '<div class="verdict-box" style="margin-top:12px">';
   html += '<p><b>综合判断：</b>';
-  if (scores.totalA > scores.totalB + 3) {
-    html += dataA.symbol + ' 综合质量明显优于 ' + dataB.symbol + '，适合优先考虑。但需结合估值判断是否入场时机。';
-  } else if (scores.totalB > scores.totalA + 3) {
-    html += dataB.symbol + ' 综合质量明显优于 ' + dataA.symbol + '，适合优先考虑。但需结合估值判断是否入场时机。';
-  } else if (Math.abs(scores.totalA - scores.totalB) <= 3) {
-    html += '两只股票综合质量接近，选择应基于：①估值吸引力（PE/PEG）；②个人对行业的偏好；③风险承受能力（Beta值）。';
+  if (scores.totalA > scores.totalB + 4) {
+    html += dataA.symbol + ' 综合评分显著优于 ' + dataB.symbol + '（+' + (scores.totalA - scores.totalB).toFixed(1) + '分），在大多数维度领先。';
+  } else if (scores.totalB > scores.totalA + 4) {
+    html += dataB.symbol + ' 综合评分显著优于 ' + dataA.symbol + '（+' + (scores.totalB - scores.totalA).toFixed(1) + '分），在大多数维度领先。';
   } else {
-    html += scores.totalA > scores.totalB ? dataA.symbol : dataB.symbol;
-    html += ' 综合评分略高，但差距不大。建议进一步研究具体业务和最新财报后再做决定。';
+    html += '两只股票综合评分接近（差距 ' + Math.abs(scores.totalA - scores.totalB).toFixed(1) + '分），选择应基于：①对增长赛道的判断；②估值与增速的匹配度（PEG）；③自身风险偏好（Beta）。';
   }
   html += '</p>';
-  html += '<p style="font-size:13px;color:#888;margin-top:8px">⚠️ 以上为数据分析，不构成投资建议。股市有风险，投资需谨慎。</p>';
+  html += '<p style="color:#666;font-size:13px;margin-top:8px">⚠️ 以上为数据模型分析，不构成投资建议。股市有风险，投资需谨慎。<br>数据说明：内置数据基于2026-06-03公开信息，股价为盘后价格。</p>';
   html += '</div></div>';
 
   return html;
@@ -821,7 +1091,7 @@ function getStaticData(symbol) {
   var s = symbol.trim().toUpperCase();
   if (STATIC_DATA[s]) {
     var d = {};
-    for (var key in STATIC_DATA[s]) d[key] = STATIC_DATA[s][key];
+    for (var k in STATIC_DATA[s]) d[k] = STATIC_DATA[s][k];
     d.market = detectMarket(s);
     d.dataSource = 'static';
     return d;
@@ -832,85 +1102,46 @@ function getStaticData(symbol) {
 async function fetchFinnhubData(symbol) {
   var key = getFinnhubKey();
   if (!key) return {error: 'NO_KEY', symbol: symbol};
-
   try {
-    // 基本报价
-    var quoteUrl = 'https://finnhub.io/api/v1/quote?symbol=' + symbol + '&token=' + key;
+    var quoteUrl   = 'https://finnhub.io/api/v1/quote?symbol=' + symbol + '&token=' + key;
     var profileUrl = 'https://finnhub.io/api/v1/stock/profile2?symbol=' + symbol + '&token=' + key;
-    var metricUrl = 'https://finnhub.io/api/v1/stock/metric?symbol=' + symbol + '&metric=all&token=' + key;
-    var recommendUrl = 'https://finnhub.io/api/v1/stock/recommendation?symbol=' + symbol + '&token=' + key;
+    var metricUrl  = 'https://finnhub.io/api/v1/stock/metric?symbol=' + symbol + '&metric=all&token=' + key;
+    var recUrl     = 'https://finnhub.io/api/v1/stock/recommendation?symbol=' + symbol + '&token=' + key;
+    var ptUrl      = 'https://finnhub.io/api/v1/stock/price-target?symbol=' + symbol + '&token=' + key;
 
-    var results = {};
-    for (var url of [quoteUrl, profileUrl, metricUrl, recommendUrl]) {
-      var resp = await fetch(url, { signal: AbortSignal.timeout(8000) });
-      if (!resp.ok) continue;
-      var data = await resp.json();
-      results[url] = data;
-    }
-
-    var quote = results[quoteUrl] || {};
-    var profile = results[profileUrl] || {};
-    var metric = results[metricUrl] || {};
-    var recommends = results[recommendUrl] || [];
-
-    var d = {
-      symbol: symbol,
-      name: profile.name || symbol,
-      currency: profile.currency || 'USD',
-      exchange: profile.exchange || '',
-      price: quote.c || null,
-      prevClose: quote.pc || null,
-      changePct: quote.dp || null,
-      marketCap: profile.marketCapitalization ? profile.marketCapitalization * 1e6 : null,
-      market: 'US',
-      dataSource: 'finnhub'
+    var fetchOne = async function(url) {
+      try { var r = await fetch(url, {signal: AbortSignal.timeout(8000)}); return r.ok ? await r.json() : {}; } catch(e) { return {}; }
     };
+    var [quote, profile, metricData, recommends, pt] = await Promise.all([quoteUrl, profileUrl, metricUrl, recUrl, ptUrl].map(fetchOne));
 
-    var m = metric.metric || {};
-    d.pe = m.peBasicExclExtraTTM || null;
-    d.forwardPe = m.peForwardPeBasicExclExtraAnnual || null;
-    d.pb = m.pbQuarterlyQuarterlyValueQuarterly || null;
-    d.ps = m.psQuarterlyQuarterlyValueQuarterly || null;
-    d.peg = m.pegForwardPeBasicExclExtraAnnual || null;
-    d.revenueGrowth = m.revenueGrowthTTMYoy || null;
-    d.earningsGrowth = m.epsGrowthTTMYoy || null;
-    d.profitMargin = m.netProfitMarginTTM || null;
-    d.operatingMargin = m.operatingMarginTTM || null;
-    d.grossMargin = m.grossMarginTTM || null;
-    d.roe = m.roeTTM || null;
-    d.debtToEquity = m.totalDebtEquityQuarterly || null;
-    d.currentRatio = m.currentRatioQuarterly || null;
-    d.freeCashFlow = m.freeCashFlowTTM ? m.freeCashFlowTTM * 1e6 : null;
-    d.operatingCashFlow = m.cashFlowFromOperationsTTM ? m.cashFlowFromOperationsTTM * 1e6 : null;
-    d.week52High = m['52WeekHigh'] || null;
-    d.week52Low = m['52WeekLow'] || null;
-    d.beta = m.beta || null;
-    d.industry = profile.finnhubIndustry || null;
-
-    // 分析师数据
-    if (recommends.length > 0) {
-      var latest = recommends[0];
-      d.analystCounts = {
-        strongBuy: latest.strongBuy || 0,
-        buy: latest.buy || 0,
-        hold: latest.hold || 0,
-        sell: latest.sell || 0,
-        strongSell: latest.strongSell || 0
-      };
+    var m = (metricData && metricData.metric) || {};
+    var d = {
+      symbol: symbol, name: profile.name || symbol,
+      currency: profile.currency || 'USD', exchange: profile.exchange || '',
+      price: quote.c || null, prevClose: quote.pc || null, changePct: quote.dp || null,
+      marketCap: profile.marketCapitalization ? profile.marketCapitalization * 1e6 : null,
+      market: 'US', dataSource: 'finnhub',
+      pe: m.peBasicExclExtraTTM || null, forwardPe: m['peExclExtraAnnual'] || null,
+      peg: m['pegForwardPeBasicExclExtraAnnual'] || null,
+      pb: m['pbAnnual'] || null, ps: m['psAnnual'] || null,
+      revenueGrowth: m.revenueGrowthTTMYoy ? m.revenueGrowthTTMYoy / 100 : null,
+      earningsGrowth: m.epsGrowthTTMYoy ? m.epsGrowthTTMYoy / 100 : null,
+      grossMargin: m.grossMarginTTM ? m.grossMarginTTM / 100 : null,
+      profitMargin: m.netProfitMarginTTM ? m.netProfitMarginTTM / 100 : null,
+      operatingMargin: m.operatingMarginTTM ? m.operatingMarginTTM / 100 : null,
+      roe: m.roeTTM ? m.roeTTM / 100 : null,
+      debtToEquity: m.totalDebtEquityQuarterly || null,
+      currentRatio: m.currentRatioQuarterly || null,
+      freeCashFlow: m.freeCashFlowTTM ? m.freeCashFlowTTM * 1e6 : null,
+      operatingCashFlow: m.cashFlowFromOperationsTTM ? m.cashFlowFromOperationsTTM * 1e6 : null,
+      week52High: m['52WeekHigh'] || null, week52Low: m['52WeekLow'] || null,
+      beta: m.beta || null, industry: profile.finnhubIndustry || null
+    };
+    if (Array.isArray(recommends) && recommends.length > 0) {
+      var lat = recommends[0];
+      d.analystCounts = {strongBuy: lat.strongBuy||0, buy: lat.buy||0, hold: lat.hold||0, sell: lat.sell||0, strongSell: lat.strongSell||0};
     }
-
-    // 目标价（需要另一次调用）
-    try {
-      var priceTargetUrl = 'https://finnhub.io/api/v1/stock/price-target?symbol=' + symbol + '&token=' + key;
-      var ptResp = await fetch(priceTargetUrl, { signal: AbortSignal.timeout(5000) });
-      if (ptResp.ok) {
-        var pt = await ptResp.json();
-        d.targetMean = pt.targetMean || null;
-        d.targetHigh = pt.targetHigh || null;
-        d.targetLow = pt.targetLow || null;
-      }
-    } catch(e) {}
-
+    if (pt) { d.targetMean = pt.targetMean||null; d.targetHigh = pt.targetHigh||null; d.targetLow = pt.targetLow||null; }
     return d;
   } catch(e) {
     return {error: 'FETCH_ERROR', symbol: symbol, msg: e.message};
@@ -918,20 +1149,11 @@ async function fetchFinnhubData(symbol) {
 }
 
 async function fetchStockData(symbol) {
-  // 先查内置数据
-  var staticData = getStaticData(symbol);
-  if (staticData) return staticData;
-
-  // 再试 Finnhub
-  var fhData = await fetchFinnhubData(symbol);
-  if (!fhData.error) return fhData;
-
-  // 都不行
-  return {
-    symbol: symbol,
-    error: 'UNSUPPORTED',
-    market: detectMarket(symbol)
-  };
+  var st = getStaticData(symbol);
+  if (st) return st;
+  var fh = await fetchFinnhubData(symbol);
+  if (!fh.error) return fh;
+  return {symbol: symbol, error: 'UNSUPPORTED', market: detectMarket(symbol)};
 }
 
 // ============================================================
@@ -947,27 +1169,21 @@ async function compare() {
   var codeA = document.getElementById('tickerA').value.trim().toUpperCase();
   var codeB = document.getElementById('tickerB').value.trim().toUpperCase();
   if (!codeA || !codeB) { showError('请输入两只股票的代码'); return; }
-
   showLoading(true);
   hideError();
   document.getElementById('result').innerHTML = '';
-
   setTimeout(async function() {
     var dataA = await fetchStockData(codeA);
     var dataB = await fetchStockData(codeB);
-
     var errMsg = '';
-    if (dataA.error === 'UNSUPPORTED') errMsg += '「' + codeA + '』不在预设列表中，且未配置 Finnhub API Key。\n请点"设置"填入 Key 后重试。\n\n';
-    if (dataB.error === 'UNSUPPORTED') errMsg += '「' + codeB + '』不在预设列表中，且未配置 Finnhub API Key。\n请点"设置"填入 Key 后重试。';
-    if (dataA.error === 'FETCH_ERROR') errMsg += '获取『' + codeA + '』数据失败：' + (dataA.msg||'网络错误') + '\n\n';
-    if (dataB.error === 'FETCH_ERROR') errMsg += '获取『' + codeB + '』数据失败：' + (dataB.msg||'网络错误') + '\n';
-
+    if (dataA.error === 'UNSUPPORTED') errMsg += '「' + codeA + '」不在预设列表，且未配置 Finnhub API Key。\n请点"设置"填入 Key 后重试。\n\n';
+    if (dataA.error === 'FETCH_ERROR') errMsg += '获取「' + codeA + '」数据失败：' + (dataA.msg||'网络错误') + '\n\n';
+    if (dataB.error === 'FETCH_ERROR') errMsg += '获取「' + codeB + '」数据失败：' + (dataB.msg||'网络错误') + '\n';
+    if (dataB.error === 'UNSUPPORTED') errMsg += '「' + codeB + '」不在预设列表，且未配置 Finnhub API Key。\n请点"设置"填入 Key 后重试。';
     if (errMsg) {
-      showError(errMsg + '\n\n💡 提示：预设股票（ARM/MRVL/NVDA/MSFT/GOOGL/AAPL/AVGO/AMD + A股8只）可直接使用，无需 Key。');
-      showLoading(false);
-      return;
+      showError(errMsg + '\n\n💡 预设股票（ARM/MRVL/NVDA/MSFT/GOOGL/AAPL/AVGO/AMD + A股8只）可直接使用，无需Key。');
+      showLoading(false); return;
     }
-
     var scores = score(dataA, dataB);
     var html = generateDeepReport(dataA, dataB, scores);
     document.getElementById('result').innerHTML = html;
@@ -990,8 +1206,7 @@ function hideError() {
   document.getElementById('error').classList.remove('show');
 }
 
-// 页面加载
-console.log('投资深度比较APP已加载');
+console.log('析投资深度比较 v3.0 已加载');
 </script>
 </body>
 </html>
