@@ -83,6 +83,7 @@ h1{font-size:26px;text-align:center;color:#ffd700;margin:10px 0 4px}
 
 <!-- 预设按钮 -->
 <div class="presets">
+  <span style="color:#ffd700;font-size:13px;width:100%;text-align:center;display:block;margin-bottom:4px">💡 点击预设按钮可快速填充输入框，再手动点"开始深度分析"</span>
   <span style="color:#ffd700;font-size:14px;width:100%;text-align:center;display:block;margin-bottom:4px">📈 美股预设</span>
   <button class="preset-btn" onclick="quickCompare('ARM','MRVL')">ARM vs MRVL</button>
   <button class="preset-btn" onclick="quickCompare('NVDA','AMD')">NVDA vs AMD</button>
@@ -1160,9 +1161,10 @@ async function fetchStockData(symbol) {
 // 主流程
 // ============================================================
 function quickCompare(a, b) {
+  // 只填充输入框，由用户手动点"开始深度分析"
   document.getElementById('tickerA').value = a;
   document.getElementById('tickerB').value = b;
-  compare();
+  document.getElementById('tickerA').focus();
 }
 
 async function compare() {
