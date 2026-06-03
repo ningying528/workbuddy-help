@@ -950,6 +950,90 @@ var STATIC_DATA = {
     ],
     "rdToRevenue": [0.07, 0.08, 0.07]
   },
+  "ALAB": {
+    "symbol": "ALAB",
+    "name": "Astera Labs Inc",
+    "currency": "USD",
+    "exchange": "NASDAQ",
+    "price": 363.54,
+    "prevClose": 355.50,
+    "changePct": 2.19,
+    "marketCap": 62310000000,
+    "pe": 245.78,
+    "forwardPe": 108.64,
+    "peg": 3.2,
+    "pb": 35.0,
+    "ps": 48.0,
+    "revenueGrowth": 0.85,
+    "earningsGrowth": 1.2,
+    "profitMargin": 0.2672,
+    "operatingMargin": 0.2236,
+    "roe": 0.2111,
+    "debtToEquity": 0.03,
+    "currentRatio": 11.30,
+    "freeCashFlow": 342810000,
+    "operatingCashFlow": 383400000,
+    "week52High": 395.0,
+    "week52Low": 80.5,
+    "recommendation": "buy",
+    "beta": 3.96,
+    "analystCounts": {"strongBuy": 8, "buy": 15, "hold": 3, "sell": 0, "strongSell": 0},
+    "targetMean": 244.97,
+    "targetHigh": 280.0,
+    "targetLow": 210.0,
+    "upside": -32.6,
+    "business": "数据中心连接方案（AIChiplet互联、PCIe/CXL/RDMA），AI基础设施核心供应商",
+    "moat": "AIChiplet互联标准制定者，与英伟达/AMD/云巨头深度合作",
+    "risks": ["估值极高PE 245x，增速不及预期将大幅回调", "竞争加剧（博通/Marvell进入互联市场）", "客户集中度高", "芯片互联赛道竞争加剧"],
+    "strengths": ["AI数据中心互联需求爆发", "AIChiplet标准领先者", "毛利率76%，盈利能力极强", "自由现金流3.4亿/年，现金充裕"],
+    "revenueHistory": [{"year": 2022, "amount": 150}, {"year": 2023, "amount": 280}, {"year": 2024, "amount": 650}],
+    "netMarginHistory": [0.10, 0.18, 0.27],
+    "grossMarginHistory": [0.72, 0.74, 0.76],
+    "rdHistory": [{"year": 2022, "amount": 60}, {"year": 2023, "amount": 95}, {"year": 2024, "amount": 180}],
+    "rdToRevenue": [0.40, 0.34, 0.28]
+  },
+  "NBIS": {
+    "symbol": "NBIS",
+    "name": "Nebius Group N.V.",
+    "currency": "USD",
+    "exchange": "NASDAQ",
+    "price": 251.68,
+    "prevClose": 245.0,
+    "changePct": 2.73,
+    "marketCap": 6444000000,
+    "pe": 78.63,
+    "forwardPe": 45.0,
+    "peg": 1.5,
+    "pb": 9.22,
+    "ps": 73.06,
+    "revenueGrowth": 2.38,
+    "earningsGrowth": 1.5,
+    "profitMargin": 0.9309,
+    "operatingMargin": -0.7055,
+    "roe": 0.1414,
+    "debtToEquity": 1.32,
+    "currentRatio": 8.33,
+    "freeCashFlow": -3150000000,
+    "operatingCashFlow": null,
+    "week52High": 280.0,
+    "week52Low": 35.0,
+    "recommendation": "buy",
+    "beta": 1.43,
+    "analystCounts": {"strongBuy": 5, "buy": 10, "hold": 1, "sell": 0, "strongSell": 0},
+    "targetMean": 238.86,
+    "targetHigh": 280.0,
+    "targetLow": 200.0,
+    "upside": -5.1,
+    "business": "欧洲AI基础设施公司，提供GPU云计算（与AWS/Azure竞争），在欧洲有数据中心优势",
+    "moat": "欧洲本土AI云供应商，数据主权合规优势；拥有自研AI大模型技术",
+    "risks": ["营业利润率-70%，尚未盈利", "自由现金流为负（-31.5亿/年）", "与AWS/Azure/谷歌云竞争激烈", "股价波动极大（Beta 1.43）"],
+    "strengths": ["欧洲AI云龙头，数据主权优势", "收入增速237%，爆发式增长", "扣非净利润率93%（一次性收益）", "欧洲数据中心布局早，先发优势"],
+    "revenueHistory": [{"year": 2022, "amount": 50}, {"year": 2023, "amount": 120}, {"year": 2024, "amount": 878}],
+    "netMarginHistory": [-2.5, -1.8, 0.93],
+    "grossMarginHistory": [0.55, 0.62, 0.72],
+    "rdHistory": [{"year": 2022, "amount": 80}, {"year": 2023, "amount": 150}, {"year": 2024, "amount": 250}],
+    "rdToRevenue": [1.6, 1.25, 0.28]
+  },
   "INTC": {
     "symbol": "INTC",
     "name": "Intel Corporation",
@@ -1715,23 +1799,95 @@ async function fetchAStockData(symbol) {
   return {error: 'UNSUPPORTED', symbol: symbol};
 }
 
+// ============================================================
+// Yahoo Finance 多代理抓取（免费，尽力而为）
+// ============================================================
+async function fetchYahooCORS(symbol) {
+  var market = detectMarket(symbol);
+  var yahooSymbol = symbol.toUpperCase();
+  if (market === 'CN') {
+    // A股转Yahoo格式：600036.SS, 000858.SZ
+    if (yahooSymbol.startsWith('6')) yahooSymbol = yahooSymbol + '.SS';
+    else yahooSymbol = yahooSymbol + '.SZ';
+  }
+  
+  var urls = [
+    'https://corsproxy.io/?url=https://query2.finance.yahoo.com/v10/finance/quoteSummary/' + encodeURIComponent(yahooSymbol) + '?modules=summaryDetail,financialData,price',
+    'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://query2.finance.yahoo.com/v10/finance/quoteSummary/' + yahooSymbol + '?modules=summaryDetail,financialData,price'),
+  ];
+  
+  for (var u = 0; u < urls.length; u++) {
+    try {
+      var resp = await fetch(urls[u], { signal: AbortSignal.timeout(8000) });
+      if (!resp.ok) continue;
+      var text = await resp.text();
+      // allorigins 返回的内容在 contents 字段
+      var json;
+      try { json = JSON.parse(text); } catch(e) { continue; }
+      var result = (json.contents ? JSON.parse(json.contents) : json).quoteSummary;
+      if (!result || !result.result || !result.result[0]) continue;
+      var r = result.result[0];
+      var sd = r.summaryDetail || {};
+      var fd = r.financialData || {};
+      var price = r.price || {};
+      
+      function g(obj, key) {
+        var v = obj[key];
+        if (v && typeof v === 'object' && v.raw !== undefined) return v.raw;
+        return v !== undefined ? v : null;
+      }
+      
+      return {
+        symbol: symbol.toUpperCase(),
+        name: g(price, 'longName') || yahooSymbol,
+        currency: g(price, 'currency') || (market==='CN' ? 'CNY' : 'USD'),
+        exchange: g(price, 'exchangeName') || '',
+        price: g(price, 'regularMarketPrice') || g(price, 'currentPrice'),
+        prevClose: g(price, 'regularMarketPreviousClose'),
+        changePct: g(price, 'regularMarketChangePercent'),
+        marketCap: g(price, 'marketCap'),
+        pe: g(sd, 'trailingPE') || g(fd, 'trailingPE'),
+        forwardPe: g(sd, 'forwardPE') || g(fd, 'forwardPE'),
+        pb: g(sd, 'priceToBook'),
+        ps: g(sd, 'priceToSalesTrailing12Months'),
+        profitMargin: g(fd, 'profitMargin'),
+        operatingMargin: g(fd, 'operatingMargins'),
+        roe: g(fd, 'returnOnEquity'),
+        debtToEquity: g(fd, 'debtToEquity'),
+        currentRatio: g(fd, 'currentRatio'),
+        freeCashFlow: g(fd, 'freeCashflow'),
+        week52High: g(sd, 'fiftyTwoWeekHigh'),
+        week52Low: g(sd, 'fiftyTwoWeekLow'),
+        beta: g(sd, 'beta'),
+        dataSource: 'yahoo-cors',
+        market: market,
+      };
+    } catch(e) { continue; }
+  }
+  return null;
+}
+
+// ============================================================
+// 主数据获取函数
+// ============================================================
 async function fetchStockData(symbol) {
   var s = symbol.trim().toUpperCase();
-  // 先查静态数据
+  // 第一优先：静态数据
   var staticData = getStaticData(s);
   if (staticData) return staticData;
 
-  var market = detectMarket(s);
-  if (market === 'CN') {
-    return {error: 'UNSUPPORTED', symbol: s};
-  } else {
-    // 美股：尝试 Finnhub
-    if (getFinnhubKey()) {
-      var data = await fetchFinnhubData(s);
-      if (!data.error) return data;
-    }
-    return {error: 'UNSUPPORTED', symbol: s};
+  // 第二优先：Finnhub（需要Key）
+  if (getFinnhubKey()) {
+    var fhData = await fetchFinnhubData(s);
+    if (!fhData.error) return fhData;
   }
+
+  // 第三优先：Yahoo Finance 多代理（免费，尽力而为）
+  var yahooData = await fetchYahooCORS(s);
+  if (yahooData) return yahooData;
+
+  // 全部失败
+  return {error: 'FETCH_ERROR', symbol: s, msg: '无法获取该股票数据，请尝试填入Finnhub API Key后重试'};
 }
 
 // ============================================================
