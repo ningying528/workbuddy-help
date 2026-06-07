@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>财富报告分析器</title>
+<title>财富报告分析器 - 上传文档自动分析</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body {
@@ -14,11 +16,34 @@ body {
 h1 { font-size:28px; text-align:center; color:#1a2a44; margin-bottom:8px; }
 .sub { text-align:center; font-size:17px; color:#64748b; margin-bottom:28px; }
 
-/* Input */
-.input-section { background:#fff; border-radius:14px; padding:22px; margin-bottom:20px; box-shadow:0 1px 4px rgba(0,0,0,0.08); }
+/* Upload area */
+.upload-area {
+  background:#fff; border:3px dashed #cbd5e1; border-radius:16px;
+  padding:40px 24px; text-align:center; cursor:pointer; margin-bottom:20px;
+  transition:all 0.3s; position:relative;
+}
+.upload-area:hover,.upload-area.drag { border-color:#1a56db; background:#f0f4ff; }
+.upload-area .icon { font-size:48px; margin-bottom:10px; }
+.upload-area .text { font-size:19px; color:#475569; margin-bottom:6px; }
+.upload-area .hint { font-size:15px; color:#94a3b8; }
+.upload-area input { display:none; }
+
+/* Status */
+.status { display:none; background:#fff; border-radius:12px; padding:16px 20px;
+  margin-bottom:16px; font-size:17px; text-align:center; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
+.status.loading { display:block; background:#f0f4ff; color:#1d4ed8; }
+.status.success { display:block; background:#f0fdf4; color:#15803d; }
+.status.error { display:block; background:#fef2f2; color:#dc2626; }
+.spinner { display:inline-block; width:22px; height:22px; border:3px solid #cbd5e1;
+  border-top-color:#1d4ed8; border-radius:50%; animation:spin 0.7s linear infinite;
+  vertical-align:middle; margin-right:8px; }
+@keyframes spin { to{transform:rotate(360deg);} }
+
+/* Input panel (collapsed by default) */
+.input-section { background:#fff; border-radius:14px; padding:22px; margin-bottom:20px;
+  box-shadow:0 1px 4px rgba(0,0,0,0.08); display:none; }
 .input-section label { font-size:18px; font-weight:bold; color:#1e293b; display:block; margin-bottom:8px; }
-.input-row { display:flex; gap:10px; margin-bottom:10px; }
-.input-row input { flex:1; font-size:18px; padding:12px 14px; border:2px solid #e2e8f0; border-radius:8px; }
+.input-section input { width:100%; font-size:18px; padding:12px 14px; border:2px solid #e2e8f0; border-radius:8px; }
 textarea { width:100%; font-size:17px; padding:14px; border:2px solid #e2e8f0; border-radius:8px;
   min-height:200px; line-height:1.7; resize:vertical; }
 .btn { font-size:19px; font-weight:bold; padding:14px 32px; border:none; border-radius:10px; cursor:pointer; margin-top:10px; }
@@ -26,7 +51,9 @@ textarea { width:100%; font-size:17px; padding:14px; border:2px solid #e2e8f0; b
 .btn-analyze:hover { background:#1550c8; }
 .btn-copy { background:#0d9488; color:#fff; }
 .btn-reset { background:#64748b; color:#fff; }
-.btn-row { display:flex; gap:12px; }
+.btn-switch { font-size:15px; padding:8px 16px; background:none; border:2px solid #cbd5e1; border-radius:8px;
+  color:#64748b; cursor:pointer; margin-top:10px; }
+.btn-row { display:flex; gap:12px; align-items:center; }
 
 /* Output */
 #output { display:none; }
@@ -76,9 +103,7 @@ li { font-size:15px; color:#334155; margin:6px 0; line-height:1.75; }
 .bcard h3 { font-size:16px; font-weight:bold; color:#1e293b; margin-bottom:8px; text-align:center; }
 .bcard p,.bcard li { font-size:14px; color:#475569; line-height:1.75; }
 .qi { font-size:14px; color:#475569; padding:5px 8px; margin:3px 0; background:#f8fafc; border-radius:6px; border-left:3px solid #94a3b8; }
-
 .conclusion { font-size:15px; font-weight:bold; color:#b91c1c; margin-top:6px; padding:6px 10px; background:#fef2f2; border-radius:6px; }
-
 .footer { text-align:center; font-size:14px; color:#94a3b8; padding:14px 0; }
 
 @media(max-width:800px){ .g2,.g3,.g4{grid-template-columns:1fr!important;} }
@@ -87,30 +112,116 @@ li { font-size:15px; color:#334155; margin:6px 0; line-height:1.75; }
 <body>
 
 <h1>财富报告分析器</h1>
-<div class="sub">粘贴报告原文，自动生成卡片式分析</div>
+<div class="sub">上传PDF或DOCX报告文件，自动生成卡片式分析</div>
 
-<div class="input-section">
+<!-- Upload Area -->
+<div class="upload-area" id="uploadArea">
+  <div class="icon">📄</div>
+  <div class="text">点击上传或拖拽文件到这里</div>
+  <div class="hint">支持 PDF / DOCX 格式</div>
+  <input type="file" id="fileInput" accept=".pdf,.docx" onchange="handleFile(this.files[0])">
+</div>
+
+<!-- Status -->
+<div class="status" id="status"></div>
+
+<!-- Manual input toggle -->
+<div style="text-align:center;margin-bottom:16px;">
+  <button class="btn-switch" id="switchBtn" onclick="toggleManual()">或者手动粘贴文字</button>
+</div>
+
+<!-- Manual input (hidden by default) -->
+<div class="input-section" id="manualInput">
   <label>报告标题</label>
-  <div class="input-row">
-    <input id="repTitle" placeholder="例如：A.I.N. 第三十二期财富报告" value="">
-  </div>
+  <input id="repTitle" placeholder="例如：A.I.N. 第三十二期财富报告">
   <label style="margin-top:12px;">报告原文内容（粘贴完整文本）</label>
-  <textarea id="repContent" placeholder="在这里粘贴财富报告的完整内容...&#10;&#10;工具会自动提取关键信息并生成卡片式分析。&#10;&#10;提示：内容越完整，分析越精准。"></textarea>
-  <button class="btn btn-analyze" onclick="analyze()">开始分析</button>
-  <div class="btn-row" style="margin-top:10px;">
-    <button class="btn btn-copy" onclick="copyHTML()" style="display:none;" id="copyBtn">复制 HTML</button>
-    <button class="btn btn-reset" onclick="resetAll()">清空重来</button>
-  </div>
+  <textarea id="repContent" placeholder="在这里粘贴财富报告的完整内容..."></textarea>
+  <button class="btn btn-analyze" onclick="analyzeFromText()">开始分析</button>
 </div>
 
 <div id="output"></div>
+<div class="btn-row" style="justify-content:center;margin-top:10px;display:none;" id="actionRow">
+  <button class="btn btn-copy" onclick="copyHTML()">复制 HTML</button>
+  <button class="btn btn-reset" onclick="resetAll()">清空重来</button>
+</div>
 
 
 <script>
-// === Analysis Engine ===
+// ===== PDF.js Setup =====
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+// ===== File Upload =====
+var uploadArea = document.getElementById('uploadArea');
+var fileInput = document.getElementById('fileInput');
+var statusDiv = document.getElementById('status');
+var extractedText = '';
+
+uploadArea.addEventListener('click', function() { fileInput.click(); });
+uploadArea.addEventListener('dragover', function(e) { e.preventDefault(); uploadArea.classList.add('drag'); });
+uploadArea.addEventListener('dragleave', function() { uploadArea.classList.remove('drag'); });
+uploadArea.addEventListener('drop', function(e) {
+  e.preventDefault();
+  uploadArea.classList.remove('drag');
+  var file = e.dataTransfer.files[0];
+  if(file) handleFile(file);
+});
+
+function showStatus(type, msg) {
+  statusDiv.className = 'status ' + type;
+  statusDiv.innerHTML = (type==='loading'?'<span class="spinner"></span>':'') + msg;
+}
+
+function hideStatus() { statusDiv.className = 'status'; statusDiv.innerHTML = ''; }
+
+async function handleFile(file) {
+  if(!file) return;
+  var name = file.name.toLowerCase();
+  var title = file.name.replace(/\.[^.]+$/,'');
+
+  try {
+    if(name.endsWith('.pdf')) {
+      showStatus('loading','正在解析 PDF 文件...');
+      var arrayBuf = await file.arrayBuffer();
+      var pdf = await pdfjsLib.getDocument({data:arrayBuf}).promise;
+      var textParts = [];
+      for(var i=1; i<=pdf.numPages; i++) {
+        var page = await pdf.getPage(i);
+        var content = await page.getTextContent();
+        var pageText = content.items.map(function(item){return item.str;}).join(' ');
+        textParts.push(pageText);
+      }
+      extractedText = textParts.join('\n\n');
+      showStatus('success','PDF 解析成功！共 '+pdf.numPages+' 页，提取 '+extractedText.length+' 个字符');
+    } else if(name.endsWith('.docx')) {
+      showStatus('loading','正在解析 DOCX 文件...');
+      var arrayBuf = await file.arrayBuffer();
+      var result = await mammoth.extractRawText({arrayBuffer:arrayBuf});
+      extractedText = result.value;
+      if(result.messages.length>0) {
+        console.warn('DOCX parse warnings:', result.messages);
+      }
+      showStatus('success','DOCX 解析成功！共提取 '+extractedText.length+' 个字符，耗时约 '+(Date.now()-startTime)/1000+' 秒');
+    } else {
+      showStatus('error','不支持的文件格式，请上传 PDF 或 DOCX 文件');
+      return;
+    }
+
+    // Auto-analyze
+    document.getElementById('repTitle').value = title;
+    document.getElementById('repContent').value = extractedText;
+    analyze(extractedText, title);
+
+  } catch(err) {
+    showStatus('error','文件解析失败：'+err.message+'。请尝试手动粘贴文字。');
+    console.error('File parse error:', err);
+    document.getElementById('manualInput').style.display = 'block';
+  }
+}
+
+// ===== Analysis Engine =====
 
 function extractSymbols(text) {
-  const map = {
+  var map = {
     'Broadcom':{name:'Broadcom',sym:'AVGO',sector:'AI芯片'},
     'AVGO':{name:'Broadcom',sym:'AVGO',sector:'AI芯片'},
     'Credo':{name:'Credo',sym:'CRDO',sector:'互联'},
@@ -140,15 +251,18 @@ function extractSymbols(text) {
     '谷歌':{name:'Google',sym:'GOOGL',sector:'云/AI'},
     '超微':{name:'SMCI',sym:'SMCI',sector:'服务器'},
     'xAI':{name:'xAI',sym:'xAI',sector:'AI'},
-    'Starlink':{name:'Starlink',sym:'STARLINK',sector:'航天'},
     'Rocket Lab':{name:'Rocket Lab',sym:'RKLB',sector:'航天'},
-    'Firefly':{name:'Firefly',sym:'FFLY',sector:'航天'},
+    'SanDisk':{name:'SanDisk',sym:'SNDK',sector:'存储'},
+    '闪迪':{name:'SanDisk',sym:'SNDK',sector:'存储'},
+    'NBIS':{name:'Nebius',sym:'NBIS',sector:'算力平台'},
+    'Nebius':{name:'Nebius',sym:'NBIS',sector:'算力平台'},
   };
-  const found = new Set();
-  const results = [];
-  for(const [k,v] of Object.entries(map)) {
-    if(text.toLowerCase().includes(k.toLowerCase()) && !found.has(v.sym)) {
-      found.add(v.sym);
+  var found = {};
+  var results = [];
+  for(var k in map) {
+    var v = map[k];
+    if(text.toLowerCase().indexOf(k.toLowerCase())>=0 && !found[v.sym]) {
+      found[v.sym] = true;
       results.push(v);
     }
   }
@@ -156,50 +270,33 @@ function extractSymbols(text) {
 }
 
 function extractPercentages(text) {
-  const patterns = [
+  var patterns = [
     /同比[+\-]?(\d+\.?\d*)%/g,
     /\+\s*(\d+\.?\d*)%/g,
-    /(\d+\.?\d*)%\s*(增长|上涨|提升|增加)/g,
+    /(\d+\.?\d*)%\s*(增长|上|提升|增加)/g,
     /营收.*?(\d+\.?\d*)%/g,
-    /毛利率[^\d]*(\d+\.?\d*)%/g,
-    /净利率[^\d]*(\d+\.?\d*)%/g,
+    /毛利.*?(\d+\.?\d*)%/g,
+    /净利.*?(\d+\.?\d*)%/g,
     /ROE[^\d]*(\d+\.?\d*)%/g,
   ];
-  const nums = [];
-  for(const p of patterns) {
-    let m;
+  var nums = [];
+  for(var i=0;i<patterns.length;i++) {
+    var p = patterns[i];
+    var m;
     while((m = p.exec(text))!==null) {
-      const v = parseFloat(m[1]);
+      var v = parseFloat(m[1]);
       if(v>0 && v<10000) nums.push(v);
     }
   }
   return nums;
 }
 
-function extractDollars(text) {
-  const patterns = [
-    /\$\s*(\d+\.?\d*)\s*[亿万亿]/g,
-    /(\d+\.?\d*)\s*亿美元/g,
-    /(\d+\.?\d*)\s*万亿/g,
-    /估值[^\d]*(\d+\.?\d*)/g,
-    /募资[^\d]*(\d+\.?\d*)/g,
-  ];
-  const nums = [];
-  for(const p of patterns) {
-    let m;
-    while((m = p.exec(text))!==null) {
-      const v = parseFloat(m[1]);
-      if(v>0 && v<100000) nums.push(v);
-    }
-  }
-  return nums;
-}
-
 function findKeywords(text, keywords) {
-  const score = {};
-  for(const kw of keywords) {
-    const re = new RegExp(kw,'gi');
-    const m = text.match(re);
+  var score = {};
+  for(var i=0;i<keywords.length;i++) {
+    var kw = keywords[i];
+    var re = new RegExp(kw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
+    var m = text.match(re);
     if(m) score[kw] = m.length;
   }
   return score;
@@ -207,15 +304,15 @@ function findKeywords(text, keywords) {
 
 function extractSnippets(text, keyword, len) {
   len = len || 120;
-  const idx = text.indexOf(keyword);
+  var idx = text.indexOf(keyword);
   if(idx<0) return '';
-  const start = Math.max(0, idx-20);
-  const end = Math.min(text.length, idx+len);
+  var start = Math.max(0, idx-20);
+  var end = Math.min(text.length, idx+len);
   return text.substring(start, end).replace(/\n/g,' ');
 }
 
 function detectDirections(text) {
-  const dirs = {
+  var dirs = {
     'AI芯片与互联':{tag:'t-o', label:'分化', score:0, items:[], symbols:[]},
     'ARM架构':{tag:'t-g', label:'持有', score:0, items:[], symbols:[]},
     '存储/HBM':{tag:'t-g', label:'持有', score:0, items:[], symbols:[]},
@@ -225,7 +322,7 @@ function detectDirections(text) {
     '航天/IPO':{tag:'t-p', label:'布局', score:0, items:[], symbols:[]},
   };
 
-  const kwMap = {
+  var kwMap = {
     'AI芯片与互联':['Broadcom','AVGO','Credo','CRDO','ASIC','定制芯片','互联','Hyperscaler'],
     'ARM架构':['ARM','Grace','Graviton','CPU架构','x86','Agentic AI','低功耗'],
     '存储/HBM':['HBM','Micron','MU','美光','SOCAMM','存储','内存','NAND','闪迪','SNDK'],
@@ -235,50 +332,42 @@ function detectDirections(text) {
     '航天/IPO':['SpaceX','SPCX','IPO','Starship','Starlink','火箭','航天','太空'],
   };
 
-  for(const [dir,kws] of Object.entries(kwMap)) {
-    for(const kw of kws) {
-      if(text.toLowerCase().includes(kw.toLowerCase())) {
+  for(var dir in kwMap) {
+    var kws = kwMap[dir];
+    for(var i=0;i<kws.length;i++) {
+      if(text.toLowerCase().indexOf(kws[i].toLowerCase())>=0) {
         dirs[dir].score++;
-        dirs[dir].items.push(kw);
+        dirs[dir].items.push(kws[i]);
       }
     }
   }
-
-  // Score tuning
-  if(dirs['AI芯片与互联'].score>0) dirs['AI芯片与互联'].tag='t-o';
-  if(dirs['存储/HBM'].score>3) dirs['存储/HBM'].tag='t-g';
 
   return dirs;
 }
 
 function generateLogicCards(text, symbols, dirs) {
-  const cards = [];
-  const percents = extractPercentages(text);
+  var cards = [];
 
-  // Card 1: Approach
-  if(text.includes('杠杆')||text.includes('仓位')||text.includes('赔率')) {
+  if(text.indexOf('杠杆')>=0||text.indexOf('仓位')>=0||text.indexOf('赔率')>=0) {
     cards.push({title:'投资方法',text:'用合理的仓位撬动不对称收益。核心不是追最热，而是找收益风险比最优的标的。'});
   } else {
     cards.push({title:'投资方法',text:'选对方向比选对时机更重要。聚焦主线，控制仓位，耐心等待。'});
   }
 
-  // Card 2: Selection
-  if(text.includes('便宜')||text.includes('回调')||text.includes('估值')) {
+  if(text.indexOf('便宜')>=0||text.indexOf('回调')>=0||text.indexOf('估值')>=0) {
     cards.push({title:'选股原则',text:'在足够便宜的时候买入优质标的。估值合理+成长确定=最佳击球区。'});
   } else {
     cards.push({title:'选股原则',text:'投龙头不投杂牌，AI主线投核心环节。'});
   }
 
-  // Card 3: Key trend
   if(symbols.length>3) {
     cards.push({title:'主线判断',text:'报告覆盖'+symbols.length+'个核心标的，聚焦'+(symbols[0]?symbols[0].name:'AI')+'等龙头，预期差驱动的机会正在酝酿。'});
   } else {
     cards.push({title:'主线判断',text:'AI基础设施投资进入新周期，从训练转向推理应用，关注Agentic AI带来的增量机会。'});
   }
 
-  // Card 4: Risk
-  if(text.includes('风险')||text.includes('回调')||text.includes('泡沫')) {
-    cards.push({title:'风险意识',text:'市场共识越强风险越大，「买预期卖事实」是获利关键。不追高、不恋战。'});
+  if(text.indexOf('风险')>=0||text.indexOf('回调')>=0||text.indexOf('泡沫')>=0) {
+    cards.push({title:'风险意识',text:'市场共识越强风险越大，买预期卖事实是获利关键。不追高、不恋战。'});
   } else {
     cards.push({title:'风险意识',text:'保持警惕，控制单票仓位，分散投资降低黑天鹅冲击。'});
   }
@@ -287,45 +376,46 @@ function generateLogicCards(text, symbols, dirs) {
 }
 
 function generateOtherStocks(text) {
-  const stocks = [];
-  const map = {
-    '南山铝业':'继续持有，每年约10%防御性收益',
-    '比特币':'6万具投资价值，高位不建议接盘',
-    'A股':'不建议参与，优先港股与美股',
-    '英伟达':'短期预期已打满，不建议追涨',
-    '谷歌':'短期预期已打满，不建议追涨',
+  var stocks = [];
+  var map = {
+    '南山铝业':{opinion:'继续持有，每年约10%防御性收益'},
+    '比特币':{opinion:'6万具投资价值，高位不建议接盘'},
+    'A股':{opinion:'不建议参与，优先港股与美股'},
+    '英伟达':{opinion:'短期预期已打满，不建议追涨'},
+    '谷歌':{opinion:'短期预期已打满，不建议追涨'},
+    '光模块':{opinion:'注意阶段性离场信号'},
+    'SMCI':{opinion:'关注估值回调后的机会'},
+    '特斯拉':{opinion:'关注FSD和机器人业务进展'},
   };
-  for(const [k,v] of Object.entries(map)) {
-    if(text.includes(k)) stocks.push({name:k,opinion:v});
+  for(var k in map) {
+    if(text.indexOf(k)>=0) stocks.push({name:k,opinion:map[k].opinion});
   }
   if(stocks.length===0) {
-    stocks.push({name:'待补充','opinion:'报告原文中未找到个股建议，请手动添加'});
+    stocks.push({name:'待补充',opinion:'报告原文中未找到个股建议，请手动添加'});
   }
   return stocks;
 }
 
 
-function analyze() {
-  const text = document.getElementById('repContent').value.trim();
-  const title = document.getElementById('repTitle').value.trim() || '财富报告分析';
+// ===== Main Analyze =====
+function analyze(text, title) {
+  text = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+  if(!text) { alert('文本内容为空，请检查文件是否损坏。'); return; }
 
-  if(!text) { alert('请先粘贴报告内容'); return; }
+  var symbols = extractSymbols(text);
+  var dirs = detectDirections(text);
+  var logicCards = generateLogicCards(text, symbols, dirs);
+  var otherStocks = generateOtherStocks(text);
 
-  const symbols = extractSymbols(text);
-  const dirs = detectDirections(text);
-  const logicCards = generateLogicCards(text, symbols, dirs);
-  const otherStocks = generateOtherStocks(text);
+  var sortedDirs = [];
+  for(var k in dirs) { if(dirs[k].score>0) sortedDirs.push([k,dirs[k]]); }
+  sortedDirs.sort(function(a,b){return b[1].score-a[1].score;});
 
-  // Sort directions by score
-  const sortedDirs = Object.entries(dirs)
-    .filter(([k,v])=>v.score>0)
-    .sort((a,b)=>b[1].score-a[1].score);
-
-  // Fill to 7
-  const allDirs = Object.entries(dirs);
+  var allDirs = [];
+  for(var k in dirs) { allDirs.push([k,dirs[k]]); }
 
   // Generate HTML
-  let html = '<div id="analysis">';
+  var html = '<div id="analysis">';
 
   // Header
   html += '<div class="card-header">';
@@ -336,21 +426,33 @@ function analyze() {
   // Row 1: Logic + Other
   html += '<div class="g2">';
   html += '<div class="card"><h3>投资底层逻辑 <span class="t-b">结论先行</span></h3>';
-  for(const lc of logicCards) {
+  for(var i=0;i<logicCards.length;i++) {
+    var lc = logicCards[i];
     html += '<div class="lc"><h4>'+lc.title+'</h4><p>'+lc.text+'</p></div>';
   }
   html += '</div>';
 
   html += '<div class="card"><h3>其他个股观点</h3>';
-  for(const s of otherStocks) {
+  for(var i=0;i<otherStocks.length;i++) {
+    var s = otherStocks[i];
     html += '<div class="sr"><span class="sn">'+s.name+'</span><span class="so">'+s.opinion+'</span></div>';
   }
 
   // Macro
-  const macroLines = [];
-  if(text.includes('非农')||text.includes('NFP')) macroLines.push('非农就业数据关注中');
-  if(text.includes('美联储')||text.includes('Fed')) macroLines.push('美联储政策关注中');
-  if(text.includes('CPI')||text.includes('通胀')) macroLines.push('通胀数据关注中');
+  var macroLines = [];
+  var macroChecks = [
+    ['非农','非农就业数据关注中'],
+    ['NFP','非农就业数据关注中'],
+    ['美联','美联储政策关注中'],
+    ['Fed','美联储政策关注中'],
+    ['CPI','通胀数据关注中'],
+    ['通胀','通胀数据关注中'],
+  ];
+  for(var i=0;i<macroChecks.length;i++) {
+    if(text.indexOf(macroChecks[i][0])>=0 && macroLines.indexOf(macroChecks[i][1])<0) {
+      macroLines.push(macroChecks[i][1]);
+    }
+  }
   if(macroLines.length===0) macroLines.push('宏观数据待补充');
   html += '<div style="margin-top:12px;font-size:15px;color:#475569;">';
   html += '<strong>宏观速览：</strong>'+macroLines.join(' | ');
@@ -359,72 +461,50 @@ function analyze() {
 
   // Row 2: Dir 1-3
   html += '<div class="g3">';
-  let dCount = 0;
-  for(const d of allDirs) {
-    if(dCount>=3) break;
-    const dd = d[1];
-    if(dd.score===0) continue;
-    dCount++;
+  var rowCount = 0;
+  for(var i=0;i<sortedDirs.length;i++) {
+    if(rowCount>=3) break;
+    var dd = sortedDirs[i][1];
     html += '<div class="card dir-card">';
-    html += '<h3>'+(dCount)+'. '+d[0]+' <span class="'+dd.tag+'">'+dd.label+'</span></h3>';
+    html += '<h3>'+(rowCount+1)+'. '+sortedDirs[i][0]+' <span class="'+dd.tag+'">'+dd.label+'</span></h3>';
     html += '<ul>';
     if(dd.items.length>0) {
-      for(const item of dd.items.slice(0,5)) {
-        html += '<li>'+extractSnippets(text, item, 100) || (item+'相关线索已提取')+'</li>';
+      for(var j=0;j<Math.min(dd.items.length,5);j++) {
+        var snip = extractSnippets(text, dd.items[j], 100);
+        html += '<li>'+(snip || dd.items[j]+'相关线索已提取')+'</li>';
       }
     } else {
       html += '<li>该方向需要补充更多信息</li>';
     }
     html += '</ul></div>';
+    rowCount++;
   }
   html += '</div>';
 
-  // Row 3: Dir 4-6
-  html += '<div class="g3">';
-  let dCount2 = 0;
-  for(const d of allDirs) {
-    if(dCount2>=3 && dCount2<6) {} // continue
-    dCount2++;
-    if(dCount2<4) continue;
-    if(dCount2>6) break;
-    const dd = d[1];
-    if(dd.score===0) continue;
-    html += '<div class="card dir-card">';
-    html += '<h3>'+(dCount2)+'. '+d[0]+' <span class="'+dd.tag+'">'+dd.label+'</span></h3>';
-    html += '<ul>';
-    if(dd.items.length>0) {
-      for(const item of dd.items.slice(0,5)) {
-        html += '<li>'+extractSnippets(text, item, 100) || (item+'相关线索已提取')+'</li>';
-      }
-    } else {
-      html += '<li>该方向需要补充更多信息</li>';
-    }
-    html += '</ul></div>';
-  }
-  html += '</div>';
-
-  // Row 4: Dir 7
-  const row4Dirs = allDirs.filter((d,i)=>i>=6);
-  if(row4Dirs.some(d=>d[1].score>0)) {
+  // Row 3: Dir 4-7
+  if(sortedDirs.length>3) {
     html += '<div class="g3">';
-    for(const d of row4Dirs) {
-      const dd = d[1];
-      if(dd.score===0) continue;
-      const idx = allDirs.indexOf(d)+1;
+    for(var i=3;i<Math.min(sortedDirs.length,7);i++) {
+      var dd = sortedDirs[i][1];
       html += '<div class="card dir-card">';
-      html += '<h3>'+idx+'. '+d[0]+' <span class="'+dd.tag+'">'+dd.label+'</span></h3>';
+      html += '<h3>'+(i+1)+'. '+sortedDirs[i][0]+' <span class="'+dd.tag+'">'+dd.label+'</span></h3>';
       html += '<ul>';
-      for(const item of dd.items.slice(0,5)) {
-        html += '<li>'+extractSnippets(text, item, 100) || (item+'已提取')+'</li>';
+      if(dd.items.length>0) {
+        for(var j=0;j<Math.min(dd.items.length,5);j++) {
+          var snip = extractSnippets(text, dd.items[j], 100);
+          html += '<li>'+(snip || dd.items[j]+'已提取')+'</li>';
+        }
+      } else {
+        html += '<li>该方向需要补充更多信息</li>';
       }
       html += '</ul></div>';
     }
     html += '</div>';
   }
 
-  // Bottom
-  const activeDirs = allDirs.filter(d=>d[1].score>0);
-  const dirLabels = activeDirs.map(d=>d[0]+'('+d[1].label+')');
+  // Bottom row
+  var activeDirs = sortedDirs.map(function(d){return d[0]+'('+d[1].label+')';});
+  var dirLabels = activeDirs.slice(0,7).join(' | ');
 
   html += '<div class="g4">';
 
@@ -432,7 +512,7 @@ function analyze() {
   html += '<p>正确标的 + 便宜买入 + 避开高位共识 + 耐心持有</p></div>';
 
   html += '<div class="bcard"><h3>方向总览</h3>';
-  html += '<p>'+dirLabels.slice(0,7).join(' | ')+'</p></div>';
+  html += '<p>'+dirLabels+'</p></div>';
 
   html += '<div class="bcard"><h3>操作总原则</h3>';
   html += '<p>主线聚焦，控制仓位，不追高不恋战。</p></div>';
@@ -444,22 +524,34 @@ function analyze() {
 
   html += '</div>';
 
-  // Footer
   html += '<div class="footer">AI辅助生成 | 结论先行 | 仅供参考，不构成投资建议</div>';
-
   html += '</div>';
 
   document.getElementById('output').innerHTML = html;
   document.getElementById('output').style.display = 'block';
-  document.getElementById('copyBtn').style.display = 'inline-block';
-
-  // Scroll to output
+  document.getElementById('actionRow').style.display = 'flex';
   document.getElementById('output').scrollIntoView({behavior:'smooth'});
-
-  // Store for copy
   window._outHTML = html;
 }
 
+
+// ===== Manual text analyze =====
+function analyzeFromText() {
+  var title = document.getElementById('repTitle').value.trim() || '财富报告分析';
+  var text = document.getElementById('repContent').value.trim();
+  if(!text) { alert('请先粘贴报告内容'); return; }
+  analyze(text, title);
+}
+
+// ===== Toggle manual input =====
+var manualVisible = false;
+function toggleManual() {
+  manualVisible = !manualVisible;
+  document.getElementById('manualInput').style.display = manualVisible ? 'block' : 'none';
+  document.getElementById('switchBtn').textContent = manualVisible ? '隐藏手动输入' : '或者手动粘贴文字';
+}
+
+// ===== Copy HTML =====
 function copyHTML() {
   if(!window._outHTML) return;
   navigator.clipboard.writeText(window._outHTML).then(function(){
@@ -469,12 +561,15 @@ function copyHTML() {
   });
 }
 
+// ===== Reset =====
 function resetAll() {
+  extractedText = '';
   document.getElementById('repContent').value = '';
   document.getElementById('repTitle').value = '';
   document.getElementById('output').style.display = 'none';
   document.getElementById('output').innerHTML = '';
-  document.getElementById('copyBtn').style.display = 'none';
+  document.getElementById('actionRow').style.display = 'none';
+  hideStatus();
   window._outHTML = null;
 }
 </script>
