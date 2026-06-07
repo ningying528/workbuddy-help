@@ -60,12 +60,18 @@ tr:hover { background: #161625; }
   <button id="btn" onclick="compare()">开始对比</button>
 </div>
 
+<div style="text-align:center;margin-bottom:10px;">
+  <button id="installBtn" onclick="installPWA()" style="display:none;padding:12px 24px;font-size:18px;background:#ff6b35;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:bold;">📱 安装到桌面（像小程序一样）</button>
+</div>
+
 <div id="result"></div>
 
 <script>
 // ===== API Key 管理 =====
 function getKey() {
-  return localStorage.getItem('finnhub_key') || '';
+  var urlKey = new URL(location.href).searchParams.get('key');
+  if (urlKey) { localStorage.setItem('finnhub_key', urlKey); }
+  return localStorage.getItem('finnhub_key') || urlKey || '';
 }
 function saveKey() {
   var k = document.getElementById('apiKey').value.trim();
@@ -73,6 +79,26 @@ function saveKey() {
   else { alert('请输入有效的 Key'); }
 }
 document.getElementById('apiKey').value = getKey();
+
+// ===== PWA 安装按钮 =====
+var installPrompt = null;
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  installPrompt = e;
+  document.getElementById('installBtn').style.display = 'inline-block';
+});
+function installPWA() {
+  if (installPrompt) {
+    installPrompt.prompt();
+    installPrompt.userChoice.then(function(r) {
+      if (r.outcome === 'accepted') { alert('安装成功！桌面出现图标'); }
+      installPrompt = null;
+      document.getElementById('installBtn').style.display = 'none';
+    });
+  } else {
+    alert('请按 Ctrl+Shift+R 刷新页面后再试，或点浏览器菜单 → 应用 → 安装此站点为应用');
+  }
+}
 
 // ===== Finnhub API =====
 var BASE = 'https://finnhub.io/api/v1/';
