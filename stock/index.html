@@ -51,7 +51,7 @@ tr:hover { background: #161625; }
 </div>
 <div class="key-row">
   <input id="apiKey" type="password" placeholder="输入 Finnhub API Key" autocomplete="off">
-  <button onclick="saveKey()">保存</button>
+  <button id="saveKeyBtn">保存</button>
 </div>
 
 <div class="query-box">
@@ -67,18 +67,42 @@ tr:hover { background: #161625; }
 <div id="result"></div>
 
 <script>
+// ===== 辅助函数 =====
+function isAShare(sym) {
+  return /^\d{6}$/.test(sym) || /\.(SZ|SS|BJ)$/i.test(sym);
+}
+
+function getEastmoneySecid(sym) {
+  sym = sym.replace(/\.(SZ|SS|BJ)$/i, '');
+  if (sym.length !== 6) return '0.' + sym;
+  return (sym.charAt(0) === '6' || sym.charAt(0) === '5' ? '1.' : '0.') + sym;
+}
+
 // ===== API Key 管理 =====
 function getKey() {
   var urlKey = new URL(location.href).searchParams.get('key');
-  if (urlKey) { localStorage.setItem('finnhub_key', urlKey); }
-  return localStorage.getItem('finnhub_key') || urlKey || '';
+  if (urlKey) {
+    localStorage.setItem('finnhub_key', urlKey);
+    // 清除URL中的key，避免分享时泄露
+    history.replaceState(null, '', location.pathname + location.hash);
+  }
+  return localStorage.getItem('finnhub_key') || '';
 }
+
 function saveKey() {
   var k = document.getElementById('apiKey').value.trim();
-  if (k) { localStorage.setItem('finnhub_key', k); alert('Key 已保存！'); }
-  else { alert('请输入有效的 Key'); }
+  if (k) {
+    localStorage.setItem('finnhub_key', k);
+    alert('Key 已保存！刷新页面后自动生效。');
+  } else {
+    alert('请输入有效的 Key');
+  }
 }
-document.getElementById('apiKey').value = getKey();
+
+// 页面加载时，把已保存的key显示到输入框
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('apiKey').value = getKey();
+});
 
 // ===== PWA 安装按钮 =====
 var installPrompt = null;
@@ -91,23 +115,17 @@ function installPWA() {
   if (installPrompt) {
     installPrompt.prompt();
     installPrompt.userChoice.then(function(r) {
-      if (r.outcome === 'accepted') { alert('安装成功！桌面出现图标'); }
+      if (r.outcome === 'accepted') { alert('安装成功！桌面上会出现图标'); }
       installPrompt = null;
       document.getElementById('installBtn').style.display = 'none';
     });
   } else {
-    alert('请按 Ctrl+Shift+R 刷新页面后再试，或点浏览器菜单 → 应用 → 安装此站点为应用');
+    alert('请刷新页面后再试，或点浏览器菜单 → 应用 → 安装此站点为应用');
   }
 }
 
-// ===== 股票数据 API（美股 Finnhub + A股 东方财富） =====
+// ===== A股数据：东方财富 JSONP =====
 var FINNHUB = 'https://finnhub.io/api/v1/';
-
-function getEastmoneySecid(sym) {
-  sym = sym.replace(/\.(SZ|SS)$/i, '');
-  if (sym.length !== 6) return '0.' + sym;
-  return (sym.charAt(0) === '6' ? '1.' : '0.') + sym;
-}
 
 function fetchEastmoney(secid) {
   return new Promise(function(resolve, reject) {
@@ -153,25 +171,7 @@ function fetchEastmoney(secid) {
   });
 }
 
-async function fetchStock(sym, key) {
-  if (/^\d{6}$/.test(sym) || /\.(SZ|SS)$/i.test(sym)) {
-    var secid = getEastmoneySecid(sym);
-    var edata = await fetchEastmoney(secid);
-    return {
-      symbol: sym,
-      name: edata.name || sym,
-      price: edata.price,
-      prevClose: edata.prevClose,
-      change: edata.change,
-      changePct: edata.changePct,
-      marketCap: null, pe: null, forwardPe: null, peg: null,
-      profitMargin: null, revenueGrowth: null, roe: null, grossMargin: null,
-      debtToEquity: null, currentRatio: null, eps: null,
-      week52High: edata.high, week52Low: edata.low, beta: null,
-      industry: '', exchange: edata.exchange, currency: 'CNY',
-      isAShare: true
-    };
-  }
+// ===== 美股数据：Finnhub =====
 async function fetchFinnhub(sym, key) {
   var [quote, profile, metricData] = await Promise.all([
     (async function() {
@@ -212,17 +212,19 @@ async function fetchFinnhub(sym, key) {
   };
 }
 
+// ===== 统一入口 =====
 async function fetchStock(sym, key) {
+  sym = sym.trim().toUpperCase();
   if (isAShare(sym)) {
     var secid = getEastmoneySecid(sym);
     var edata = await fetchEastmoney(secid);
     return {
       symbol: sym,
-      name: sdata.name || sym,
+      name: edata.name || sym,
       price: edata.price,
       prevClose: edata.prevClose,
-      change: edata.price - edata.prevClose,
-      changePct: edata.prevClose ? (edata.price - edata.prevClose) / edata.prevClose : 0,
+      change: edata.change,
+      changePct: edata.changePct,
       marketCap: null, pe: null, forwardPe: null, peg: null,
       profitMargin: null, revenueGrowth: null, roe: null, grossMargin: null,
       debtToEquity: null, currentRatio: null, eps: null,
@@ -332,6 +334,9 @@ async function compare() {
     btn.disabled = false;
   }
 }
+
+// 绑定保存按钮事件（兼容PWA离线场景）
+document.getElementById('saveKeyBtn').addEventListener('click', saveKey);
 
 // ===== PWA Service Worker =====
 if ('serviceWorker' in navigator) {
