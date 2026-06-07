@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智能报告分析器 - 上传文档自动分析</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family:'PingFang SC','Microsoft YaHei',sans-serif;
+  background:#f0f2f5; color:#222; font-size:18px;
+  line-height:1.8; max-width:1000px; margin:0 auto; padding:20px 16px;
+}
+h1 { font-size:28px; text-align:center; color:#1a2a44; margin-bottom:8px; }
+.sub { text-align:center; font-size:17px; color:#64748b; margin-bottom:28px; }
+
+/* Upload area */
+.upload-area {
+  background:#fff; border:3px dashed #cbd5e1; border-radius:16px;
+  padding:40px 24px; text-align:center; cursor:pointer; margin-bottom:20px;
+  transition:all 0.3s; position:relative;
+}
+.upload-area:hover,.upload-area.drag { border-color:#1a56db; background:#f0f4ff; }
+.upload-area .icon { font-size:48px; margin-bottom:10px; }
+.upload-area .text { font-size:19px; color:#475569; margin-bottom:6px; }
+.upload-area .hint { font-size:15px; color:#94a3b8; }
+.upload-area input { display:none; }
+
+/* Status */
+.status { display:none; background:#fff; border-radius:12px; padding:16px 20px;
+  margin-bottom:16px; font-size:17px; text-align:center; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
+.status.loading { display:block; background:#f0f4ff; color:#1d4ed8; }
+.status.success { display:block; background:#f0fdf4; color:#15803d; }
+.status.error { display:block; background:#fef2f2; color:#dc2626; }
+.spinner { display:inline-block; width:22px; height:22px; border:3px solid #cbd5e1;
+  border-top-color:#1d4ed8; border-radius:50%; animation:spin 0.7s linear infinite;
+  vertical-align:middle; margin-right:8px; }
+@keyframes spin { to{transform:rotate(360deg);} }
+
+/* Input panel */
+.input-section { background:#fff; border-radius:14px; padding:22px; margin-bottom:20px;
+  box-shadow:0 1px 4px rgba(0,0,0,0.08); display:none; }
+.input-section label { font-size:18px; font-weight:bold; color:#1e293b; display:block; margin-bottom:8px; }
+.input-section input { width:100%; font-size:18px; padding:12px 14px; border:2px solid #e2e8f0; border-radius:8px; }
+textarea { width:100%; font-size:17px; padding:14px; border:2px solid #e2e8f0; border-radius:8px;
+  min-height:200px; line-height:1.7; resize:vertical; }
+.btn { font-size:19px; font-weight:bold; padding:14px 32px; border:none; border-radius:10px; cursor:pointer; margin-top:10px; }
+.btn-analyze { background:#1a56db; color:#fff; width:100%; }
+.btn-analyze:hover { background:#1550c8; }
+.btn-copy { background:#0d9488; color:#fff; }
+.btn-reset { background:#64748b; color:#fff; }
+.btn-switch { font-size:15px; padding:8px 16px; background:none; border:2px solid #cbd5e1; border-radius:8px;
+  color:#64748b; cursor:pointer; margin-top:10px; }
+.btn-row { display:flex; gap:12px; align-items:center; }
+
+/* Output */
+#output { display:none; }
+
+/* Header */
+.card-header {
+  background:linear-gradient(135deg,#1a2a44,#2d4a6e);
+  border-radius:16px; padding:36px 28px; color:#fff; margin-bottom:24px;
+}
+.card-header h2 { font-size:34px; font-weight:bold; }
+.card-header .subtitle { font-size:17px; opacity:0.85; margin-top:6px; }
+
+/* Grids */
+.g2 { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:24px; }
+.g3 { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-bottom:24px; }
+.g4 { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px; }
+
+/* Cards */
+.card { background:#fff; border-radius:14px; padding:22px 20px; box-shadow:0 1px 4px rgba(0,0,0,0.08); }
+.card h3 { font-size:22px; margin-bottom:12px; }
+
+/* Tags */
+.t-r { background:#fee2e2; color:#dc2626; padding:3px 12px; border-radius:20px; font-size:14px; font-weight:bold; }
+.t-g { background:#dcfce7; color:#15803d; padding:3px 12px; border-radius:20px; font-size:14px; font-weight:bold; }
+.t-b { background:#dbeafe; color:#1d4ed8; padding:3px 12px; border-radius:20px; font-size:14px; font-weight:bold; }
+.t-o { background:#ffedd5; color:#c2410c; padding:3px 12px; border-radius:20px; font-size:14px; font-weight:bold; }
+.t-p { background:#f3e8ff; color:#7c3aed; padding:3px 12px; border-radius:20px; font-size:14px; font-weight:bold; }
+
+/* Logic cards */
+.lc { background:#f8fafc; border-radius:10px; padding:14px; margin-bottom:8px; }
+.lc h4 { font-size:16px; color:#1e293b; margin-bottom:4px; }
+.lc p { font-size:14.5px; color:#475569; }
+
+/* Key points */
+.kp { display:flex; align-items:flex-start; padding:8px 10px; background:#f8fafc; border-radius:8px; margin-bottom:6px; font-size:15px; }
+.kp .num { font-weight:bold; color:#1a56db; min-width:28px; }
+.kp .txt { color:#334155; flex:1; }
+
+/* Bottom */
+.bcard { background:#fff; border-radius:12px; padding:16px 14px; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
+.bcard h3 { font-size:16px; font-weight:bold; color:#1e293b; margin-bottom:8px; text-align:center; }
+.bcard p,.bcard li { font-size:14px; color:#475569; line-height:1.75; }
+.qi { font-size:14px; color:#475569; padding:5px 8px; margin:3px 0; background:#f8fafc; border-radius:6px; border-left:3px solid #94a3b8; }
+.footer { text-align:center; font-size:14px; color:#94a3b8; padding:14px 0; }
+
+@media(max-width:800px){ .g2,.g3,.g4{grid-template-columns:1fr!important;} }
+</style>
+</head>
+<body>
+
+<h1>智能报告分析器</h1>
+<div class="sub">上传任何PDF或DOCX文档，自动提取关键信息并生成分析报告</div>
+
+<!-- Upload Area -->
+<div class="upload-area" id="uploadArea">
+  <div class="icon">📄</div>
+  <div class="text">点击上传或拖拽文件到这里</div>
+  <div class="hint">支持 PDF / DOCX 格式，任意内容均可分析</div>
+  <input type="file" id="fileInput" accept=".pdf,.docx" onchange="handleFile(this.files[0])">
+</div>
+
+<!-- Status -->
+<div class="status" id="status"></div>
+
+<!-- Manual input toggle -->
+<div style="text-align:center;margin-bottom:16px;">
+  <button class="btn-switch" id="switchBtn" onclick="toggleManual()">或者手动粘贴文字</button>
+</div>
+
+<!-- Manual input -->
+<div class="input-section" id="manualInput">
+  <label>报告标题</label>
+  <input id="repTitle" placeholder="例如：xxx研究报告 / xxx分析">
+  <label style="margin-top:12px;">报告原文内容（粘贴完整文本）</label>
+  <textarea id="repContent" placeholder="在这里粘贴报告的完整内容..."></textarea>
+  <button class="btn btn-analyze" onclick="analyzeFromText()">开始分析</button>
+</div>
+
+<div id="output"></div>
+<div class="btn-row" style="justify-content:center;margin-top:10px;display:none;" id="actionRow">
+  <button class="btn btn-copy" onclick="copyHTML()">复制 HTML</button>
+  <button class="btn btn-reset" onclick="resetAll()">清空重来</button>
+</div>
+
+<script>
+// ===== PDF.js Setup =====
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+var uploadArea = document.getElementById('uploadArea');
+var fileInput = document.getElementById('fileInput');
+var statusDiv = document.getElementById('status');
+var extractedText = '';
+var startTime = 0;
+
+uploadArea.addEventListener('click', function() { fileInput.click(); });
+uploadArea.addEventListener('dragover', function(e) { e.preventDefault(); uploadArea.classList.add('drag'); });
+uploadArea.addEventListener('dragleave', function() { uploadArea.classList.remove('drag'); });
+uploadArea.addEventListener('drop', function(e) {
+  e.preventDefault();
+  uploadArea.classList.remove('drag');
+  var file = e.dataTransfer.files[0];
+  if(file) handleFile(file);
+});
+
+function showStatus(type, msg) {
+  statusDiv.className = 'status ' + type;
+  statusDiv.innerHTML = (type==='loading'?'<span class="spinner"></span>':'') + msg;
+}
+
+function hideStatus() { statusDiv.className = 'status'; statusDiv.innerHTML = ''; }
+
+async function handleFile(file) {
+  if(!file) return;
+  var name = file.name.toLowerCase();
+  var title = file.name.replace(/\.[^.]+$/,'');
+  startTime = Date.now();
+
+  try {
+    if(name.endsWith('.pdf')) {
+      showStatus('loading','正在解析 PDF 文件...');
+      var arrayBuf = await file.arrayBuffer();
+      var pdf = await pdfjsLib.getDocument({data:arrayBuf}).promise;
+      var textParts = [];
+      for(var i=1; i<=pdf.numPages; i++) {
+        var page = await pdf.getPage(i);
+        var content = await page.getTextContent();
+        var pageText = content.items.map(function(item){return item.str;}).join(' ');
+        textParts.push(pageText);
+      }
+      extractedText = textParts.join('\n\n');
+      var elapsed = ((Date.now()-startTime)/1000).toFixed(1);
+      showStatus('success','PDF 解析成功！共 '+pdf.numPages+' 页，提取 '+extractedText.length+' 个字符（耗时 '+elapsed+' 秒）');
+    } else if(name.endsWith('.docx')) {
+      showStatus('loading','正在解析 DOCX 文件...');
+      var arrayBuf = await file.arrayBuffer();
+      var result = await mammoth.extractRawText({arrayBuffer:arrayBuf});
+      extractedText = result.value;
+      if(result.messages.length>0) {
+        console.warn('DOCX parse warnings:', result.messages);
+      }
+      var elapsed = ((Date.now()-startTime)/1000).toFixed(1);
+      showStatus('success','DOCX 解析成功！共提取 '+extractedText.length+' 个字符（耗时 '+elapsed+' 秒）');
+    } else {
+      showStatus('error','不支持的文件格式，请上传 PDF 或 DOCX 文件');
+      return;
+    }
+
+    // Auto-analyze
+    document.getElementById('repTitle').value = title;
+    document.getElementById('repContent').value = extractedText;
+    analyze(extractedText, title);
+
+  } catch(err) {
+    showStatus('error','文件解析失败：'+err.message+'。请尝试手动粘贴文字。');
+    console.error('File parse error:', err);
+    document.getElementById('manualInput').style.display = 'block';
+  }
+}
+
+// ===== Generic Analysis Engine =====
+
+// Extract sentences containing key patterns
+function extractKeySentences(text, patterns, maxCount) {
+  maxCount = maxCount || 8;
+  var sentences = text.split(/[。！？\n\r]+/);
+  var results = [];
+  var seen = {};
+  for(var p=0; p<patterns.length; p++) {
+    var pat = patterns[p];
+    for(var i=0; i<sentences.length; i++) {
+      var s = sentences[i].trim();
+      if(s.length < 8) continue;
+      if(s.indexOf(pat) >= 0 && !seen[s]) {
+        seen[s] = true;
+        results.push(s);
+        if(results.length >= maxCount) return results;
+      }
+    }
+  }
+  return results;
+}
+
+// Extract numbers with context
+function extractNumbers(text, keyword, maxCount) {
+  maxCount = maxCount || 5;
+  var results = [];
+  var sentences = text.split(/[。！？\n\r]+/);
+  for(var i=0; i<sentences.length; i++) {
+    var s = sentences[i].trim();
+    if(s.indexOf(keyword) >= 0) {
+      // Extract numbers from this sentence
+      var nums = s.match(/\d+\.?\d*\s*[%亿万千百]/g);
+      if(nums) {
+        for(var j=0; j<nums.length && results.length<maxCount; j++) {
+          results.push(nums[j]);
+        }
+      }
+    }
+    if(results.length >= maxCount) break;
+  }
+  return results;
+}
+
+// Detect main topics by word frequency (simple Chinese segmentation by punctuation)
+function detectTopics(text) {
+  // Remove common punctuation, split by common delimiters
+  var clean = text.replace(/[，。！？、；：""''（）【】《》\n\r\t]/g, ' ');
+  var words = clean.split(/\s+/);
+  var freq = {};
+  var stopWords = ['的','了','是','在','和','有','对','也','被','把','等','与','及','或','但','而','然','如果','因为','所以','可以','可能','已经','没有','这个','那个','一个','以及','同时','目前','未来','预计','认为','表示','提到','指出','强调','建议','推荐','关注','注意','风险','机会','增长','下降','上升','提高','降低','增加','减少'];
+  for(var i=0; i<words.length; i++) {
+    var w = words[i].trim();
+    if(w.length >= 2 && stopWords.indexOf(w) < 0 && /^[\u4e00-\u9fa5a-zA-Z0-9]+$/.test(w)) {
+      freq[w] = (freq[w] || 0) + 1;
+    }
+  }
+  // Sort by frequency
+  var sorted = [];
+  for(var w in freq) sorted.push([w, freq[w]]);
+  sorted.sort(function(a,b){return b[1]-a[1];});
+  return sorted.slice(0, 12);
+}
+
+// Extract conclusions / recommendations
+function extractConclusions(text) {
+  var patterns = ['结论','建议','推荐','总结','综上','展望','预计','预测','认为','策略','操作','买入','卖出','持有','观望','风险','机会','注意','关注'];
+  return extractKeySentences(text, patterns, 6);
+}
+
+// Extract data points
+function extractDataPoints(text) {
+  var results = [];
+  var sentences = text.split(/[。！？\n\r]+/);
+  for(var i=0; i<sentences.length; i++) {
+    var s = sentences[i].trim();
+    if(s.length < 10) continue;
+    // Look for sentences with numbers AND keywords
+    if(/\d/.test(s) && /[增长下降升降幅比%，]/.test(s)) {
+      if(results.indexOf(s) < 0) {
+        results.push(s);
+        if(results.length >= 8) break;
+      }
+    }
+  }
+  return results;
+}
+
+// Detect if content is about finance/stocks
+function detectContentType(text) {
+  var financeKw = ['股票','股价','市值','PE','PB','ROE','营收','净利润','毛利率','财报','季报','年报','买入','卖出','持有','目标价','上涨','下跌','牛市','熊市','板块','指数'];
+  var techKw = ['AI','人工智能','芯片','半导体','云计算','大数据','机器学习','深度学习','算法','模型','GPU','CPU','服务器'];
+  var macroKw = ['GDP','CPI','通胀','美联储','央行','利率','汇率','货币政策','财政'];
+  var counts = {finance:0, tech:0, macro:0};
+  var tl = text.toLowerCase();
+  for(var i=0;i<financeKw.length;i++) if(tl.indexOf(financeKw[i].toLowerCase())>=0) counts.finance++;
+  for(var i=0;i<techKw.length;i++) if(tl.indexOf(techKw[i].toLowerCase())>=0) counts.tech++;
+  for(var i=0;i<macroKw.length;i++) if(tl.indexOf(macroKw[i].toLowerCase())>=0) counts.macro++;
+  if(counts.finance >= 3) return 'finance';
+  if(counts.tech >= 3) return 'tech';
+  if(counts.macro >= 2) return 'macro';
+  return 'general';
+}
+
+// ===== Main Analyze =====
+function analyze(text, title) {
+  text = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+  if(!text) { alert('文本内容为空，请检查文件是否损坏。'); return; }
+
+  var contentType = detectContentType(text);
+  var topics = detectTopics(text);
+  var conclusions = extractConclusions(text);
+  var dataPoints = extractDataPoints(text);
+  var sentences = text.split(/[。！？\n\r]+/);
+
+  // Generate logic cards (generic)
+  var logicCards = [];
+  logicCards.push({title:'核心判断', text: conclusions.length>0 ? conclusions[0] : (title || '本报告')+'的核心观点待进一步分析。'});
+  logicCards.push({title:'主要内容', text: '报告共提取 '+sentences.length+' 个段落，涉及 '+topics.slice(0,5).map(function(t){return t[0];}).join('、')+' 等主题。'});
+  if(dataPoints.length > 0) {
+    logicCards.push({title:'关键数据', text: '报告包含 '+dataPoints.length+' 组关键数据，建议重点关注量化指标。'});
+  }
+  logicCards.push({title:'风险提示', text: text.indexOf('风险')>=0 ? '报告提及风险事项，请仔细阅读风险章节。' : '请结合实际情况判断报告结论的适用性。'});
+
+  // Generate HTML
+  var html = '<div id="analysis">';
+
+  // Header
+  html += '<div class="card-header">';
+  html += '<h2>'+(title || '智能报告分析')+'</h2>';
+  html += '<div class="subtitle">智能分析 | 自动提取关键信息 | '+ (contentType==='finance'?'金融投资类':contentType==='tech'?'科技类':contentType==='macro'?'宏观经济类':'综合类') + '</div>';
+  html += '</div>';
+
+  // Row 1: Logic + Key Data
+  html += '<div class="g2">';
+  html += '<div class="card"><h3>核心结论 <span class="t-b">结论先行</span></h3>';
+  for(var i=0;i<logicCards.length;i++) {
+    html += '<div class="lc"><h4>'+logicCards[i].title+'</h4><p>'+logicCards[i].text+'</p></div>';
+  }
+  html += '</div>';
+
+  // Key data points
+  html += '<div class="card"><h3>关键数据点</h3>';
+  if(dataPoints.length > 0) {
+    for(var i=0;i<Math.min(dataPoints.length,6);i++) {
+      html += '<div class="kp"><span class="num">'+(i+1)+'.</span><span class="txt">'+dataPoints[i]+'</span></div>';
+    }
+  } else {
+    html += '<div style="color:#94a3b8;font-size:15px;padding:12px 0;">未检测到明确数据，请查看原文。</div>';
+  }
+  html += '</div></div>';
+
+  // Row 2: Topics + Conclusions
+  html += '<div class="g2">';
+
+  // Topics
+  html += '<div class="card"><h3>高频主题词</h3>';
+  if(topics.length > 0) {
+    for(var i=0;i<Math.min(topics.length,10);i++) {
+      html += '<span style="display:inline-block;background:#e0e7ff;color:#1e40af;padding:4px 12px;margin:4px;border-radius:16px;font-size:15px;">'+topics[i][0]+' ('+topics[i][1]+')</span>';
+    }
+  }
+  html += '</div>';
+
+  // Conclusions
+  html += '<div class="card"><h3>结论与建议</h3>';
+  if(conclusions.length > 0) {
+    for(var i=0;i<conclusions.length;i++) {
+      html += '<div class="kp"><span class="num">'+(i+1)+'.</span><span class="txt">'+conclusions[i]+'</span></div>';
+    }
+  } else {
+    html += '<div style="color:#94a3b8;font-size:15px;padding:12px 0;">未检测到明确的结论性表述。</div>';
+  }
+  html += '</div></div>';
+
+  // Row 3: Original data preview (first 500 chars)
+  html += '<div class="card" style="margin-bottom:24px;"><h3>原文摘要（前500字）</h3>';
+  html += '<div style="background:#f8fafc;border-radius:8px;padding:14px;font-size:14px;color:#475569;line-height:1.7;max-height:200px;overflow:auto;">';
+  html += text.substring(0, 500).replace(/\n/g,'<br>') + '...';
+  html += '</div></div>';
+
+  // Bottom
+  html += '<div class="g4">';
+
+  html += '<div class="bcard"><h3>报告信息</h3>';
+  html += '<p>总字数：'+text.length+' 字<br>段落数：'+sentences.length+'<br>文件类型：'+(contentType==='finance'?'金融投资':contentType==='tech'?'科技':contentType==='macro'?'宏观经济':'综合')+'</p></div>';
+
+  html += '<div class="bcard"><h3>分析说明</h3>';
+  html += '<p>本报告由AI自动分析生成，提取高频主题词、关键数据和结论性表述，仅供参考。</p></div>';
+
+  html += '<div class="bcard"><h3>使用建议</h3>';
+  html += '<p>1. 结合原文核对关键数据<br>2. 关注结论与建议章节<br>3. 注意报告中的风险提示</p></div>';
+
+  html += '<div class="bcard"><h3>金句提醒</h3>';
+  html += '<div class="qi">数据会说谎，逻辑不会</div>';
+  html += '<div class="qi">看清趋势比看清数据更重要</div>';
+  html += '<div class="qi">报告是参考，不是答案</div></div>';
+
+  html += '</div>';
+
+  html += '<div class="footer">智能分析 | 仅供参考，不构成任何投资建议 | '+new Date().toLocaleDateString('zh-CN')+'</div>';
+  html += '</div>';
+
+  document.getElementById('output').innerHTML = html;
+  document.getElementById('output').style.display = 'block';
+  document.getElementById('actionRow').style.display = 'flex';
+  document.getElementById('output').scrollIntoView({behavior:'smooth'});
+  window._outHTML = html;
+}
+
+
+// ===== Manual text analyze =====
+function analyzeFromText() {
+  var title = document.getElementById('repTitle').value.trim() || '智能报告分析';
+  var text = document.getElementById('repContent').value.trim();
+  if(!text) { alert('请先粘贴报告内容'); return; }
+  analyze(text, title);
+}
+
+// ===== Toggle manual input =====
+var manualVisible = false;
+function toggleManual() {
+  manualVisible = !manualVisible;
+  document.getElementById('manualInput').style.display = manualVisible ? 'block' : 'none';
+  document.getElementById('switchBtn').textContent = manualVisible ? '隐藏手动输入' : '或者手动粘贴文字';
+}
+
+// ===== Copy HTML =====
+function copyHTML() {
+  if(!window._outHTML) return;
+  navigator.clipboard.writeText(window._outHTML).then(function(){
+    alert('HTML已复制到剪贴板！');
+  }).catch(function(){
+    alert('复制失败，请手动选择输出区域并按Ctrl+C');
+  });
+}
+
+// ===== Reset =====
+function resetAll() {
+  extractedText = '';
+  document.getElementById('repContent').value = '';
+  document.getElementById('repTitle').value = '';
+  document.getElementById('output').style.display = 'none';
+  document.getElementById('output').innerHTML = '';
+  document.getElementById('actionRow').style.display = 'none';
+  hideStatus();
+  window._outHTML = null;
+}
+</script>
+</body>
+</html>
