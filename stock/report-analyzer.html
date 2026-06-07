@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>财富报告分析器</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family:'PingFang SC','Microsoft YaHei',sans-serif;
+  background:#f0f2f5; color:#222; font-size:18px;
+  line-height:1.8; max-width:1000px; margin:0 auto; padding:20px 16px;
+}
+h1 { font-size:28px; text-align:center; color:#1a2a44; margin-bottom:8px; }
+.sub { text-align:center; font-size:17px; color:#64748b; margin-bottom:28px; }
+
+/* Input */
+.input-section { background:#fff; border-radius:14px; padding:22px; margin-bottom:20px; box-shadow:0 1px 4px rgba(0,0,0,0.08); }
+.input-section label { font-size:18px; font-weight:bold; color:#1e293b; display:block; margin-bottom:8px; }
+.input-row { display:flex; gap:10px; margin-bottom:10px; }
+.input-row input { flex:1; font-size:18px; padding:12px 14px; border:2px solid #e2e8f0; border-radius:8px; }
+textarea { width:100%; font-size:17px; padding:14px; border:2px solid #e2e8f0; border-radius:8px;
+  min-height:200px; line-height:1.7; resize:vertical; }
+.btn { font-size:19px; font-weight:bold; padding:14px 32px; border:none; border-radius:10px; cursor:pointer; margin-top:10px; }
+.btn-analyze { background:#1a56db; color:#fff; width:100%; }
+.btn-analyze:hover { background:#1550c8; }
+.btn-copy { background:#0d9488; color:#fff; }
+.btn-reset { background:#64748b; color:#fff; }
+.btn-row { display:flex; gap:12px; }
+
+/* Output */
+#output { display:none; }
+
+/* Header */
+.card-header {
+  background:linear-gradient(135deg,#1a2a44,#2d4a6e);
+  border-radius:16px; padding:36px 28px; color:#fff; margin-bottom:24px;
+}
+.card-header h2 { font-size:34px; font-weight:bold; }
+.card-header .subtitle { font-size:17px; opacity:0.85; margin-top:6px; }
+
+/* Grids */
+.g2 { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:24px; }
+.g3 { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-bottom:24px; }
+.g4 { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px; }
+
+/* Cards */
+.card { background:#fff; border-radius:14px; padding:22px 20px; box-shadow:0 1px 4px rgba(0,0,0,0.08); }
+.card h3 { font-size:22px; margin-bottom:12px; }
+.card h3.small { font-size:18px; }
+
+/* Tags */
+.t-r { background:#fee2e2; color:#dc2626; padding:3px 12px; border-radius:20px; font-size:14px; font-weight:bold; }
+.t-g { background:#dcfce7; color:#15803d; padding:3px 12px; border-radius:20px; font-size:14px; font-weight:bold; }
+.t-b { background:#dbeafe; color:#1d4ed8; padding:3px 12px; border-radius:20px; font-size:14px; font-weight:bold; }
+.t-o { background:#ffedd5; color:#c2410c; padding:3px 12px; border-radius:20px; font-size:14px; font-weight:bold; }
+.t-p { background:#f3e8ff; color:#7c3aed; padding:3px 12px; border-radius:20px; font-size:14px; font-weight:bold; }
+
+/* Logic cards */
+.lc { background:#f8fafc; border-radius:10px; padding:14px; margin-bottom:8px; }
+.lc h4 { font-size:16px; color:#1e293b; margin-bottom:4px; }
+.lc p { font-size:14.5px; color:#475569; }
+
+/* Stock rows */
+.sr { display:flex; align-items:center; padding:8px 10px; background:#f8fafc; border-radius:8px; margin-bottom:6px; font-size:15px; }
+.sn { font-weight:bold; color:#1e293b; min-width:90px; }
+.so { color:#475569; margin-left:8px; }
+
+/* Direction cards */
+.dir-card h3 { font-size:20px; color:#1e293b; }
+ul { margin:6px 0 0 6px; padding-left:18px; }
+li { font-size:15px; color:#334155; margin:6px 0; line-height:1.75; }
+
+/* Bottom */
+.bcard { background:#fff; border-radius:12px; padding:16px 14px; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
+.bcard h3 { font-size:16px; font-weight:bold; color:#1e293b; margin-bottom:8px; text-align:center; }
+.bcard p,.bcard li { font-size:14px; color:#475569; line-height:1.75; }
+.qi { font-size:14px; color:#475569; padding:5px 8px; margin:3px 0; background:#f8fafc; border-radius:6px; border-left:3px solid #94a3b8; }
+
+.conclusion { font-size:15px; font-weight:bold; color:#b91c1c; margin-top:6px; padding:6px 10px; background:#fef2f2; border-radius:6px; }
+
+.footer { text-align:center; font-size:14px; color:#94a3b8; padding:14px 0; }
+
+@media(max-width:800px){ .g2,.g3,.g4{grid-template-columns:1fr!important;} }
+</style>
+</head>
+<body>
+
+<h1>财富报告分析器</h1>
+<div class="sub">粘贴报告原文，自动生成卡片式分析</div>
+
+<div class="input-section">
+  <label>报告标题</label>
+  <div class="input-row">
+    <input id="repTitle" placeholder="例如：A.I.N. 第三十二期财富报告" value="">
+  </div>
+  <label style="margin-top:12px;">报告原文内容（粘贴完整文本）</label>
+  <textarea id="repContent" placeholder="在这里粘贴财富报告的完整内容...&#10;&#10;工具会自动提取关键信息并生成卡片式分析。&#10;&#10;提示：内容越完整，分析越精准。"></textarea>
+  <button class="btn btn-analyze" onclick="analyze()">开始分析</button>
+  <div class="btn-row" style="margin-top:10px;">
+    <button class="btn btn-copy" onclick="copyHTML()" style="display:none;" id="copyBtn">复制 HTML</button>
+    <button class="btn btn-reset" onclick="resetAll()">清空重来</button>
+  </div>
+</div>
+
+<div id="output"></div>
+
+
+<script>
+// === Analysis Engine ===
+
+function extractSymbols(text) {
+  const map = {
+    'Broadcom':{name:'Broadcom',sym:'AVGO',sector:'AI芯片'},
+    'AVGO':{name:'Broadcom',sym:'AVGO',sector:'AI芯片'},
+    'Credo':{name:'Credo',sym:'CRDO',sector:'互联'},
+    'CRDO':{name:'Credo',sym:'CRDO',sector:'互联'},
+    'Micron':{name:'Micron',sym:'MU',sector:'存储'},
+    '美光':{name:'Micron',sym:'MU',sector:'存储'},
+    'MU':{name:'Micron',sym:'MU',sector:'存储'},
+    '英伟达':{name:'NVIDIA',sym:'NVDA',sector:'GPU'},
+    'NVIDIA':{name:'NVIDIA',sym:'NVDA',sector:'GPU'},
+    'NVDA':{name:'NVIDIA',sym:'NVDA',sector:'GPU'},
+    'AMD':{name:'AMD',sym:'AMD',sector:'CPU/GPU'},
+    'Intel':{name:'Intel',sym:'INTC',sector:'CPU'},
+    'INTC':{name:'Intel',sym:'INTC',sector:'CPU'},
+    '英特尔':{name:'Intel',sym:'INTC',sector:'CPU'},
+    'ARM':{name:'ARM Holdings',sym:'ARM',sector:'架构'},
+    '台积电':{name:'TSMC',sym:'TSM',sector:'制造'},
+    'TSMC':{name:'TSMC',sym:'TSM',sector:'制造'},
+    'Amphenol':{name:'Amphenol',sym:'APH',sector:'连接器'},
+    'APH':{name:'Amphenol',sym:'APH',sector:'连接器'},
+    'MACOM':{name:'MACOM',sym:'MTSI',sector:'光通信'},
+    'MTSI':{name:'MACOM',sym:'MTSI',sector:'光通信'},
+    'SpaceX':{name:'SpaceX',sym:'SPCX',sector:'航天'},
+    'SPCX':{name:'SpaceX',sym:'SPCX',sector:'航天'},
+    'Marvell':{name:'Marvell',sym:'MRVL',sector:'网络芯片'},
+    'MRVL':{name:'Marvell',sym:'MRVL',sector:'网络芯片'},
+    'Tesla':{name:'Tesla',sym:'TSLA',sector:'电动车'},
+    '谷歌':{name:'Google',sym:'GOOGL',sector:'云/AI'},
+    '超微':{name:'SMCI',sym:'SMCI',sector:'服务器'},
+    'xAI':{name:'xAI',sym:'xAI',sector:'AI'},
+    'Starlink':{name:'Starlink',sym:'STARLINK',sector:'航天'},
+    'Rocket Lab':{name:'Rocket Lab',sym:'RKLB',sector:'航天'},
+    'Firefly':{name:'Firefly',sym:'FFLY',sector:'航天'},
+  };
+  const found = new Set();
+  const results = [];
+  for(const [k,v] of Object.entries(map)) {
+    if(text.toLowerCase().includes(k.toLowerCase()) && !found.has(v.sym)) {
+      found.add(v.sym);
+      results.push(v);
+    }
+  }
+  return results;
+}
+
+function extractPercentages(text) {
+  const patterns = [
+    /同比[+\-]?(\d+\.?\d*)%/g,
+    /\+\s*(\d+\.?\d*)%/g,
+    /(\d+\.?\d*)%\s*(增长|上涨|提升|增加)/g,
+    /营收.*?(\d+\.?\d*)%/g,
+    /毛利率[^\d]*(\d+\.?\d*)%/g,
+    /净利率[^\d]*(\d+\.?\d*)%/g,
+    /ROE[^\d]*(\d+\.?\d*)%/g,
+  ];
+  const nums = [];
+  for(const p of patterns) {
+    let m;
+    while((m = p.exec(text))!==null) {
+      const v = parseFloat(m[1]);
+      if(v>0 && v<10000) nums.push(v);
+    }
+  }
+  return nums;
+}
+
+function extractDollars(text) {
+  const patterns = [
+    /\$\s*(\d+\.?\d*)\s*[亿万亿]/g,
+    /(\d+\.?\d*)\s*亿美元/g,
+    /(\d+\.?\d*)\s*万亿/g,
+    /估值[^\d]*(\d+\.?\d*)/g,
+    /募资[^\d]*(\d+\.?\d*)/g,
+  ];
+  const nums = [];
+  for(const p of patterns) {
+    let m;
+    while((m = p.exec(text))!==null) {
+      const v = parseFloat(m[1]);
+      if(v>0 && v<100000) nums.push(v);
+    }
+  }
+  return nums;
+}
+
+function findKeywords(text, keywords) {
+  const score = {};
+  for(const kw of keywords) {
+    const re = new RegExp(kw,'gi');
+    const m = text.match(re);
+    if(m) score[kw] = m.length;
+  }
+  return score;
+}
+
+function extractSnippets(text, keyword, len) {
+  len = len || 120;
+  const idx = text.indexOf(keyword);
+  if(idx<0) return '';
+  const start = Math.max(0, idx-20);
+  const end = Math.min(text.length, idx+len);
+  return text.substring(start, end).replace(/\n/g,' ');
+}
+
+function detectDirections(text) {
+  const dirs = {
+    'AI芯片与互联':{tag:'t-o', label:'分化', score:0, items:[], symbols:[]},
+    'ARM架构':{tag:'t-g', label:'持有', score:0, items:[], symbols:[]},
+    '存储/HBM':{tag:'t-g', label:'持有', score:0, items:[], symbols:[]},
+    '高速连接':{tag:'t-b', label:'布局', score:0, items:[], symbols:[]},
+    '算力平台':{tag:'t-g', label:'持有', score:0, items:[], symbols:[]},
+    'CPU/制造':{tag:'t-o', label:'分化', score:0, items:[], symbols:[]},
+    '航天/IPO':{tag:'t-p', label:'布局', score:0, items:[], symbols:[]},
+  };
+
+  const kwMap = {
+    'AI芯片与互联':['Broadcom','AVGO','Credo','CRDO','ASIC','定制芯片','互联','Hyperscaler'],
+    'ARM架构':['ARM','Grace','Graviton','CPU架构','x86','Agentic AI','低功耗'],
+    '存储/HBM':['HBM','Micron','MU','美光','SOCAMM','存储','内存','NAND','闪迪','SNDK'],
+    '高速连接':['AEC','DSP','LPO','CPO','光模块','MACOM','MTSI','SerDes','1.6T','ACC'],
+    '算力平台':['算力租赁','NBIS','GPU租赁','Nebius'],
+    'CPU/制造':['AMD','Intel','INTC','APH','Amphenol','18A','制程'],
+    '航天/IPO':['SpaceX','SPCX','IPO','Starship','Starlink','火箭','航天','太空'],
+  };
+
+  for(const [dir,kws] of Object.entries(kwMap)) {
+    for(const kw of kws) {
+      if(text.toLowerCase().includes(kw.toLowerCase())) {
+        dirs[dir].score++;
+        dirs[dir].items.push(kw);
+      }
+    }
+  }
+
+  // Score tuning
+  if(dirs['AI芯片与互联'].score>0) dirs['AI芯片与互联'].tag='t-o';
+  if(dirs['存储/HBM'].score>3) dirs['存储/HBM'].tag='t-g';
+
+  return dirs;
+}
+
+function generateLogicCards(text, symbols, dirs) {
+  const cards = [];
+  const percents = extractPercentages(text);
+
+  // Card 1: Approach
+  if(text.includes('杠杆')||text.includes('仓位')||text.includes('赔率')) {
+    cards.push({title:'投资方法',text:'用合理的仓位撬动不对称收益。核心不是追最热，而是找收益风险比最优的标的。'});
+  } else {
+    cards.push({title:'投资方法',text:'选对方向比选对时机更重要。聚焦主线，控制仓位，耐心等待。'});
+  }
+
+  // Card 2: Selection
+  if(text.includes('便宜')||text.includes('回调')||text.includes('估值')) {
+    cards.push({title:'选股原则',text:'在足够便宜的时候买入优质标的。估值合理+成长确定=最佳击球区。'});
+  } else {
+    cards.push({title:'选股原则',text:'投龙头不投杂牌，AI主线投核心环节。'});
+  }
+
+  // Card 3: Key trend
+  if(symbols.length>3) {
+    cards.push({title:'主线判断',text:'报告覆盖'+symbols.length+'个核心标的，聚焦'+(symbols[0]?symbols[0].name:'AI')+'等龙头，预期差驱动的机会正在酝酿。'});
+  } else {
+    cards.push({title:'主线判断',text:'AI基础设施投资进入新周期，从训练转向推理应用，关注Agentic AI带来的增量机会。'});
+  }
+
+  // Card 4: Risk
+  if(text.includes('风险')||text.includes('回调')||text.includes('泡沫')) {
+    cards.push({title:'风险意识',text:'市场共识越强风险越大，「买预期卖事实」是获利关键。不追高、不恋战。'});
+  } else {
+    cards.push({title:'风险意识',text:'保持警惕，控制单票仓位，分散投资降低黑天鹅冲击。'});
+  }
+
+  return cards;
+}
+
+function generateOtherStocks(text) {
+  const stocks = [];
+  const map = {
+    '南山铝业':'继续持有，每年约10%防御性收益',
+    '比特币':'6万具投资价值，高位不建议接盘',
+    'A股':'不建议参与，优先港股与美股',
+    '英伟达':'短期预期已打满，不建议追涨',
+    '谷歌':'短期预期已打满，不建议追涨',
+  };
+  for(const [k,v] of Object.entries(map)) {
+    if(text.includes(k)) stocks.push({name:k,opinion:v});
+  }
+  if(stocks.length===0) {
+    stocks.push({name:'待补充','opinion:'报告原文中未找到个股建议，请手动添加'});
+  }
+  return stocks;
+}
+
+
+function analyze() {
+  const text = document.getElementById('repContent').value.trim();
+  const title = document.getElementById('repTitle').value.trim() || '财富报告分析';
+
+  if(!text) { alert('请先粘贴报告内容'); return; }
+
+  const symbols = extractSymbols(text);
+  const dirs = detectDirections(text);
+  const logicCards = generateLogicCards(text, symbols, dirs);
+  const otherStocks = generateOtherStocks(text);
+
+  // Sort directions by score
+  const sortedDirs = Object.entries(dirs)
+    .filter(([k,v])=>v.score>0)
+    .sort((a,b)=>b[1].score-a[1].score);
+
+  // Fill to 7
+  const allDirs = Object.entries(dirs);
+
+  // Generate HTML
+  let html = '<div id="analysis">';
+
+  // Header
+  html += '<div class="card-header">';
+  html += '<h2>'+title+'</h2>';
+  html += '<div class="subtitle">内部分享 | 7大方向 + 操作策略 + 底层逻辑 | AI驱动分析</div>';
+  html += '</div>';
+
+  // Row 1: Logic + Other
+  html += '<div class="g2">';
+  html += '<div class="card"><h3>投资底层逻辑 <span class="t-b">结论先行</span></h3>';
+  for(const lc of logicCards) {
+    html += '<div class="lc"><h4>'+lc.title+'</h4><p>'+lc.text+'</p></div>';
+  }
+  html += '</div>';
+
+  html += '<div class="card"><h3>其他个股观点</h3>';
+  for(const s of otherStocks) {
+    html += '<div class="sr"><span class="sn">'+s.name+'</span><span class="so">'+s.opinion+'</span></div>';
+  }
+
+  // Macro
+  const macroLines = [];
+  if(text.includes('非农')||text.includes('NFP')) macroLines.push('非农就业数据关注中');
+  if(text.includes('美联储')||text.includes('Fed')) macroLines.push('美联储政策关注中');
+  if(text.includes('CPI')||text.includes('通胀')) macroLines.push('通胀数据关注中');
+  if(macroLines.length===0) macroLines.push('宏观数据待补充');
+  html += '<div style="margin-top:12px;font-size:15px;color:#475569;">';
+  html += '<strong>宏观速览：</strong>'+macroLines.join(' | ');
+  html += '</div>';
+  html += '</div></div>';
+
+  // Row 2: Dir 1-3
+  html += '<div class="g3">';
+  let dCount = 0;
+  for(const d of allDirs) {
+    if(dCount>=3) break;
+    const dd = d[1];
+    if(dd.score===0) continue;
+    dCount++;
+    html += '<div class="card dir-card">';
+    html += '<h3>'+(dCount)+'. '+d[0]+' <span class="'+dd.tag+'">'+dd.label+'</span></h3>';
+    html += '<ul>';
+    if(dd.items.length>0) {
+      for(const item of dd.items.slice(0,5)) {
+        html += '<li>'+extractSnippets(text, item, 100) || (item+'相关线索已提取')+'</li>';
+      }
+    } else {
+      html += '<li>该方向需要补充更多信息</li>';
+    }
+    html += '</ul></div>';
+  }
+  html += '</div>';
+
+  // Row 3: Dir 4-6
+  html += '<div class="g3">';
+  let dCount2 = 0;
+  for(const d of allDirs) {
+    if(dCount2>=3 && dCount2<6) {} // continue
+    dCount2++;
+    if(dCount2<4) continue;
+    if(dCount2>6) break;
+    const dd = d[1];
+    if(dd.score===0) continue;
+    html += '<div class="card dir-card">';
+    html += '<h3>'+(dCount2)+'. '+d[0]+' <span class="'+dd.tag+'">'+dd.label+'</span></h3>';
+    html += '<ul>';
+    if(dd.items.length>0) {
+      for(const item of dd.items.slice(0,5)) {
+        html += '<li>'+extractSnippets(text, item, 100) || (item+'相关线索已提取')+'</li>';
+      }
+    } else {
+      html += '<li>该方向需要补充更多信息</li>';
+    }
+    html += '</ul></div>';
+  }
+  html += '</div>';
+
+  // Row 4: Dir 7
+  const row4Dirs = allDirs.filter((d,i)=>i>=6);
+  if(row4Dirs.some(d=>d[1].score>0)) {
+    html += '<div class="g3">';
+    for(const d of row4Dirs) {
+      const dd = d[1];
+      if(dd.score===0) continue;
+      const idx = allDirs.indexOf(d)+1;
+      html += '<div class="card dir-card">';
+      html += '<h3>'+idx+'. '+d[0]+' <span class="'+dd.tag+'">'+dd.label+'</span></h3>';
+      html += '<ul>';
+      for(const item of dd.items.slice(0,5)) {
+        html += '<li>'+extractSnippets(text, item, 100) || (item+'已提取')+'</li>';
+      }
+      html += '</ul></div>';
+    }
+    html += '</div>';
+  }
+
+  // Bottom
+  const activeDirs = allDirs.filter(d=>d[1].score>0);
+  const dirLabels = activeDirs.map(d=>d[0]+'('+d[1].label+')');
+
+  html += '<div class="g4">';
+
+  html += '<div class="bcard"><h3>核心方法论</h3>';
+  html += '<p>正确标的 + 便宜买入 + 避开高位共识 + 耐心持有</p></div>';
+
+  html += '<div class="bcard"><h3>方向总览</h3>';
+  html += '<p>'+dirLabels.slice(0,7).join(' | ')+'</p></div>';
+
+  html += '<div class="bcard"><h3>操作总原则</h3>';
+  html += '<p>主线聚焦，控制仓位，不追高不恋战。</p></div>';
+
+  html += '<div class="bcard"><h3>金句提醒</h3>';
+  html += '<div class="qi">市场共识越强，风险往往越大</div>';
+  html += '<div class="qi">赛道底层没问题，就陪着企业吃到红利</div>';
+  html += '<div class="qi">买预期，卖事实</div></div>';
+
+  html += '</div>';
+
+  // Footer
+  html += '<div class="footer">AI辅助生成 | 结论先行 | 仅供参考，不构成投资建议</div>';
+
+  html += '</div>';
+
+  document.getElementById('output').innerHTML = html;
+  document.getElementById('output').style.display = 'block';
+  document.getElementById('copyBtn').style.display = 'inline-block';
+
+  // Scroll to output
+  document.getElementById('output').scrollIntoView({behavior:'smooth'});
+
+  // Store for copy
+  window._outHTML = html;
+}
+
+function copyHTML() {
+  if(!window._outHTML) return;
+  navigator.clipboard.writeText(window._outHTML).then(function(){
+    alert('HTML已复制到剪贴板！');
+  }).catch(function(){
+    alert('复制失败，请手动选择输出区域并按Ctrl+C');
+  });
+}
+
+function resetAll() {
+  document.getElementById('repContent').value = '';
+  document.getElementById('repTitle').value = '';
+  document.getElementById('output').style.display = 'none';
+  document.getElementById('output').innerHTML = '';
+  document.getElementById('copyBtn').style.display = 'none';
+  window._outHTML = null;
+}
+</script>
+</body>
+</html>
