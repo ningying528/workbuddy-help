@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=5.0,user-scalable=yes">
+<meta name="theme-color" content="#0a0a1a">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<title>股票分析对比</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Microsoft YaHei', sans-serif; background: #0a0a1a; color: #e0e0e0; padding: 16px; max-width: 1200px; margin: 0 auto; }
+h1 { text-align: center; color: #00d4ff; font-size: 24px; margin-bottom: 16px; }
+.query-box { display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+.query-box input { padding: 10px 12px; font-size: 16px; border: 2px solid #333; border-radius: 8px; background: #1a1a2e; color: #fff; width: 140px; }
+.query-box button { padding: 10px 20px; font-size: 16px; background: #00d4ff; color: #000; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+.query-box button:hover { background: #00b4dd; }
+.query-box button:disabled { background: #555; cursor: not-allowed; }
+.result { display: none; }
+.cards { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+.card { background: #1a1a2e; border-radius: 12px; padding: 16px; flex: 1; min-width: 280px; max-width: 500px; border: 1px solid #333; }
+.card h2 { color: #00d4ff; font-size: 20px; margin-bottom: 12px; text-align: center; }
+.metric { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #222; font-size: 15px; }
+.metric:last-child { border-bottom: none; }
+.label { color: #aaa; }
+.value { color: #fff; font-weight: bold; }
+.value.up { color: #ff4444; }
+.value.down { color: #00cc00; }
+.section-title { color: #00d4ff; font-size: 17px; margin: 16px 0 10px 0; border-left: 4px solid #00d4ff; padding-left: 10px; }
+.summary { background: #0d1117; border-radius: 8px; padding: 12px; margin-top: 12px; font-size: 14px; line-height: 1.8; color: #ccc; }
+table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
+th, td { padding: 10px; text-align: left; border-bottom: 1px solid #333; }
+th { color: #00d4ff; background: #0d1117; }
+td { color: #e0e0e0; }
+tr:hover { background: #161625; }
+.error { color: #ff4444; text-align: center; font-size: 16px; padding: 20px; }
+.loading { text-align: center; color: #00d4ff; font-size: 18px; padding: 30px; }
+</style>
+</head>
+<body>
+
+<h1>📊 股票分析对比</h1>
+
+<div class="query-box">
+  <input id="s1" placeholder="股票代码1" value="NVDA">
+  <input id="s2" placeholder="股票代码2" value="AMD">
+  <button id="btn" onclick="compare()">🔍 开始对比</button>
+</div>
+
+<div id="result"></div>
+
+<script>
+var CORS = ['https://api.allorigins.win/raw?url=', 'https://corsproxy.io/?'];
+
+async function yf(u) {
+  for (var i = 0; i < CORS.length; i++) {
+    try {
+      var r = await fetch(CORS[i] + encodeURIComponent(u), { signal: AbortSignal.timeout(15000) });
+      if (r.ok) return r.json();
+    } catch (e) {}
+  }
+  throw new Error('网络连接失败，请重试');
+}
+
+async function getQuote(sym) {
+  var d = await yf('https://query1.finance.yahoo.com/v7/finance/quote?symbols=' + sym);
+  var r = d.quoteResponse && d.quoteResponse.result && d.quoteResponse.result[0];
+  if (!r) throw new Error('未找到 ' + sym);
+  return r;
+}
+
+async function getDetail(sym) {
+  try {
+    var d = await yf('https://query1.finance.yahoo.com/v10/finance/quoteSummary/' + sym + '?modules=assetProfile,defaultKeyStatistics,financialData,summaryDetail');
+    return (d.quoteSummary && d.quoteSummary.result && d.quoteSummary.result[0]) || {};
+  } catch (e) { return {}; }
+}
+
+function buildData(q, s) {
+  var d = {};
+  d.symbol = q.symbol;
+  d.name = q.longName || q.shortName || q.symbol;
+  d.price = q.regularMarketPrice || 0;
+  d.change = q.regularMarketChange || 0;
+  d.changePct = q.regularMarketChangePercent || 0;
+  d.marketCap = q.marketCap;
+  var ds = s.defaultKeyStatistics || {}, fd = s.financialData || {}, sd = s.summaryDetail || {}, ap = s.assetProfile || {};
+  d.pe = q.trailingPE || sd.trailingPE;
+  d.forwardPE = q.forwardPE || sd.forwardPE;
+  d.pegRatio = ds.pegRatio;
+  d.analystTarget = fd.targetMeanPrice;
+  d.recommendation = fd.recommendationKey;
+  d.profitMargin = fd.profitMargins;
+  d.revenueGrowth = fd.revenueGrowth;
+  d.roe = fd.returnOnEquity;
+  d.grossMargins = fd.grossMargins;
+  d.debtToEquity = fd.debtToEquity;
+  d.currentRatio = fd.currentRatio;
+  d.eps = q.epsTrailingTwelveMonths || ds.lastEPS;
+  d.longBusinessSummary = ap.longBusinessSummary || '';
+  d.sector = (ap.sector || '') + (ap.industry ? ' / ' + ap.industry : '');
+  return d;
+}
+
+function fmtNum(n, d) {
+  if (n === null || n === undefined || isNaN(n)) return 'N/A';
+  if (Math.abs(n) >= 1e12) return (n / 1e12).toFixed(d || 2) + ' 万亿';
+  if (Math.abs(n) >= 1e8) return (n / 1e8).toFixed(d || 0) + ' 亿';
+  if (Math.abs(n) >= 1e4) return (n / 1e4).toFixed(d || 0) + ' 万';
+  return n.toFixed(d || 2);
+}
+
+function fmtPct(n) {
+  if (n === null || n === undefined) return 'N/A';
+  return (n * 100).toFixed(2) + '%';
+}
+
+function getRecText(r) {
+  var m = { strong_buy: '强烈买入', buy: '买入', hold: '持有', sell: '卖出', strong_sell: '强烈卖出' };
+  return m[r] || r || 'N/A';
+}
+
+function renderCard(d) {
+  var cc = d.change >= 0 ? 'up' : 'down';
+  var cs = d.change >= 0 ? '+' : '';
+  return '<div class="card"><h2>' + d.symbol + ' · ' + d.name + '</h2>' +
+    '<div class="metric"><span class="label">当前价格</span><span class="value ' + cc + '">' + fmtNum(d.price, 2) + ' USD</span></div>' +
+    '<div class="metric"><span class="label">涨跌</span><span class="value ' + cc + '">' + cs + fmtNum(d.change, 2) + ' (' + cs + fmtPct(d.changePct / 100) + ')</span></div>' +
+    '<div class="metric"><span class="label">市值</span><span class="value">' + fmtNum(d.marketCap) + '</span></div>' +
+    '<div class="metric"><span class="label">市盈率 (PE)</span><span class="value">' + fmtNum(d.pe, 2) + '</span></div>' +
+    '<div class="metric"><span class="label">远期市盈率</span><span class="value">' + fmtNum(d.forwardPE, 2) + '</span></div>' +
+    '<div class="metric"><span class="label">PEG 比率</span><span class="value">' + fmtNum(d.pegRatio, 2) + '</span></div>' +
+    '<div class="metric"><span class="label">分析师目标价</span><span class="value">' + fmtNum(d.analystTarget, 2) + '</span></div>' +
+    '<div class="metric"><span class="label">评级</span><span class="value" style="color:#00d4ff">' + getRecText(d.recommendation) + '</span></div>' +
+    '<div class="metric"><span class="label">净利润率</span><span class="value">' + fmtPct(d.profitMargin) + '</span></div>' +
+    '<div class="metric"><span class="label">营收增长率</span><span class="value">' + fmtPct(d.revenueGrowth) + '</span></div>' +
+    '<div class="metric"><span class="label">ROE</span><span class="value">' + fmtPct(d.roe) + '</span></div>' +
+    '<div class="metric"><span class="label">毛利率</span><span class="value">' + fmtPct(d.grossMargins) + '</span></div>' +
+    '<div class="metric"><span class="label">负债权益比</span><span class="value">' + fmtNum(d.debtToEquity, 2) + '</span></div>' +
+    '<div class="metric"><span class="label">流动比率</span><span class="value">' + fmtNum(d.currentRatio, 2) + '</span></div>' +
+    '<div class="metric"><span class="label">EPS</span><span class="value">' + fmtNum(d.eps, 2) + '</span></div>' +
+    '<div class="section-title">公司简介</div>' +
+    '<div class="summary">' + (d.longBusinessSummary || '暂无简介') + '<br><br><strong>所属行业：</strong>' + (d.sector || 'N/A') + '</div></div>';
+}
+
+function renderTable(d1, d2) {
+  var rows = [
+    ['指标', d1.symbol + ' (' + d1.name + ')', d2.symbol + ' (' + d2.name + ')', '对比'],
+    ['当前价格 (USD)', fmtNum(d1.price, 2), fmtNum(d2.price, 2), d1.price > d2.price ? d1.symbol + ' 更高' : d2.symbol + ' 更高'],
+    ['涨跌幅 (%)', fmtPct(d1.changePct / 100), fmtPct(d2.changePct / 100), Math.abs(d1.changePct) > Math.abs(d2.changePct) ? d1.symbol + ' 波动更大' : d2.symbol + ' 波动更大'],
+    ['市值', fmtNum(d1.marketCap), fmtNum(d2.marketCap), d1.marketCap > d2.marketCap ? d1.symbol + ' 更大' : d2.symbol + ' 更大'],
+    ['市盈率 (PE)', fmtNum(d1.pe, 2), fmtNum(d2.pe, 2), (d1.pe && d2.pe) ? (d1.pe < d2.pe ? d1.symbol + ' 估值更低' : d2.symbol + ' 估值更低') : 'N/A'],
+    ['PEG 比率', fmtNum(d1.pegRatio, 2), fmtNum(d2.pegRatio, 2), d1.pegRatio < d2.pegRatio ? d1.symbol + ' 更优' : d2.symbol + ' 更优'],
+    ['净利润率', fmtPct(d1.profitMargin), fmtPct(d2.profitMargin), d1.profitMargin > d2.profitMargin ? d1.symbol + ' 更优' : d2.symbol + ' 更优'],
+    ['营收增长率', fmtPct(d1.revenueGrowth), fmtPct(d2.revenueGrowth), d1.revenueGrowth > d2.revenueGrowth ? d1.symbol + ' 更优' : d2.symbol + ' 更优'],
+    ['ROE', fmtPct(d1.roe), fmtPct(d2.roe), d1.roe > d2.roe ? d1.symbol + ' 更优' : d2.symbol + ' 更优'],
+    ['毛利率', fmtPct(d1.grossMargins), fmtPct(d2.grossMargins), d1.grossMargins > d2.grossMargins ? d1.symbol + ' 更优' : d2.symbol + ' 更优'],
+    ['负债权益比', fmtNum(d1.debtToEquity, 2), fmtNum(d2.debtToEquity, 2), d1.debtToEquity < d2.debtToEquity ? d1.symbol + ' 更健康' : d2.symbol + ' 更健康'],
+    ['流动比率', fmtNum(d1.currentRatio, 2), fmtNum(d2.currentRatio, 2), d1.currentRatio > d2.currentRatio ? d1.symbol + ' 更优' : d2.symbol + ' 更优'],
+  ];
+  var h = '<div class="section-title">📊 对比汇总表</div><table><thead><tr><th>' + rows[0][0] + '</th><th>' + rows[0][1] + '</th><th>' + rows[0][2] + '</th><th>' + rows[0][3] + '</th></tr></thead><tbody>';
+  for (var i = 1; i < rows.length; i++) {
+    h += '<tr><td>' + rows[i][0] + '</td><td>' + rows[i][1] + '</td><td>' + rows[i][2] + '</td><td>' + rows[i][3] + '</td></tr>';
+  }
+  return h + '</tbody></table>';
+}
+
+async function compare() {
+  var s1 = document.getElementById('s1').value.trim().toUpperCase();
+  var s2 = document.getElementById('s2').value.trim().toUpperCase();
+  var result = document.getElementById('result');
+  var btn = document.getElementById('btn');
+  
+  if (!s1 || !s2) {
+    result.innerHTML = '<div class="error">请输入两个股票代码</div>';
+    result.style.display = 'block';
+    return;
+  }
+  
+  btn.disabled = true;
+  result.innerHTML = '<div class="loading">⏳ 正在获取 ' + s1 + ' 和 ' + s2 + ' 的数据...</div>';
+  result.style.display = 'block';
+  
+  try {
+    var [q1, q2, s1 detail, s2 detail] = await Promise.all([
+      getQuote(s1),
+      getQuote(s2),
+      getDetail(s1),
+      getDetail(s2)
+    ]);
+    
+    var d1 = buildData(q1, s1detail);
+    var d2 = buildData(q2, s2detail);
+    
+    result.innerHTML = '<div class="cards">' + renderCard(d1) + renderCard(d2) + '</div>' + renderTable(d1, d2);
+    result.scrollIntoView({ behavior: 'smooth' });
+  } catch (e) {
+    result.innerHTML = '<div class="error">❌ ' + e.message + '<br><br>提示：请确认股票代码正确（美股如 AAPL, NVDA）</div>';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// PWA Service Worker 注册
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(function() {});
+}
+</script>
+</body>
+</html>
