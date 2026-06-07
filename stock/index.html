@@ -384,9 +384,12 @@ document.getElementById('apiKey').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') saveKey();
 });
 
-// ===== PWA Service Worker =====
+// ===== PWA Service Worker（强制更新所有旧版本）=====
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').catch(function() {});
+  navigator.serviceWorker.getRegistrations().then(function(regs) {
+    regs.forEach(function(r) { r.unregister(); });
+    return navigator.serviceWorker.register('./sw.js');
+  }).catch(function() {});
 }
 </script>
 </body>
