@@ -169,49 +169,27 @@ function installPWA() {
   }
 }
 
-// ===== A股数据：东方财富 JSONP =====
-function fetchEastmoney(secid) {
-  return new Promise(function(resolve, reject) {
-    var cbName = 'emcb_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
-    window[cbName] = function(data) {
-      try { delete window[cbName]; } catch(e) {}
-      var s = document.querySelector('script[src*="' + cbName + '"]');
-      if (s && s.parentNode) s.parentNode.removeChild(s);
-      if (data && data.data) {
-        var d = data.data;
-        resolve({
-          name: d.f58 || secid,
-          price: (d.f43 || 0) / 100,
-          prevClose: (d.f60 || 0) / 100,
-          open: (d.f46 || 0) / 100,
-          high: (d.f44 || 0) / 100,
-          low: (d.f45 || 0) / 100,
-          change: (d.f169 || 0) / 100,
-          changePct: (d.f170 || 0),
-          exchange: secid.startsWith('1.') ? '上交所' : '深交所',
-          currency: 'CNY'
-        });
-      } else {
-        reject(new Error('东方财富数据为空'));
-      }
-    };
-    var script = document.createElement('script');
-    script.src = 'https://push2.eastmoney.com/api/qt/stock/get?secid=' + secid +
-                 '&fields=f43,f44,f45,f46,f57,f58,f60,f169,f170&cb=' + cbName;
-    script.onerror = function() {
-      try { delete window[cbName]; } catch(e) {}
-      try { document.body.removeChild(script); } catch(e) {}
-      reject(new Error('东方财富API网络错误'));
-    };
-    setTimeout(function() {
-      if (window[cbName]) {
-        try { delete window[cbName]; } catch(e) {}
-        try { document.body.removeChild(script); } catch(e) {}
-        reject(new Error('东方财富API超时'));
-      }
-    }, 10000);
-    document.body.appendChild(script);
-  });
+// ===== A股数据：东方财富 fetch（不走JSONP，更可靠）=====
+async function fetchEastmoney(secid) {
+  var url = 'https://push2.eastmoney.com/api/qt/stock/get?secid=' + secid +
+            '&fields=f43,f44,f45,f46,f57,f58,f60,f169,f170';
+  var resp = await fetch(url, { signal: AbortSignal.timeout(10000) });
+  if (!resp.ok) throw new Error('东方财富API请求失败 (' + resp.status + ')');
+  var json = await resp.json();
+  if (!json || !json.data) throw new Error('东方财富数据为空');
+  var d = json.data;
+  return {
+    name: d.f58 || secid,
+    price: (d.f43 || 0) / 100,
+    prevClose: (d.f60 || 0) / 100,
+    open: (d.f46 || 0) / 100,
+    high: (d.f44 || 0) / 100,
+    low: (d.f45 || 0) / 100,
+    change: (d.f169 || 0) / 100,
+    changePct: (d.f170 || 0),
+    exchange: secid.startsWith('1.') ? '上交所' : '深交所',
+    currency: 'CNY'
+  };
 }
 
 // ===== 美股数据：Finnhub =====
