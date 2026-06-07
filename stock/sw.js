@@ -1,6 +1,7 @@
-// Service Worker - PWA 离线支持
-var CACHE = 'stock-pwa-v1';
-var STATIC = ['./index.html', './manifest.json', './icon.svg'];
+// Service Worker v4 — PWA 桌面安装版
+// 缓存所有静态资源，不缓存 HTML/API
+var CACHE = 'stock-v6';
+var STATIC = ['./manifest.json', './icon.svg', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', function(e) {
   self.skipWaiting();
@@ -15,5 +16,9 @@ self.addEventListener('activate', function(e) {
 });
 
 self.addEventListener('fetch', function(e) {
+  if (e.request.url.indexOf('/api/') > -1) return;
+  if (e.request.mode === 'navigate') {
+    return fetch(e.request);
+  }
   e.respondWith(caches.match(e.request).then(function(r) { return r || fetch(e.request); }));
 });
