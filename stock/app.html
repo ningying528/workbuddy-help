@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=5.0,user-scalable=yes">
+<meta name="theme-color" content="#0a0a1a">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<title>股票分析对比</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Microsoft YaHei', sans-serif; background: #0a0a1a; color: #e0e0e0; padding: 16px; max-width: 1200px; margin: 0 auto; }
+h1 { text-align: center; color: #00d4ff; font-size: 28px; margin-bottom: 16px; }
+.query-box { display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+.query-box input { padding: 10px 12px; font-size: 18px; border: 2px solid #333; border-radius: 8px; background: #1a1a2e; color: #fff; width: 140px; }
+.query-box button { padding: 10px 20px; font-size: 18px; background: #00d4ff; color: #000; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+.query-box button:hover { background: #00b4dd; }
+.query-box button:disabled { background: #555; cursor: not-allowed; }
+.key-row { display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
+.key-row input { padding: 8px 12px; font-size: 16px; border: 2px solid #555; border-radius: 8px; background: #111; color: #ffd700; width: 320px; }
+.key-row button { padding: 8px 16px; font-size: 16px; background: #444; color: #fff; border: none; border-radius: 8px; cursor: pointer; }
+.key-hint { text-align: center; font-size: 14px; color: #888; margin-bottom: 8px; }
+.key-hint a { color: #00d4ff; }
+.result { display: none; }
+.cards { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+.card { background: #1a1a2e; border-radius: 12px; padding: 16px; flex: 1; min-width: 280px; max-width: 500px; border: 1px solid #333; }
+.card h2 { color: #00d4ff; font-size: 22px; margin-bottom: 12px; text-align: center; }
+.metric { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #222; font-size: 17px; }
+.metric:last-child { border-bottom: none; }
+.label { color: #aaa; }
+.value { color: #fff; font-weight: bold; }
+.value.up { color: #ff4444; }
+.value.down { color: #00cc00; }
+.section-title { color: #00d4ff; font-size: 19px; margin: 16px 0 10px 0; border-left: 4px solid #00d4ff; padding-left: 10px; }
+.summary { background: #0d1117; border-radius: 8px; padding: 12px; margin-top: 12px; font-size: 16px; line-height: 1.8; color: #ccc; }
+table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 16px; }
+th, td { padding: 10px; text-align: left; border-bottom: 1px solid #333; }
+th { color: #00d4ff; background: #0d1117; }
+td { color: #e0e0e0; }
+tr:hover { background: #161625; }
+.error { color: #ff4444; text-align: center; font-size: 18px; padding: 20px; }
+.loading { text-align: center; color: #00d4ff; font-size: 20px; padding: 30px; }
+#keyStatus { text-align: center; font-size: 13px; color: #0f0; margin-bottom: 8px; min-height: 20px; }
+</style>
+</head>
+<body>
+
+<h1>股票分析对比</h1>
+
+<div class="key-hint">
+  需要 <a href="https://finnhub.io/register" target="_blank">Finnhub API Key</a>（免费注册，60次/分钟）→ 粘贴到下方输入框
+</div>
+<div class="key-row">
+  <input id="apiKey" type="text" placeholder="输入 Finnhub API Key" autocomplete="off">
+  <button id="saveKeyBtn">保存</button>
+  <button onclick="clearKey()" style="padding:8px 12px;font-size:14px;background:#800;color:#fff;border:none;border-radius:6px;cursor:pointer;">清除</button>
+</div>
+<div id="keyStatus"></div>
+
+<div class="query-box">
+  <input id="s1" placeholder="股票代码1" value="NVDA">
+  <input id="s2" placeholder="股票代码2" value="AMD">
+  <button id="btn" onclick="compare()">开始对比</button>
+</div>
+
+<div style="text-align:center;margin-bottom:10px;">
+  <button id="installBtn" onclick="installPWA()" style="display:none;padding:12px 24px;font-size:18px;background:#ff6b35;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:bold;">安装到桌面（像小程序一样）</button>
+</div>
+
+<div id="result"></div>
+
+<script>
+// ===== Cookie 读写工具 =====
+function setCookie(name, value, days) {
+  var expires = "";
+  if (days) {
+    var d = new Date();
+    d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+    expires = "; expires=" + d.toUTCString();
+  }
+  document.cookie = name + "=" + encodeURIComponent(value) + expires + "; path=/; SameSite=Lax";
+}
+function getCookie(name) {
+  var n = name + "=";
+  var ca = document.cookie.split(';');
+  for (var i = 0; i < ca.length; i++) {
+    var c = ca[i].trim();
+    if (c.indexOf(n) === 0) return decodeURIComponent(c.substring(n.length, c.length));
+  }
+  return null;
+}
+
+// ===== 辅助函数 =====
+function isAShare(sym) {
+  return /^\d{6}$/.test(sym) || /\.(SZ|SS|BJ)$/i.test(sym);
+}
+function getEastmoneySecid(sym) {
+  sym = sym.replace(/\.(SZ|SS|BJ)$/i, '');
+  if (sym.length !== 6) return '0.' + sym;
+  return (sym.charAt(0) === '6' || sym.charAt(0) === '5' ? '1.' : '0.') + sym;
+}
+
+// ===== API Key 管理（localStorage + Cookie 双保险）=====
+function getKey() {
+  var urlKey = new URL(location.href).searchParams.get('key');
+  if (urlKey) {
+    localStorage.setItem('finnhub_key', urlKey);
+    setCookie('finnhub_key', urlKey, 365);
+    history.replaceState(null, '', location.pathname + location.hash);
+  }
+  var k = localStorage.getItem('finnhub_key');
+  if (k) return k;
+  k = getCookie('finnhub_key');
+  if (k) {
+    localStorage.setItem('finnhub_key', k);
+  }
+  return k || '';
+}
+function saveKey() {
+  var k = document.getElementById('apiKey').value.trim();
+  if (k) {
+    localStorage.setItem('finnhub_key', k);
+    setCookie('finnhub_key', k, 365);
+    var status = document.getElementById('keyStatus');
+    status.textContent = 'Key 已保存！关闭APP重新打开也不会丢失。';
+    status.style.color = '#0f0';
+    setTimeout(function() { status.textContent = ''; }, 5000);
+  } else {
+    alert('请输入有效的 Key');
+  }
+}
+function clearKey() {
+  localStorage.removeItem('finnhub_key');
+  setCookie('finnhub_key', '', -1);
+  document.getElementById('apiKey').value = '';
+  var status = document.getElementById('keyStatus');
+  status.textContent = 'Key 已清除';
+  status.style.color = '#f44';
+  setTimeout(function() { status.textContent = ''; status.style.color = '#0f0'; }, 3000);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var k = getKey();
+  document.getElementById('apiKey').value = k;
+  if (k) {
+    var status = document.getElementById('keyStatus');
+    status.textContent = 'Key 已加载（来自本地存储）';
+    setTimeout(function() { status.textContent = ''; }, 3000);
+  }
+});
+
+// ===== PWA 安装按钮 =====
+var installPrompt = null;
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  installPrompt = e;
+  document.getElementById('installBtn').style.display = 'inline-block';
+});
+function installPWA() {
+  if (installPrompt) {
+    installPrompt.prompt();
+    installPrompt.userChoice.then(function(r) {
+      if (r.outcome === 'accepted') { alert('安装成功！桌面会出现图标'); }
+      installPrompt = null;
+      document.getElementById('installBtn').style.display = 'none';
+    });
+  } else {
+    alert('请刷新页面后再试，或点浏览器菜单 -> 应用 -> 安装此站点为应用');
+  }
+}
+
+// ===== A股数据：东方财富 JSONP =====
+function fetchEastmoney(secid) {
+  return new Promise(function(resolve, reject) {
+    var cbName = 'emcb_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+    window[cbName] = function(data) {
+      try { delete window[cbName]; } catch(e) {}
+      var s = document.querySelector('script[src*="' + cbName + '"]');
+      if (s && s.parentNode) s.parentNode.removeChild(s);
+      if (data && data.data) {
+        var d = data.data;
+        resolve({
+          name: d.f58 || secid,
+          price: (d.f43 || 0) / 100,
+          prevClose: (d.f60 || 0) / 100,
+          open: (d.f46 || 0) / 100,
+          high: (d.f44 || 0) / 100,
+          low: (d.f45 || 0) / 100,
+          change: (d.f169 || 0) / 100,
+          changePct: (d.f170 || 0),
+          exchange: secid.startsWith('1.') ? '上交所' : '深交所',
+          currency: 'CNY'
+        });
+      } else {
+        reject(new Error('东方财富数据为空'));
+      }
+    };
+    var script = document.createElement('script');
+    script.src = 'https://push2.eastmoney.com/api/qt/stock/get?secid=' + secid +
+                 '&fields=f43,f44,f45,f46,f57,f58,f60,f169,f170&cb=' + cbName;
+    script.onerror = function() {
+      try { delete window[cbName]; } catch(e) {}
+      try { document.body.removeChild(script); } catch(e) {}
+      reject(new Error('东方财富API网络错误'));
+    };
+    setTimeout(function() {
+      if (window[cbName]) {
+        try { delete window[cbName]; } catch(e) {}
+        try { document.body.removeChild(script); } catch(e) {}
+        reject(new Error('东方财富API超时'));
+      }
+    }, 10000);
+    document.body.appendChild(script);
+  });
+}
+
+// ===== 美股数据：Finnhub =====
+var FINNHUB = 'https://finnhub.io/api/v1/';
+async function fetchFinnhub(sym, key) {
+  var [quote, profile, metricData] = await Promise.all([
+    (async function() {
+      var r = await fetch(FINNHUB + 'quote?symbol=' + sym + '&token=' + key, {signal: AbortSignal.timeout(12000)});
+      if (!r.ok) throw new Error('API请求失败 (' + r.status + ')');
+      return r.json();
+    })(),
+    fetch(FINNHUB + 'stock/profile2?symbol=' + sym + '&token=' + key, {signal: AbortSignal.timeout(8000)}).then(function(r){return r.json();}).catch(function(){return {};}),
+    fetch(FINNHUB + 'stock/metric?symbol=' + sym + '&metric=all&token=' + key, {signal: AbortSignal.timeout(8000)}).then(function(r){return r.json();}).catch(function(){return {};})
+  ]);
+  if (!quote || quote.c == null) throw new Error('找不到 ' + sym);
+  var m = metricData.metric || {}, p = profile || {};
+  return {
+    symbol: sym,
+    name: p.name || sym,
+    price: quote.c,
+    prevClose: quote.pc,
+    change: quote.c - quote.pc,
+    changePct: quote.pc ? (quote.c - quote.pc) / quote.pc : 0,
+    marketCap: p.marketCapitalization ? p.marketCapitalization * 1e6 : null,
+    pe: m.peBasicExclExtraTTM || null,
+    forwardPe: m.peExclExtraAnnual || null,
+    peg: m.pegForwardPeBasicExclExtraAnnual || null,
+    profitMargin: m.netProfitMarginTTM != null ? m.netProfitMarginTTM / 100 : null,
+    revenueGrowth: m.revenueGrowthTTMYoy != null ? m.revenueGrowthTTMYoy / 100 : null,
+    roe: m.roeTTM != null ? m.roeTTM / 100 : null,
+    grossMargin: m.grossMarginTTM != null ? m.grossMarginTTM / 100 : null,
+    debtToEquity: m.totalDebtToEquityQuarterly != null ? m.totalDebtToEquityQuarterly / 100 : null,
+    currentRatio: m.currentRatioQuarterly || null,
+    eps: m.epsBasicExclExtraItemsTTM || null,
+    week52High: m['52WeekHigh'] || null,
+    week52Low: m['52WeekLow'] || null,
+    beta: m.beta || null,
+    industry: p.finnhubIndustry || '',
+    exchange: p.exchange || '',
+    currency: p.currency || 'USD',
+    isAShare: false
+  };
+}
+
+// ===== 统一入口 =====
+async function fetchStock(sym, key) {
+  sym = sym.trim().toUpperCase();
+  if (isAShare(sym)) {
+    var secid = getEastmoneySecid(sym);
+    var edata = await fetchEastmoney(secid);
+    return {
+      symbol: sym,
+      name: edata.name || sym,
+      price: edata.price,
+      prevClose: edata.prevClose,
+      change: edata.change,
+      changePct: edata.changePct,
+      marketCap: null, pe: null, forwardPe: null, peg: null,
+      profitMargin: null, revenueGrowth: null, roe: null, grossMargin: null,
+      debtToEquity: null, currentRatio: null, eps: null,
+      week52High: edata.high, week52Low: edata.low, beta: null,
+      industry: '', exchange: edata.exchange, currency: 'CNY',
+      isAShare: true
+    };
+  }
+  return fetchFinnhub(sym, key);
+}
+
+// ===== 格式化函数 =====
+function fmNum(n, d) {
+  if (n == null || isNaN(n)) return 'N/A';
+  d = d || 2;
+  if (Math.abs(n) >= 1e12) return (n / 1e12).toFixed(d) + ' 万亿';
+  if (Math.abs(n) >= 1e8) return (n / 1e8).toFixed(d) + ' 亿';
+  if (Math.abs(n) >= 1e4) return (n / 1e4).toFixed(d) + ' 万';
+  return n.toFixed(d);
+}
+function fmPct(n) {
+  if (n == null || isNaN(n)) return 'N/A';
+  return (n * 100).toFixed(2) + '%';
+}
+
+// ===== 渲染 =====
+function renderCard(d) {
+  var cc = d.change >= 0 ? 'up' : 'down';
+  var cs = d.change >= 0 ? '+' : '';
+  var cur = d.currency || 'USD';
+  return '<div class="card"><h2>' + d.symbol + ' - ' + d.name + '</h2>' +
+    '<div class="metric"><span class="label">当前价格</span><span class="value ' + cc + '">' + fmNum(d.price, 2) + ' ' + cur + '</span></div>' +
+    '<div class="metric"><span class="label">涨跌</span><span class="value ' + cc + '">' + cs + fmNum(d.change, 2) + ' (' + cs + fmPct(d.changePct) + ')</span></div>' +
+    '<div class="metric"><span class="label">市值</span><span class="value">' + fmNum(d.marketCap) + '</span></div>' +
+    '<div class="metric"><span class="label">市盈率 (PE)</span><span class="value">' + fmNum(d.pe, 2) + '</span></div>' +
+    '<div class="metric"><span class="label">远期市盈率</span><span class="value">' + fmNum(d.forwardPe, 2) + '</span></div>' +
+    '<div class="metric"><span class="label">PEG 比率</span><span class="value">' + fmNum(d.peg, 2) + '</span></div>' +
+    '<div class="metric"><span class="label">52周最高</span><span class="value">' + fmNum(d.week52High, 2) + '</span></div>' +
+    '<div class="metric"><span class="label">52周最低</span><span class="value">' + fmNum(d.week52Low, 2) + '</span></div>' +
+    '<div class="metric"><span class="label">Beta</span><span class="value">' + fmNum(d.beta, 2) + '</span></div>' +
+    '<div class="metric"><span class="label">净利润率</span><span class="value">' + fmPct(d.profitMargin) + '</span></div>' +
+    '<div class="metric"><span class="label">营收增长率</span><span class="value">' + fmPct(d.revenueGrowth) + '</span></div>' +
+    '<div class="metric"><span class="label">ROE</span><span class="value">' + fmPct(d.roe) + '</span></div>' +
+    '<div class="metric"><span class="label">毛利率</span><span class="value">' + fmPct(d.grossMargin) + '</span></div>' +
+    '<div class="metric"><span class="label">负债权益比</span><span class="value">' + fmNum(d.debtToEquity, 2) + '</span></div>' +
+    '<div class="metric"><span class="label">流动比率</span><span class="value">' + fmNum(d.currentRatio, 2) + '</span></div>' +
+    '<div class="metric"><span class="label">EPS</span><span class="value">' + fmNum(d.eps, 2) + '</span></div>' +
+    '<div class="section-title">公司简介</div>' +
+    '<div class="summary"><strong>行业：</strong>' + (d.industry || 'N/A') + '<br><strong>交易所：</strong>' + (d.exchange || 'N/A') + '</div></div>';
+}
+function renderTable(d1, d2) {
+  var rows = [
+    ['指标', d1.symbol + ' (' + d1.name + ')', d2.symbol + ' (' + d2.name + ')', '对比'],
+    ['当前价格', fmNum(d1.price, 2), fmNum(d2.price, 2), d1.price > d2.price ? d1.symbol + ' 更高' : d2.symbol + ' 更高'],
+    ['涨跌幅 (%)', fmPct(d1.changePct), fmPct(d2.changePct), Math.abs(d1.changePct) > Math.abs(d2.changePct) ? d1.symbol + ' 波动更大' : d2.symbol + ' 波动更大'],
+    ['市值', fmNum(d1.marketCap), fmNum(d2.marketCap), d1.marketCap > d2.marketCap ? d1.symbol + ' 更大' : d2.symbol + ' 更大'],
+    ['市盈率 (PE)', fmNum(d1.pe, 2), fmNum(d2.pe, 2), (d1.pe && d2.pe) ? (d1.pe < d2.pe ? d1.symbol + ' 估值更低' : d2.symbol + ' 估值更低') : 'N/A'],
+    ['PEG 比率', fmNum(d1.peg, 2), fmNum(d2.peg, 2), d1.peg < d2.peg ? d1.symbol + ' 更优' : d2.symbol + ' 更优'],
+    ['净利润率', fmPct(d1.profitMargin), fmPct(d2.profitMargin), d1.profitMargin > d2.profitMargin ? d1.symbol + ' 更优' : d2.symbol + ' 更优'],
+    ['营收增长率', fmPct(d1.revenueGrowth), fmPct(d2.revenueGrowth), d1.revenueGrowth > d2.revenueGrowth ? d1.symbol + ' 更优' : d2.symbol + ' 更优'],
+    ['ROE', fmPct(d1.roe), fmPct(d2.roe), d1.roe > d2.roe ? d1.symbol + ' 更优' : d2.symbol + ' 更优'],
+    ['毛利率', fmPct(d1.grossMargin), fmPct(d2.grossMargin), d1.grossMargin > d2.grossMargin ? d1.symbol + ' 更优' : d2.symbol + ' 更优'],
+    ['负债权益比', fmNum(d1.debtToEquity, 2), fmNum(d2.debtToEquity, 2), d1.debtToEquity < d2.debtToEquity ? d1.symbol + ' 更稳健' : d2.symbol + ' 更稳健'],
+    ['流动比率', fmNum(d1.currentRatio, 2), fmNum(d2.currentRatio, 2), d1.currentRatio > d2.currentRatio ? d1.symbol + ' 更优' : d2.symbol + ' 更优'],
+  ];
+  var h = '<div class="section-title">对比汇总表</div><table><thead><tr><th>' + rows[0][0] + '</th><th>' + rows[0][1] + '</th><th>' + rows[0][2] + '</th><th>' + rows[0][3] + '</th></tr></thead><tbody>';
+  for (var i = 1; i < rows.length; i++) {
+    h += '<tr><td>' + rows[i][0] + '</td><td>' + rows[i][1] + '</td><td>' + rows[i][2] + '</td><td>' + rows[i][3] + '</td></tr>';
+  }
+  return h + '</tbody></table>';
+}
+
+// ===== 主函数 =====
+async function compare() {
+  var s1 = document.getElementById('s1').value.trim().toUpperCase();
+  var s2 = document.getElementById('s2').value.trim().toUpperCase();
+  var result = document.getElementById('result');
+  var btn = document.getElementById('btn');
+  var key = getKey();
+
+  if (!s1 || !s2) {
+    result.innerHTML = '<div class="error">请输入两个股票代码</div>';
+    result.style.display = 'block';
+    return;
+  }
+  if (!key && (!isAShare(s1) || !isAShare(s2))) {
+    result.innerHTML = '<div class="error">美股需要 Finnhub API Key<br><br>免费获取：<a href="https://finnhub.io/register" target="_blank" style="color:#00d4ff">finnhub.io/register</a> 注册后复制 Key 粘贴到上方输入框<br><br>只查询A股不需要 Key</div>';
+    result.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  result.innerHTML = '<div class="loading">正在获取 ' + s1 + ' 和 ' + s2 + ' 的数据...</div>';
+  result.style.display = 'block';
+
+  try {
+    var [d1, d2] = await Promise.all([
+      fetchStock(s1, key),
+      fetchStock(s2, key)
+    ]);
+    result.innerHTML = '<div class="cards">' + renderCard(d1) + renderCard(d2) + '</div>' + renderTable(d1, d2);
+    result.scrollIntoView({ behavior: 'smooth' });
+  } catch (e) {
+    result.innerHTML = '<div class="error">' + e.message + '<br><br>提示：请确认股票代码正确（美股如 AAPL, NVDA；A股如 300308.SZ）</div>';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// 绑定按钮事件
+document.getElementById('saveKeyBtn').addEventListener('click', saveKey);
+document.getElementById('apiKey').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') saveKey();
+});
+
+// ===== 纯网页版：不注册 Service Worker，零缓存 =====
+</script>
+</body>
+</html>
