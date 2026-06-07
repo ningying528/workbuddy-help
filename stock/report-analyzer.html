@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>财富报告分析器 - 上传文档自动分析</title>
+<title>智能报告分析器 - 上传文档自动分析</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <style>
@@ -39,7 +39,7 @@ h1 { font-size:28px; text-align:center; color:#1a2a44; margin-bottom:8px; }
   vertical-align:middle; margin-right:8px; }
 @keyframes spin { to{transform:rotate(360deg);} }
 
-/* Input panel (collapsed by default) */
+/* Input panel */
 .input-section { background:#fff; border-radius:14px; padding:22px; margin-bottom:20px;
   box-shadow:0 1px 4px rgba(0,0,0,0.08); display:none; }
 .input-section label { font-size:18px; font-weight:bold; color:#1e293b; display:block; margin-bottom:8px; }
@@ -74,7 +74,6 @@ textarea { width:100%; font-size:17px; padding:14px; border:2px solid #e2e8f0; b
 /* Cards */
 .card { background:#fff; border-radius:14px; padding:22px 20px; box-shadow:0 1px 4px rgba(0,0,0,0.08); }
 .card h3 { font-size:22px; margin-bottom:12px; }
-.card h3.small { font-size:18px; }
 
 /* Tags */
 .t-r { background:#fee2e2; color:#dc2626; padding:3px 12px; border-radius:20px; font-size:14px; font-weight:bold; }
@@ -88,22 +87,16 @@ textarea { width:100%; font-size:17px; padding:14px; border:2px solid #e2e8f0; b
 .lc h4 { font-size:16px; color:#1e293b; margin-bottom:4px; }
 .lc p { font-size:14.5px; color:#475569; }
 
-/* Stock rows */
-.sr { display:flex; align-items:center; padding:8px 10px; background:#f8fafc; border-radius:8px; margin-bottom:6px; font-size:15px; }
-.sn { font-weight:bold; color:#1e293b; min-width:90px; }
-.so { color:#475569; margin-left:8px; }
-
-/* Direction cards */
-.dir-card h3 { font-size:20px; color:#1e293b; }
-ul { margin:6px 0 0 6px; padding-left:18px; }
-li { font-size:15px; color:#334155; margin:6px 0; line-height:1.75; }
+/* Key points */
+.kp { display:flex; align-items:flex-start; padding:8px 10px; background:#f8fafc; border-radius:8px; margin-bottom:6px; font-size:15px; }
+.kp .num { font-weight:bold; color:#1a56db; min-width:28px; }
+.kp .txt { color:#334155; flex:1; }
 
 /* Bottom */
 .bcard { background:#fff; border-radius:12px; padding:16px 14px; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
 .bcard h3 { font-size:16px; font-weight:bold; color:#1e293b; margin-bottom:8px; text-align:center; }
 .bcard p,.bcard li { font-size:14px; color:#475569; line-height:1.75; }
 .qi { font-size:14px; color:#475569; padding:5px 8px; margin:3px 0; background:#f8fafc; border-radius:6px; border-left:3px solid #94a3b8; }
-.conclusion { font-size:15px; font-weight:bold; color:#b91c1c; margin-top:6px; padding:6px 10px; background:#fef2f2; border-radius:6px; }
 .footer { text-align:center; font-size:14px; color:#94a3b8; padding:14px 0; }
 
 @media(max-width:800px){ .g2,.g3,.g4{grid-template-columns:1fr!important;} }
@@ -111,14 +104,14 @@ li { font-size:15px; color:#334155; margin:6px 0; line-height:1.75; }
 </head>
 <body>
 
-<h1>财富报告分析器</h1>
-<div class="sub">上传PDF或DOCX报告文件，自动生成卡片式分析</div>
+<h1>智能报告分析器</h1>
+<div class="sub">上传任何PDF或DOCX文档，自动提取关键信息并生成分析报告</div>
 
 <!-- Upload Area -->
 <div class="upload-area" id="uploadArea">
   <div class="icon">📄</div>
   <div class="text">点击上传或拖拽文件到这里</div>
-  <div class="hint">支持 PDF / DOCX 格式</div>
+  <div class="hint">支持 PDF / DOCX 格式，任意内容均可分析</div>
   <input type="file" id="fileInput" accept=".pdf,.docx" onchange="handleFile(this.files[0])">
 </div>
 
@@ -130,12 +123,12 @@ li { font-size:15px; color:#334155; margin:6px 0; line-height:1.75; }
   <button class="btn-switch" id="switchBtn" onclick="toggleManual()">或者手动粘贴文字</button>
 </div>
 
-<!-- Manual input (hidden by default) -->
+<!-- Manual input -->
 <div class="input-section" id="manualInput">
   <label>报告标题</label>
-  <input id="repTitle" placeholder="例如：A.I.N. 第三十二期财富报告">
+  <input id="repTitle" placeholder="例如：xxx研究报告 / xxx分析">
   <label style="margin-top:12px;">报告原文内容（粘贴完整文本）</label>
-  <textarea id="repContent" placeholder="在这里粘贴财富报告的完整内容..."></textarea>
+  <textarea id="repContent" placeholder="在这里粘贴报告的完整内容..."></textarea>
   <button class="btn btn-analyze" onclick="analyzeFromText()">开始分析</button>
 </div>
 
@@ -145,16 +138,15 @@ li { font-size:15px; color:#334155; margin:6px 0; line-height:1.75; }
   <button class="btn btn-reset" onclick="resetAll()">清空重来</button>
 </div>
 
-
 <script>
 // ===== PDF.js Setup =====
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-// ===== File Upload =====
 var uploadArea = document.getElementById('uploadArea');
 var fileInput = document.getElementById('fileInput');
 var statusDiv = document.getElementById('status');
 var extractedText = '';
+var startTime = 0;
 
 uploadArea.addEventListener('click', function() { fileInput.click(); });
 uploadArea.addEventListener('dragover', function(e) { e.preventDefault(); uploadArea.classList.add('drag'); });
@@ -177,6 +169,7 @@ async function handleFile(file) {
   if(!file) return;
   var name = file.name.toLowerCase();
   var title = file.name.replace(/\.[^.]+$/,'');
+  startTime = Date.now();
 
   try {
     if(name.endsWith('.pdf')) {
@@ -191,7 +184,8 @@ async function handleFile(file) {
         textParts.push(pageText);
       }
       extractedText = textParts.join('\n\n');
-      showStatus('success','PDF 解析成功！共 '+pdf.numPages+' 页，提取 '+extractedText.length+' 个字符');
+      var elapsed = ((Date.now()-startTime)/1000).toFixed(1);
+      showStatus('success','PDF 解析成功！共 '+pdf.numPages+' 页，提取 '+extractedText.length+' 个字符（耗时 '+elapsed+' 秒）');
     } else if(name.endsWith('.docx')) {
       showStatus('loading','正在解析 DOCX 文件...');
       var arrayBuf = await file.arrayBuffer();
@@ -200,7 +194,8 @@ async function handleFile(file) {
       if(result.messages.length>0) {
         console.warn('DOCX parse warnings:', result.messages);
       }
-      showStatus('success','DOCX 解析成功！共提取 '+extractedText.length+' 个字符，耗时约 '+(Date.now()-startTime)/1000+' 秒');
+      var elapsed = ((Date.now()-startTime)/1000).toFixed(1);
+      showStatus('success','DOCX 解析成功！共提取 '+extractedText.length+' 个字符（耗时 '+elapsed+' 秒）');
     } else {
       showStatus('error','不支持的文件格式，请上传 PDF 或 DOCX 文件');
       return;
@@ -218,313 +213,207 @@ async function handleFile(file) {
   }
 }
 
-// ===== Analysis Engine =====
+// ===== Generic Analysis Engine =====
 
-function extractSymbols(text) {
-  var map = {
-    'Broadcom':{name:'Broadcom',sym:'AVGO',sector:'AI芯片'},
-    'AVGO':{name:'Broadcom',sym:'AVGO',sector:'AI芯片'},
-    'Credo':{name:'Credo',sym:'CRDO',sector:'互联'},
-    'CRDO':{name:'Credo',sym:'CRDO',sector:'互联'},
-    'Micron':{name:'Micron',sym:'MU',sector:'存储'},
-    '美光':{name:'Micron',sym:'MU',sector:'存储'},
-    'MU':{name:'Micron',sym:'MU',sector:'存储'},
-    '英伟达':{name:'NVIDIA',sym:'NVDA',sector:'GPU'},
-    'NVIDIA':{name:'NVIDIA',sym:'NVDA',sector:'GPU'},
-    'NVDA':{name:'NVIDIA',sym:'NVDA',sector:'GPU'},
-    'AMD':{name:'AMD',sym:'AMD',sector:'CPU/GPU'},
-    'Intel':{name:'Intel',sym:'INTC',sector:'CPU'},
-    'INTC':{name:'Intel',sym:'INTC',sector:'CPU'},
-    '英特尔':{name:'Intel',sym:'INTC',sector:'CPU'},
-    'ARM':{name:'ARM Holdings',sym:'ARM',sector:'架构'},
-    '台积电':{name:'TSMC',sym:'TSM',sector:'制造'},
-    'TSMC':{name:'TSMC',sym:'TSM',sector:'制造'},
-    'Amphenol':{name:'Amphenol',sym:'APH',sector:'连接器'},
-    'APH':{name:'Amphenol',sym:'APH',sector:'连接器'},
-    'MACOM':{name:'MACOM',sym:'MTSI',sector:'光通信'},
-    'MTSI':{name:'MACOM',sym:'MTSI',sector:'光通信'},
-    'SpaceX':{name:'SpaceX',sym:'SPCX',sector:'航天'},
-    'SPCX':{name:'SpaceX',sym:'SPCX',sector:'航天'},
-    'Marvell':{name:'Marvell',sym:'MRVL',sector:'网络芯片'},
-    'MRVL':{name:'Marvell',sym:'MRVL',sector:'网络芯片'},
-    'Tesla':{name:'Tesla',sym:'TSLA',sector:'电动车'},
-    '谷歌':{name:'Google',sym:'GOOGL',sector:'云/AI'},
-    '超微':{name:'SMCI',sym:'SMCI',sector:'服务器'},
-    'xAI':{name:'xAI',sym:'xAI',sector:'AI'},
-    'Rocket Lab':{name:'Rocket Lab',sym:'RKLB',sector:'航天'},
-    'SanDisk':{name:'SanDisk',sym:'SNDK',sector:'存储'},
-    '闪迪':{name:'SanDisk',sym:'SNDK',sector:'存储'},
-    'NBIS':{name:'Nebius',sym:'NBIS',sector:'算力平台'},
-    'Nebius':{name:'Nebius',sym:'NBIS',sector:'算力平台'},
-  };
-  var found = {};
+// Extract sentences containing key patterns
+function extractKeySentences(text, patterns, maxCount) {
+  maxCount = maxCount || 8;
+  var sentences = text.split(/[。！？\n\r]+/);
   var results = [];
-  for(var k in map) {
-    var v = map[k];
-    if(text.toLowerCase().indexOf(k.toLowerCase())>=0 && !found[v.sym]) {
-      found[v.sym] = true;
-      results.push(v);
+  var seen = {};
+  for(var p=0; p<patterns.length; p++) {
+    var pat = patterns[p];
+    for(var i=0; i<sentences.length; i++) {
+      var s = sentences[i].trim();
+      if(s.length < 8) continue;
+      if(s.indexOf(pat) >= 0 && !seen[s]) {
+        seen[s] = true;
+        results.push(s);
+        if(results.length >= maxCount) return results;
+      }
     }
   }
   return results;
 }
 
-function extractPercentages(text) {
-  var patterns = [
-    /同比[+\-]?(\d+\.?\d*)%/g,
-    /\+\s*(\d+\.?\d*)%/g,
-    /(\d+\.?\d*)%\s*(增长|上|提升|增加)/g,
-    /营收.*?(\d+\.?\d*)%/g,
-    /毛利.*?(\d+\.?\d*)%/g,
-    /净利.*?(\d+\.?\d*)%/g,
-    /ROE[^\d]*(\d+\.?\d*)%/g,
-  ];
-  var nums = [];
-  for(var i=0;i<patterns.length;i++) {
-    var p = patterns[i];
-    var m;
-    while((m = p.exec(text))!==null) {
-      var v = parseFloat(m[1]);
-      if(v>0 && v<10000) nums.push(v);
+// Extract numbers with context
+function extractNumbers(text, keyword, maxCount) {
+  maxCount = maxCount || 5;
+  var results = [];
+  var sentences = text.split(/[。！？\n\r]+/);
+  for(var i=0; i<sentences.length; i++) {
+    var s = sentences[i].trim();
+    if(s.indexOf(keyword) >= 0) {
+      // Extract numbers from this sentence
+      var nums = s.match(/\d+\.?\d*\s*[%亿万千百]/g);
+      if(nums) {
+        for(var j=0; j<nums.length && results.length<maxCount; j++) {
+          results.push(nums[j]);
+        }
+      }
+    }
+    if(results.length >= maxCount) break;
+  }
+  return results;
+}
+
+// Detect main topics by word frequency (simple Chinese segmentation by punctuation)
+function detectTopics(text) {
+  // Remove common punctuation, split by common delimiters
+  var clean = text.replace(/[，。！？、；：""''（）【】《》\n\r\t]/g, ' ');
+  var words = clean.split(/\s+/);
+  var freq = {};
+  var stopWords = ['的','了','是','在','和','有','对','也','被','把','等','与','及','或','但','而','然','如果','因为','所以','可以','可能','已经','没有','这个','那个','一个','以及','同时','目前','未来','预计','认为','表示','提到','指出','强调','建议','推荐','关注','注意','风险','机会','增长','下降','上升','提高','降低','增加','减少'];
+  for(var i=0; i<words.length; i++) {
+    var w = words[i].trim();
+    if(w.length >= 2 && stopWords.indexOf(w) < 0 && /^[\u4e00-\u9fa5a-zA-Z0-9]+$/.test(w)) {
+      freq[w] = (freq[w] || 0) + 1;
     }
   }
-  return nums;
+  // Sort by frequency
+  var sorted = [];
+  for(var w in freq) sorted.push([w, freq[w]]);
+  sorted.sort(function(a,b){return b[1]-a[1];});
+  return sorted.slice(0, 12);
 }
 
-function findKeywords(text, keywords) {
-  var score = {};
-  for(var i=0;i<keywords.length;i++) {
-    var kw = keywords[i];
-    var re = new RegExp(kw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
-    var m = text.match(re);
-    if(m) score[kw] = m.length;
-  }
-  return score;
+// Extract conclusions / recommendations
+function extractConclusions(text) {
+  var patterns = ['结论','建议','推荐','总结','综上','展望','预计','预测','认为','策略','操作','买入','卖出','持有','观望','风险','机会','注意','关注'];
+  return extractKeySentences(text, patterns, 6);
 }
 
-function extractSnippets(text, keyword, len) {
-  len = len || 120;
-  var idx = text.indexOf(keyword);
-  if(idx<0) return '';
-  var start = Math.max(0, idx-20);
-  var end = Math.min(text.length, idx+len);
-  return text.substring(start, end).replace(/\n/g,' ');
-}
-
-function detectDirections(text) {
-  var dirs = {
-    'AI芯片与互联':{tag:'t-o', label:'分化', score:0, items:[], symbols:[]},
-    'ARM架构':{tag:'t-g', label:'持有', score:0, items:[], symbols:[]},
-    '存储/HBM':{tag:'t-g', label:'持有', score:0, items:[], symbols:[]},
-    '高速连接':{tag:'t-b', label:'布局', score:0, items:[], symbols:[]},
-    '算力平台':{tag:'t-g', label:'持有', score:0, items:[], symbols:[]},
-    'CPU/制造':{tag:'t-o', label:'分化', score:0, items:[], symbols:[]},
-    '航天/IPO':{tag:'t-p', label:'布局', score:0, items:[], symbols:[]},
-  };
-
-  var kwMap = {
-    'AI芯片与互联':['Broadcom','AVGO','Credo','CRDO','ASIC','定制芯片','互联','Hyperscaler'],
-    'ARM架构':['ARM','Grace','Graviton','CPU架构','x86','Agentic AI','低功耗'],
-    '存储/HBM':['HBM','Micron','MU','美光','SOCAMM','存储','内存','NAND','闪迪','SNDK'],
-    '高速连接':['AEC','DSP','LPO','CPO','光模块','MACOM','MTSI','SerDes','1.6T','ACC'],
-    '算力平台':['算力租赁','NBIS','GPU租赁','Nebius'],
-    'CPU/制造':['AMD','Intel','INTC','APH','Amphenol','18A','制程'],
-    '航天/IPO':['SpaceX','SPCX','IPO','Starship','Starlink','火箭','航天','太空'],
-  };
-
-  for(var dir in kwMap) {
-    var kws = kwMap[dir];
-    for(var i=0;i<kws.length;i++) {
-      if(text.toLowerCase().indexOf(kws[i].toLowerCase())>=0) {
-        dirs[dir].score++;
-        dirs[dir].items.push(kws[i]);
+// Extract data points
+function extractDataPoints(text) {
+  var results = [];
+  var sentences = text.split(/[。！？\n\r]+/);
+  for(var i=0; i<sentences.length; i++) {
+    var s = sentences[i].trim();
+    if(s.length < 10) continue;
+    // Look for sentences with numbers AND keywords
+    if(/\d/.test(s) && /[增长下降升降幅比%，]/.test(s)) {
+      if(results.indexOf(s) < 0) {
+        results.push(s);
+        if(results.length >= 8) break;
       }
     }
   }
-
-  return dirs;
+  return results;
 }
 
-function generateLogicCards(text, symbols, dirs) {
-  var cards = [];
-
-  if(text.indexOf('杠杆')>=0||text.indexOf('仓位')>=0||text.indexOf('赔率')>=0) {
-    cards.push({title:'投资方法',text:'用合理的仓位撬动不对称收益。核心不是追最热，而是找收益风险比最优的标的。'});
-  } else {
-    cards.push({title:'投资方法',text:'选对方向比选对时机更重要。聚焦主线，控制仓位，耐心等待。'});
-  }
-
-  if(text.indexOf('便宜')>=0||text.indexOf('回调')>=0||text.indexOf('估值')>=0) {
-    cards.push({title:'选股原则',text:'在足够便宜的时候买入优质标的。估值合理+成长确定=最佳击球区。'});
-  } else {
-    cards.push({title:'选股原则',text:'投龙头不投杂牌，AI主线投核心环节。'});
-  }
-
-  if(symbols.length>3) {
-    cards.push({title:'主线判断',text:'报告覆盖'+symbols.length+'个核心标的，聚焦'+(symbols[0]?symbols[0].name:'AI')+'等龙头，预期差驱动的机会正在酝酿。'});
-  } else {
-    cards.push({title:'主线判断',text:'AI基础设施投资进入新周期，从训练转向推理应用，关注Agentic AI带来的增量机会。'});
-  }
-
-  if(text.indexOf('风险')>=0||text.indexOf('回调')>=0||text.indexOf('泡沫')>=0) {
-    cards.push({title:'风险意识',text:'市场共识越强风险越大，买预期卖事实是获利关键。不追高、不恋战。'});
-  } else {
-    cards.push({title:'风险意识',text:'保持警惕，控制单票仓位，分散投资降低黑天鹅冲击。'});
-  }
-
-  return cards;
+// Detect if content is about finance/stocks
+function detectContentType(text) {
+  var financeKw = ['股票','股价','市值','PE','PB','ROE','营收','净利润','毛利率','财报','季报','年报','买入','卖出','持有','目标价','上涨','下跌','牛市','熊市','板块','指数'];
+  var techKw = ['AI','人工智能','芯片','半导体','云计算','大数据','机器学习','深度学习','算法','模型','GPU','CPU','服务器'];
+  var macroKw = ['GDP','CPI','通胀','美联储','央行','利率','汇率','货币政策','财政'];
+  var counts = {finance:0, tech:0, macro:0};
+  var tl = text.toLowerCase();
+  for(var i=0;i<financeKw.length;i++) if(tl.indexOf(financeKw[i].toLowerCase())>=0) counts.finance++;
+  for(var i=0;i<techKw.length;i++) if(tl.indexOf(techKw[i].toLowerCase())>=0) counts.tech++;
+  for(var i=0;i<macroKw.length;i++) if(tl.indexOf(macroKw[i].toLowerCase())>=0) counts.macro++;
+  if(counts.finance >= 3) return 'finance';
+  if(counts.tech >= 3) return 'tech';
+  if(counts.macro >= 2) return 'macro';
+  return 'general';
 }
-
-function generateOtherStocks(text) {
-  var stocks = [];
-  var map = {
-    '南山铝业':{opinion:'继续持有，每年约10%防御性收益'},
-    '比特币':{opinion:'6万具投资价值，高位不建议接盘'},
-    'A股':{opinion:'不建议参与，优先港股与美股'},
-    '英伟达':{opinion:'短期预期已打满，不建议追涨'},
-    '谷歌':{opinion:'短期预期已打满，不建议追涨'},
-    '光模块':{opinion:'注意阶段性离场信号'},
-    'SMCI':{opinion:'关注估值回调后的机会'},
-    '特斯拉':{opinion:'关注FSD和机器人业务进展'},
-  };
-  for(var k in map) {
-    if(text.indexOf(k)>=0) stocks.push({name:k,opinion:map[k].opinion});
-  }
-  if(stocks.length===0) {
-    stocks.push({name:'待补充',opinion:'报告原文中未找到个股建议，请手动添加'});
-  }
-  return stocks;
-}
-
 
 // ===== Main Analyze =====
 function analyze(text, title) {
   text = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n');
   if(!text) { alert('文本内容为空，请检查文件是否损坏。'); return; }
 
-  var symbols = extractSymbols(text);
-  var dirs = detectDirections(text);
-  var logicCards = generateLogicCards(text, symbols, dirs);
-  var otherStocks = generateOtherStocks(text);
+  var contentType = detectContentType(text);
+  var topics = detectTopics(text);
+  var conclusions = extractConclusions(text);
+  var dataPoints = extractDataPoints(text);
+  var sentences = text.split(/[。！？\n\r]+/);
 
-  var sortedDirs = [];
-  for(var k in dirs) { if(dirs[k].score>0) sortedDirs.push([k,dirs[k]]); }
-  sortedDirs.sort(function(a,b){return b[1].score-a[1].score;});
-
-  var allDirs = [];
-  for(var k in dirs) { allDirs.push([k,dirs[k]]); }
+  // Generate logic cards (generic)
+  var logicCards = [];
+  logicCards.push({title:'核心判断', text: conclusions.length>0 ? conclusions[0] : (title || '本报告')+'的核心观点待进一步分析。'});
+  logicCards.push({title:'主要内容', text: '报告共提取 '+sentences.length+' 个段落，涉及 '+topics.slice(0,5).map(function(t){return t[0];}).join('、')+' 等主题。'});
+  if(dataPoints.length > 0) {
+    logicCards.push({title:'关键数据', text: '报告包含 '+dataPoints.length+' 组关键数据，建议重点关注量化指标。'});
+  }
+  logicCards.push({title:'风险提示', text: text.indexOf('风险')>=0 ? '报告提及风险事项，请仔细阅读风险章节。' : '请结合实际情况判断报告结论的适用性。'});
 
   // Generate HTML
   var html = '<div id="analysis">';
 
   // Header
   html += '<div class="card-header">';
-  html += '<h2>'+title+'</h2>';
-  html += '<div class="subtitle">内部分享 | 7大方向 + 操作策略 + 底层逻辑 | AI驱动分析</div>';
+  html += '<h2>'+(title || '智能报告分析')+'</h2>';
+  html += '<div class="subtitle">智能分析 | 自动提取关键信息 | '+ (contentType==='finance'?'金融投资类':contentType==='tech'?'科技类':contentType==='macro'?'宏观经济类':'综合类') + '</div>';
   html += '</div>';
 
-  // Row 1: Logic + Other
+  // Row 1: Logic + Key Data
   html += '<div class="g2">';
-  html += '<div class="card"><h3>投资底层逻辑 <span class="t-b">结论先行</span></h3>';
+  html += '<div class="card"><h3>核心结论 <span class="t-b">结论先行</span></h3>';
   for(var i=0;i<logicCards.length;i++) {
-    var lc = logicCards[i];
-    html += '<div class="lc"><h4>'+lc.title+'</h4><p>'+lc.text+'</p></div>';
+    html += '<div class="lc"><h4>'+logicCards[i].title+'</h4><p>'+logicCards[i].text+'</p></div>';
   }
   html += '</div>';
 
-  html += '<div class="card"><h3>其他个股观点</h3>';
-  for(var i=0;i<otherStocks.length;i++) {
-    var s = otherStocks[i];
-    html += '<div class="sr"><span class="sn">'+s.name+'</span><span class="so">'+s.opinion+'</span></div>';
-  }
-
-  // Macro
-  var macroLines = [];
-  var macroChecks = [
-    ['非农','非农就业数据关注中'],
-    ['NFP','非农就业数据关注中'],
-    ['美联','美联储政策关注中'],
-    ['Fed','美联储政策关注中'],
-    ['CPI','通胀数据关注中'],
-    ['通胀','通胀数据关注中'],
-  ];
-  for(var i=0;i<macroChecks.length;i++) {
-    if(text.indexOf(macroChecks[i][0])>=0 && macroLines.indexOf(macroChecks[i][1])<0) {
-      macroLines.push(macroChecks[i][1]);
+  // Key data points
+  html += '<div class="card"><h3>关键数据点</h3>';
+  if(dataPoints.length > 0) {
+    for(var i=0;i<Math.min(dataPoints.length,6);i++) {
+      html += '<div class="kp"><span class="num">'+(i+1)+'.</span><span class="txt">'+dataPoints[i]+'</span></div>';
     }
+  } else {
+    html += '<div style="color:#94a3b8;font-size:15px;padding:12px 0;">未检测到明确数据，请查看原文。</div>';
   }
-  if(macroLines.length===0) macroLines.push('宏观数据待补充');
-  html += '<div style="margin-top:12px;font-size:15px;color:#475569;">';
-  html += '<strong>宏观速览：</strong>'+macroLines.join(' | ');
-  html += '</div>';
   html += '</div></div>';
 
-  // Row 2: Dir 1-3
-  html += '<div class="g3">';
-  var rowCount = 0;
-  for(var i=0;i<sortedDirs.length;i++) {
-    if(rowCount>=3) break;
-    var dd = sortedDirs[i][1];
-    html += '<div class="card dir-card">';
-    html += '<h3>'+(rowCount+1)+'. '+sortedDirs[i][0]+' <span class="'+dd.tag+'">'+dd.label+'</span></h3>';
-    html += '<ul>';
-    if(dd.items.length>0) {
-      for(var j=0;j<Math.min(dd.items.length,5);j++) {
-        var snip = extractSnippets(text, dd.items[j], 100);
-        html += '<li>'+(snip || dd.items[j]+'相关线索已提取')+'</li>';
-      }
-    } else {
-      html += '<li>该方向需要补充更多信息</li>';
+  // Row 2: Topics + Conclusions
+  html += '<div class="g2">';
+
+  // Topics
+  html += '<div class="card"><h3>高频主题词</h3>';
+  if(topics.length > 0) {
+    for(var i=0;i<Math.min(topics.length,10);i++) {
+      html += '<span style="display:inline-block;background:#e0e7ff;color:#1e40af;padding:4px 12px;margin:4px;border-radius:16px;font-size:15px;">'+topics[i][0]+' ('+topics[i][1]+')</span>';
     }
-    html += '</ul></div>';
-    rowCount++;
   }
   html += '</div>';
 
-  // Row 3: Dir 4-7
-  if(sortedDirs.length>3) {
-    html += '<div class="g3">';
-    for(var i=3;i<Math.min(sortedDirs.length,7);i++) {
-      var dd = sortedDirs[i][1];
-      html += '<div class="card dir-card">';
-      html += '<h3>'+(i+1)+'. '+sortedDirs[i][0]+' <span class="'+dd.tag+'">'+dd.label+'</span></h3>';
-      html += '<ul>';
-      if(dd.items.length>0) {
-        for(var j=0;j<Math.min(dd.items.length,5);j++) {
-          var snip = extractSnippets(text, dd.items[j], 100);
-          html += '<li>'+(snip || dd.items[j]+'已提取')+'</li>';
-        }
-      } else {
-        html += '<li>该方向需要补充更多信息</li>';
-      }
-      html += '</ul></div>';
+  // Conclusions
+  html += '<div class="card"><h3>结论与建议</h3>';
+  if(conclusions.length > 0) {
+    for(var i=0;i<conclusions.length;i++) {
+      html += '<div class="kp"><span class="num">'+(i+1)+'.</span><span class="txt">'+conclusions[i]+'</span></div>';
     }
-    html += '</div>';
+  } else {
+    html += '<div style="color:#94a3b8;font-size:15px;padding:12px 0;">未检测到明确的结论性表述。</div>';
   }
+  html += '</div></div>';
 
-  // Bottom row
-  var activeDirs = sortedDirs.map(function(d){return d[0]+'('+d[1].label+')';});
-  var dirLabels = activeDirs.slice(0,7).join(' | ');
+  // Row 3: Original data preview (first 500 chars)
+  html += '<div class="card" style="margin-bottom:24px;"><h3>原文摘要（前500字）</h3>';
+  html += '<div style="background:#f8fafc;border-radius:8px;padding:14px;font-size:14px;color:#475569;line-height:1.7;max-height:200px;overflow:auto;">';
+  html += text.substring(0, 500).replace(/\n/g,'<br>') + '...';
+  html += '</div></div>';
 
+  // Bottom
   html += '<div class="g4">';
 
-  html += '<div class="bcard"><h3>核心方法论</h3>';
-  html += '<p>正确标的 + 便宜买入 + 避开高位共识 + 耐心持有</p></div>';
+  html += '<div class="bcard"><h3>报告信息</h3>';
+  html += '<p>总字数：'+text.length+' 字<br>段落数：'+sentences.length+'<br>文件类型：'+(contentType==='finance'?'金融投资':contentType==='tech'?'科技':contentType==='macro'?'宏观经济':'综合')+'</p></div>';
 
-  html += '<div class="bcard"><h3>方向总览</h3>';
-  html += '<p>'+dirLabels+'</p></div>';
+  html += '<div class="bcard"><h3>分析说明</h3>';
+  html += '<p>本报告由AI自动分析生成，提取高频主题词、关键数据和结论性表述，仅供参考。</p></div>';
 
-  html += '<div class="bcard"><h3>操作总原则</h3>';
-  html += '<p>主线聚焦，控制仓位，不追高不恋战。</p></div>';
+  html += '<div class="bcard"><h3>使用建议</h3>';
+  html += '<p>1. 结合原文核对关键数据<br>2. 关注结论与建议章节<br>3. 注意报告中的风险提示</p></div>';
 
   html += '<div class="bcard"><h3>金句提醒</h3>';
-  html += '<div class="qi">市场共识越强，风险往往越大</div>';
-  html += '<div class="qi">赛道底层没问题，就陪着企业吃到红利</div>';
-  html += '<div class="qi">买预期，卖事实</div></div>';
+  html += '<div class="qi">数据会说谎，逻辑不会</div>';
+  html += '<div class="qi">看清趋势比看清数据更重要</div>';
+  html += '<div class="qi">报告是参考，不是答案</div></div>';
 
   html += '</div>';
 
-  html += '<div class="footer">AI辅助生成 | 结论先行 | 仅供参考，不构成投资建议</div>';
+  html += '<div class="footer">智能分析 | 仅供参考，不构成任何投资建议 | '+new Date().toLocaleDateString('zh-CN')+'</div>';
   html += '</div>';
 
   document.getElementById('output').innerHTML = html;
@@ -537,7 +426,7 @@ function analyze(text, title) {
 
 // ===== Manual text analyze =====
 function analyzeFromText() {
-  var title = document.getElementById('repTitle').value.trim() || '财富报告分析';
+  var title = document.getElementById('repTitle').value.trim() || '智能报告分析';
   var text = document.getElementById('repContent').value.trim();
   if(!text) { alert('请先粘贴报告内容'); return; }
   analyze(text, title);
