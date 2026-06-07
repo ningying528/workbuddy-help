@@ -3,140 +3,243 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>【A.I.N.】第三十二期财富报告总结</title>
+<title>AI与太空赛道投资方向 — AIN第32期</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
   font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  background: #0d1117; color: #e6edf3; font-size: 22px;
-  line-height: 2; max-width: 900px; margin: 0 auto; padding: 30px 20px;
+  background: #f0f2f5; color: #222; font-size: 18px;
+  line-height: 1.8; max-width: 1100px; margin: 0 auto; padding: 20px 16px;
 }
-h1 { font-size: 36px; color: #58a6ff; text-align: center; margin: 30px 0 10px; }
-.sub { text-align: center; color: #8b949e; font-size: 22px; margin-bottom: 40px; }
-h2 { font-size: 30px; color: #58a6ff; margin: 40px 0 16px; padding-bottom: 8px; border-bottom: 2px solid #21262d; }
-.op { font-size: 24px; font-weight: bold; color: #3fb950; margin: 16px 0; }
-.logic { font-size: 22px; font-weight: bold; color: #f0883e; margin: 12px 0 8px; }
-ul { margin: 8px 0 20px 24px; }
-li { font-size: 20px; margin: 8px 0; line-height: 1.8; }
-.quote { font-size: 20px; font-style: italic; color: #79c0ff; margin: 10px 0 10px 20px; padding: 10px 0; border-left: 3px solid #58a6ff; padding-left: 16px; }
-.conclusion { font-size: 24px; font-weight: bold; color: #da3633; margin: 12px 0; line-height: 1.8; }
-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 20px; }
-th { background: #1a56db; color: #fff; padding: 12px; font-size: 20px; }
-td { background: #161b22; padding: 10px 12px; border: 1px solid #30363d; font-size: 18px; }
-td.over { color: #3fb950; font-weight: bold; }
-.highlight { background: #da363320; padding: 2px 8px; border-radius: 4px; }
+/* Header */
+.header {
+  background: linear-gradient(135deg, #1a2a44, #2d4a6e);
+  border-radius: 16px; padding: 36px 28px; color: #fff; margin-bottom: 24px;
+}
+.header h1 { font-size: 34px; font-weight: bold; }
+.header .sub { font-size: 17px; opacity: 0.85; margin-top: 6px; }
+
+/* Grid layout */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 24px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-bottom: 24px; }
+
+/* Cards */
+.card {
+  background: #fff; border-radius: 14px; padding: 22px 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+.card h2 { font-size: 22px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+
+/* Tags */
+.tag-red { background: #fee2e2; color: #dc2626; padding: 4px 14px; border-radius: 20px; font-size: 15px; font-weight: bold; }
+.tag-green { background: #dcfce7; color: #15803d; padding: 4px 14px; border-radius: 20px; font-size: 15px; font-weight: bold; }
+.tag-blue { background: #dbeafe; color: #1d4ed8; padding: 4px 14px; border-radius: 20px; font-size: 15px; font-weight: bold; }
+.tag-orange { background: #ffedd5; color: #c2410c; padding: 4px 14px; border-radius: 20px; font-size: 15px; font-weight: bold; }
+.tag-purple { background: #f3e8ff; color: #7c3aed; padding: 4px 14px; border-radius: 20px; font-size: 15px; font-weight: bold; }
+.tag-darkblue { background: #1a56db; color: #fff; padding: 4px 14px; border-radius: 20px; font-size: 15px; font-weight: bold; }
+
+/* Logic cards */
+.logic-card { background: #f8fafc; border-radius: 10px; padding: 16px; margin-bottom: 10px; }
+.logic-card h3 { font-size: 17px; color: #1e293b; margin-bottom: 6px; }
+.logic-card p { font-size: 15px; color: #475569; line-height: 1.7; }
+
+/* Direction cards */
+.dir-card h2 { font-size: 21px; color: #1e293b; }
+ul { margin: 6px 0 0 6px; padding-left: 18px; }
+li { font-size: 16px; color: #334155; margin: 6px 0; line-height: 1.75; }
+.conclusion { font-size: 16px; font-weight: bold; color: #b91c1c; margin-top: 8px; padding: 8px 12px; background: #fef2f2; border-radius: 8px; }
+.conclusion-blue { color: #1d4ed8; background: #eff6ff; }
+
+/* Stock opinion row */
+.stock-row { display: flex; align-items: center; padding: 10px 14px; background: #fff; border-radius: 10px; margin-bottom: 8px; font-size: 16px; }
+.stock-name { font-weight: bold; color: #1e293b; min-width: 120px; }
+.stock-opinion { color: #475569; }
+
+/* Bottom section */
+.bottom-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 14px; margin-bottom: 24px; }
+.bottom-card { background: #fff; border-radius: 12px; padding: 18px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.bottom-card h3 { font-size: 17px; font-weight: bold; color: #1e293b; margin-bottom: 10px; text-align: center; }
+.bottom-card p, .bottom-card li { font-size: 14.5px; color: #475569; line-height: 1.75; }
+.quote-item { font-size: 14.5px; color: #475569; padding: 6px 10px; margin: 4px 0; background: #f8fafc; border-radius: 6px; border-left: 3px solid #94a3b8; }
+
+/* Footer */
+.footer { text-align: center; font-size: 14px; color: #94a3b8; padding: 16px 0; }
+
+/* Responsive */
+@media (max-width: 800px) {
+  .grid-2, .grid-3, .bottom-grid { grid-template-columns: 1fr !important; }
+  body { font-size: 17px; } .header h1 { font-size: 28px; }
+  .card h2 { font-size: 20px; } li { font-size: 16px; }
+}
+
+/* Macro table */
+.macro-table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 15px; }
+.macro-table th { background: #f1f5f9; padding: 8px 10px; text-align: left; font-size: 14px; color: #475569; }
+.macro-table td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; font-size: 15px; }
+.td-good { color: #15803d; font-weight: bold; }
 </style>
 </head>
 <body>
 
-<h1>【A.I.N.】第三十二期财富报告</h1>
-<div class="sub">2026年6月1日 — 6月7日 | 美股AI板块深度跟踪</div>
+<!-- Header -->
+<div class="header">
+  <h1>AI与太空赛道投资方向</h1>
+  <div class="sub">内部分享 | 7大方向 + 操作策略 + 底层逻辑 | AIN第32期 2026/06/01~07</div>
+</div>
 
-<h2>一、底层逻辑与核心结论</h2>
-<div class="conclusion">AI基础设施投资进入"Agentic AI"新周期，Broadcom/Marvell/Credo等ASIC与互联芯片厂商订单爆发；HBM内存是AI算力瓶颈，Micron直接受益；SpaceX IPO是2026年最大事件，预计募资750亿美元，估值1.75-1.77万亿美元。</div>
+<!-- Row 1: Logic + Other Stocks -->
+<div class="grid-2">
 
-<h2>二、宏观环境（2026年6月）</h2>
-<table>
-<tr><th>指标</th><th>预期</th><th>实际</th></tr>
-<tr><td>5月非农就业</td><td>+80K ~ +85K</td><td class="over">+172K（大超预期）</td></tr>
-<tr><td>3月非农（修正）</td><td>+178K</td><td>+185K</td></tr>
-<tr><td>4月非农（修正）</td><td>+115K</td><td>+179K</td></tr>
-<tr><td>失业率（U-3）</td><td>4.3%</td><td>4.3%（持平）</td></tr>
-</table>
-<div class="conclusion">就业数据强于预期，美联储降息预期推迟，但AI资本开支持续超预期，科技股估值有支撑。</div>
+<div class="card">
+  <h2>投资底层逻辑 <span class="tag-darkblue">结论先行</span></h2>
 
-<h2>三、AI芯片与互联（Broadcom / Credo）</h2>
+  <div class="logic-card"><h3>杠杆思维</h3><p>用最少的钱撬动不对称收益。核心不是追最热，而是找收益风险比最优的仓位。</p></div>
+  <div class="logic-card"><h3>选股原则</h3><p>选对正确标的，并在足够便宜的时候买入，避免在高位共识最强时接盘。</p></div>
+  <div class="logic-card"><h3>预期管理</h3><p>全市场共识过强等于预期打满，优先寻找未完全看懂、但预期尚未透支的方向。</p></div>
+  <div class="logic-card"><h3>信息优势</h3><p>线下信息质量通常高于线上噪音。投资需要主动复盘、独立判断，而不是情绪化交易。</p></div>
+</div>
 
-<div class="op">【操作建议】买入持有</div>
-<div class="op">【关注标的】AVGO · CRDO</div>
+<div class="card">
+  <h2>其他个股观点</h2>
 
-<div class="logic">Broadcom（AVGO）</div>
-<ul>
-<li>2026 Q2营收 $222.19亿，同比+48%</li>
-<li>AI营收同比+143%，超预期</li>
-<li>GAAP EPS $2.44，超预期 $2.40</li>
-<li>目标价 $448.90，上涨空间15%</li>
-<li>Hyperscaler资本开支加速，ASIC需求爆发</li>
-</ul>
+  <div class="stock-row"><span class="stock-name">南山铝业</span><span class="stock-opinion">继续持有，每年约10%的防御性收益。</span></div>
+  <div class="stock-row"><span class="stock-name">比特币</span><span class="stock-opinion">6万具投资价值，14万高位不建议接盘。</span></div>
+  <div class="stock-row"><span class="stock-name">英伟达 / 谷歌 / 台积电</span><span class="stock-opinion">短期预期已打满，不建议高位追涨。</span></div>
+  <div class="stock-row"><span class="stock-name">A股</span><span class="stock-opinion">不建议参与，优先港股与美股市场。</span></div>
 
-<div class="logic">Credo（CRDO）</div>
-<ul>
-<li>2026 Q2营收 $4.37亿，同比+157%</li>
-<li>GAAP毛利率68.2%，GAAP EPS $1.16</li>
-<li>AEC有源电缆在AI数据中心需求爆发</li>
-<li>SerDes IP随1.6T互联升级持续放量</li>
-</ul>
+  <table class="macro-table" style="margin-top:16px;">
+    <tr><th colspan="3" style="font-size:16px;font-weight:bold;color:#1e293b;padding-bottom:6px;">5月非农数据速览</th></tr>
+    <tr><th>指标</th><th>预期</th><th>实际</th></tr>
+    <tr><td>5月NFP</td><td>+80K ~ +85K</td><td class="td-good">+172K 大超预期</td></tr>
+    <tr><td>失业率</td><td>4.3%</td><td>4.3% 持平</td></tr>
+    <tr><td>美联储态度</td><td>偏鹰</td><td>降息推迟</td></tr>
+  </table>
+</div>
+</div>
 
-<h2>四、AI内存（Micron / HBM / SOCAMM）</h2>
 
-<div class="op">【操作建议】买入持有</div>
-<div class="op">【关注标的】MU</div>
+<!-- Row 2: Directions 1-3 -->
+<div class="grid-3">
 
-<ul>
-<li>Micron Q2营收 $132.5亿，同比+131%</li>
-<li>NVIDIA Rubin NVL72标配HBM4，内存带宽提升40%</li>
-<li>SOCAMM新架构：CPU直连内存，容量升级</li>
-<li>AI Agent上下文长度30K→100K+，内存需求成倍增长</li>
-<li>Micron在HBM领域技术领先竞争对手</li>
-</ul>
+<div class="card dir-card">
+  <h2>1. AI芯片与互联赛道 <span class="tag-red">建议离场</span></h2>
+  <ul>
+    <li>Broadcom Q2营收+48%，AI+143%，但短期预期打满，"Buy the rumor, sell the news"</li>
+    <li>Credo +157%，AEC需求爆发，但已在高位</li>
+    <li>Hyperscaler资本开支加速利好ASIC，但当前估值已充分反映</li>
+    <li>重点关注：已获利的应尽快落袋为安，未持仓的不追高</li>
+  </ul>
+  <div class="conclusion">结论：短期获利盘巨大，等待回调再介入。</div>
+</div>
 
-<h2>五、Computex 2026 重点（ARM / MACOM）</h2>
+<div class="card dir-card">
+  <h2>2. ARM架构赛道 <span class="tag-green">坚定持有</span></h2>
+  <ul>
+    <li>Agentic AI推动下，低功耗成为核心约束，ARM优势持续放大</li>
+    <li>高通、联发科PC芯片、云巨头自研芯片均基于ARM架构</li>
+    <li>NVIDIA Grace CPU基于ARM；AWS Graviton全栈ARM</li>
+    <li>Counterpoint预测：2030年ARM在数据中心CPU占比超50%</li>
+    <li>未来3至5年是半导体底层架构迁移的重要窗口期</li>
+    <li>近期回调反而是上车机会，拿到筹码后不应轻易下车</li>
+  </ul>
+</div>
 
-<div class="op">【操作建议】关注</div>
-<div class="op">【关注标的】ARM · MTSI</div>
+<div class="card dir-card">
+  <h2>3. 存储赛道 <span class="tag-green">坚定持有</span></h2>
+  <ul>
+    <li>存储是AI算力群的刚性卡脖子节点，本质上对应"内存墙"问题</li>
+    <li>美光MU受益于HBM供不应求和HBM3E的优势转换</li>
+    <li>NVIDIA Rubin NVL72标配HBM4，单颗GPU带宽提升40%</li>
+    <li>SOCAMM新架构：CPU直连内存，容量55TB升级路径清晰</li>
+    <li>闪迪SNDK独立后专注NAND与SSD，企业级SSD需求强劲</li>
+    <li>参考目标：MU 1600美元，SNDK 2000美元</li>
+  </ul>
+</div>
+</div>
 
-<ul>
-<li>ARM CEO：Agentic AI推动AI PC换机潮</li>
-<li>2030年ARM在数据中心CPU占比超50%（Counterpoint预测）</li>
-<li>NVIDIA Grace、AWS Graviton均基于ARM</li>
-<li>MACOM：1.6T光模块DSP+CPO布局，LPO方案降低功耗</li>
-<li>CPO共封装光学是下一代互联方向</li>
-</ul>
 
-<h2>六、Intel与Amphenol（INTC / APH）</h2>
+<!-- Row 3: Directions 4-6 -->
+<div class="grid-3">
 
-<div class="op">【操作建议】观望INTC，买入持有APH</div>
-<div class="op">【关注标的】INTC · APH</div>
+<div class="card dir-card">
+  <h2>4. 高速连接赛道 <span class="tag-blue">布局机会</span></h2>
+  <ul>
+    <li>AI集群互联成为新瓶颈，铜互联、光互联、重驱动芯片同步受益</li>
+    <li>Credo短期回调不改长期逻辑，Q4光通一体存在潜在弹性</li>
+    <li>MACOM（MTSI）1.6T光模块DSP+CPO布局领先</li>
+    <li>Exteriors Labs解决PCIe信号衰减，Marvell是网络芯片核心龙头</li>
+    <li>适合布局，不适合赚一点小钱就提前离场</li>
+  </ul>
+</div>
 
-<ul>
-<li>Intel：18A制程推进，但AI GPU市场被NVIDIA垄断</li>
-<li>Amphenol：AI连接器龙头，全年营收预期+58%</li>
-<li>APH P/E 40.3x，估值偏高但业绩超预期</li>
-<li>当前AI周期最大回撤仅-5.42%，持股体验好</li>
-</ul>
+<div class="card dir-card">
+  <h2>5. NBIS算力租赁 <span class="tag-green">坚定持有</span></h2>
+  <ul>
+    <li>AI时代的"超级包租公"，精准卡位算力紧缺痛点</li>
+    <li>采购NVIDIA GPU再租赁给AI创业公司，现金流模型清晰</li>
+    <li>公司已进入盈利期，投入期基本过去，进入增长加速段</li>
+    <li>短期噪音不改变底层逻辑，应坚定持有</li>
+  </ul>
+</div>
 
-<h2>七、SpaceX IPO（SPCX）——2026年最大IPO</h2>
+<div class="card dir-card">
+  <h2>6. CPU赛道 <span class="tag-orange">分化明显</span></h2>
+  <ul>
+    <li>AMD坚定看好，是少数能持续紧咬NVIDIA的AI芯片玩家</li>
+    <li>英特尔结构性包袱重，设计被AMD与Arm蚕食，制造落后台积电</li>
+    <li>英特尔明确建议逢高卖出，不赌困境反转</li>
+    <li>APH（Amphenol）已在高位分批下车，不建议继续恋战</li>
+    <li>Intel 18A制程进展顺利，但AI GPU市场已被NVIDIA垄断</li>
+  </ul>
+</div>
+</div>
 
-<div class="op">【操作建议】重点参与</div>
-<div class="op">【关注标的】SPCX（拟上市代码）</div>
 
-<ul>
-<li>IPO时间：2026年6月12日</li>
-<li>预计募资：750亿美元</li>
-<li>预计估值：1.75 ~ 1.77万亿美元</li>
-<li>业务：Starship + Starlink + xAI</li>
-<li>S&P 500快速纳入预期（5-15个交易日）</li>
-<li>风险：Musk政治风险、Starship试射、Starlink盈利</li>
-<li>Bloomberg预期估值：7800亿美元（保守）</li>
-</ul>
+<!-- Row 4: Direction 7 -->
+<div class="grid-3">
+<div class="card dir-card" style="grid-column: span 1;">
+  <h2>7. 航天赛道 <span class="tag-purple">提前布局</span></h2>
+  <ul>
+    <li>等待SpaceX上市带动整个太空板块估值重塑</li>
+    <li>总仓位不超过10%，AI依然是主线，航天是弹性布局</li>
+    <li>Rocket Lab是SpaceX之外第一梯队，Redwire是太空基础设施卖水人</li>
+    <li>Firefly重组后处于相对低位，事件催化弹性较大</li>
+    <li>SpaceX IPO时间预计2026年6月12日，募资750亿美元，估值1.75~1.77万亿美元</li>
+    <li>S&P 500快速纳入预期，被动资金将大量流入</li>
+  </ul>
+</div>
+</div>
 
-<h2>八、核心方法论</h2>
 
-<div class="conclusion">Buy the Rumor, Sell the News（买预期，卖事实）</div>
+<!-- Bottom Row -->
+<div class="bottom-grid">
 
-<ol style="font-size:20px; margin:12px 0 20px 24px;">
-<li>AI投资时钟：财报超预期→买互联芯片→买内存→买整机</li>
-<li>SpaceX IPO前布局相关供应链</li>
-<li>Agentic AI是下一轮核心叙事</li>
-<li>ARM替代x86是大势所趋</li>
-</ol>
+<div class="bottom-card">
+  <h3>核心方法论</h3>
+  <p style="font-size:15px;font-weight:bold;">正确标的 + 便宜买入 + 避开高位共识 + 耐心持有。</p>
+  <p style="margin-top:6px;">投资不是追热点，而是守住赔率与纪律。"Buy the rumor, sell the news"。</p>
+</div>
 
-<h2>九、本期金句</h2>
+<div class="bottom-card">
+  <h3>本次7大方向</h3>
+  <p>光模块离场，ARM持有，存储持有，高速连接布局，NBIS持有，CPU分化，航天提前布局。</p>
+</div>
 
-<div class="quote">"AI Agent上下文长度从30K到100K+，内存需求是十倍。"—— Micron CEO</div>
-<div class="quote">"Agentic AI是AI的iPhone时刻。"—— A.I.N.</div>
-<div class="quote">"SpaceX不是火箭公司，它是数据公司。"—— 行业观察</div>
-<div class="quote">"Buy the rumor（IPO前）, sell the news（纳入指数后）。"—— 华尔街</div>
+<div class="bottom-card">
+  <h3>操作总原则</h3>
+  <p>离场光模块与英特尔高位风险，持有ARM/存储/NBIS/AMD，布局高速连接与航天，航天仓位不超过总仓位10%。</p>
+</div>
+
+<div class="bottom-card">
+  <h3>金句提醒</h3>
+  <div class="quote-item">市场共识越强，风险往往越大</div>
+  <div class="quote-item">赛道底层没问题，就陪着企业吃到最肥的红利</div>
+  <div class="quote-item">AI这波重新洗牌，可能是最后一次洗牌</div>
+</div>
+</div>
+
+
+<div class="footer">内部分享材料 | 结论先行，纪律优先 | 主线聚焦 AI 与太空</div>
 
 </body>
 </html>
