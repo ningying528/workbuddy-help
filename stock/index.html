@@ -16,7 +16,7 @@ h1 { text-align: center; color: #00d4ff; font-size: 28px; margin-bottom: 16px; }
 .query-box button { padding: 10px 20px; font-size: 18px; background: #00d4ff; color: #000; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
 .query-box button:hover { background: #00b4dd; }
 .query-box button:disabled { background: #555; cursor: not-allowed; }
-.key-row { display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; flex-wrap: wrap; }
+.key-row { display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
 .key-row input { padding: 8px 12px; font-size: 16px; border: 2px solid #555; border-radius: 8px; background: #111; color: #ffd700; width: 320px; }
 .key-row button { padding: 8px 16px; font-size: 16px; background: #444; color: #fff; border: none; border-radius: 8px; cursor: pointer; }
 .key-hint { text-align: center; font-size: 14px; color: #888; margin-bottom: 8px; }
@@ -40,6 +40,7 @@ td { color: #e0e0e0; }
 tr:hover { background: #161625; }
 .error { color: #ff4444; text-align: center; font-size: 18px; padding: 20px; }
 .loading { text-align: center; color: #00d4ff; font-size: 20px; padding: 30px; }
+#keyStatus { text-align: center; font-size: 13px; color: #0f0; margin-bottom: 8px; min-height: 20px; }
 </style>
 </head>
 <body>
@@ -50,9 +51,11 @@ tr:hover { background: #161625; }
   需要 <a href="https://finnhub.io/register" target="_blank">Finnhub API Key</a>（免费注册，60次/分钟）→ 粘贴到下方输入框
 </div>
 <div class="key-row">
-  <input id="apiKey" type="password" placeholder="输入 Finnhub API Key" autocomplete="off">
+  <input id="apiKey" type="text" placeholder="输入 Finnhub API Key" autocomplete="off">
   <button id="saveKeyBtn">保存</button>
+  <button onclick="clearKey()" style="padding:8px 12px;font-size:14px;background:#800;color:#fff;border:none;border-radius:6px;cursor:pointer;">清除</button>
 </div>
+<div id="keyStatus"></div>
 
 <div class="query-box">
   <input id="s1" placeholder="股票代码1" value="NVDA">
@@ -61,47 +64,89 @@ tr:hover { background: #161625; }
 </div>
 
 <div style="text-align:center;margin-bottom:10px;">
-  <button id="installBtn" onclick="installPWA()" style="display:none;padding:12px 24px;font-size:18px;background:#ff6b35;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:bold;">📱 安装到桌面（像小程序一样）</button>
+  <button id="installBtn" onclick="installPWA()" style="display:none;padding:12px 24px;font-size:18px;background:#ff6b35;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:bold;">安装到桌面（像小程序一样）</button>
 </div>
 
 <div id="result"></div>
 
 <script>
+// ===== Cookie 读写工具 =====
+function setCookie(name, value, days) {
+  var expires = "";
+  if (days) {
+    var d = new Date();
+    d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+    expires = "; expires=" + d.toUTCString();
+  }
+  document.cookie = name + "=" + encodeURIComponent(value) + expires + "; path=/; SameSite=Lax";
+}
+function getCookie(name) {
+  var n = name + "=";
+  var ca = document.cookie.split(';');
+  for (var i = 0; i < ca.length; i++) {
+    var c = ca[i].trim();
+    if (c.indexOf(n) === 0) return decodeURIComponent(c.substring(n.length, c.length));
+  }
+  return null;
+}
+
 // ===== 辅助函数 =====
 function isAShare(sym) {
   return /^\d{6}$/.test(sym) || /\.(SZ|SS|BJ)$/i.test(sym);
 }
-
 function getEastmoneySecid(sym) {
   sym = sym.replace(/\.(SZ|SS|BJ)$/i, '');
   if (sym.length !== 6) return '0.' + sym;
   return (sym.charAt(0) === '6' || sym.charAt(0) === '5' ? '1.' : '0.') + sym;
 }
 
-// ===== API Key 管理 =====
+// ===== API Key 管理（localStorage + Cookie 双保险）=====
 function getKey() {
   var urlKey = new URL(location.href).searchParams.get('key');
   if (urlKey) {
     localStorage.setItem('finnhub_key', urlKey);
-    // 清除URL中的key，避免分享时泄露
+    setCookie('finnhub_key', urlKey, 365);
     history.replaceState(null, '', location.pathname + location.hash);
   }
-  return localStorage.getItem('finnhub_key') || '';
+  var k = localStorage.getItem('finnhub_key');
+  if (k) return k;
+  k = getCookie('finnhub_key');
+  if (k) {
+    localStorage.setItem('finnhub_key', k);
+  }
+  return k || '';
 }
-
 function saveKey() {
   var k = document.getElementById('apiKey').value.trim();
   if (k) {
     localStorage.setItem('finnhub_key', k);
-    alert('Key 已保存！刷新页面后自动生效。');
+    setCookie('finnhub_key', k, 365);
+    var status = document.getElementById('keyStatus');
+    status.textContent = 'Key 已保存！关闭APP重新打开也不会丢失。';
+    status.style.color = '#0f0';
+    setTimeout(function() { status.textContent = ''; }, 5000);
   } else {
     alert('请输入有效的 Key');
   }
 }
+function clearKey() {
+  localStorage.removeItem('finnhub_key');
+  setCookie('finnhub_key', '', -1);
+  document.getElementById('apiKey').value = '';
+  var status = document.getElementById('keyStatus');
+  status.textContent = 'Key 已清除';
+  status.style.color = '#f44';
+  setTimeout(function() { status.textContent = ''; status.style.color = '#0f0'; }, 3000);
+}
 
-// 页面加载时，把已保存的key显示到输入框
 document.addEventListener('DOMContentLoaded', function() {
-  document.getElementById('apiKey').value = getKey();
+  var k = getKey();
+  document.getElementById('apiKey').value = k;
+  if (k) {
+    var status = document.getElementById('keyStatus');
+    status.textContent = 'Key 已加载（来自本地存储）';
+    setTimeout(function() { status.textContent = ''; }, 3000);
+  }
 });
 
 // ===== PWA 安装按钮 =====
@@ -115,18 +160,16 @@ function installPWA() {
   if (installPrompt) {
     installPrompt.prompt();
     installPrompt.userChoice.then(function(r) {
-      if (r.outcome === 'accepted') { alert('安装成功！桌面上会出现图标'); }
+      if (r.outcome === 'accepted') { alert('安装成功！桌面会出现图标'); }
       installPrompt = null;
       document.getElementById('installBtn').style.display = 'none';
     });
   } else {
-    alert('请刷新页面后再试，或点浏览器菜单 → 应用 → 安装此站点为应用');
+    alert('请刷新页面后再试，或点浏览器菜单 -> 应用 -> 安装此站点为应用');
   }
 }
 
 // ===== A股数据：东方财富 JSONP =====
-var FINNHUB = 'https://finnhub.io/api/v1/';
-
 function fetchEastmoney(secid) {
   return new Promise(function(resolve, reject) {
     var cbName = 'emcb_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
@@ -172,6 +215,7 @@ function fetchEastmoney(secid) {
 }
 
 // ===== 美股数据：Finnhub =====
+var FINNHUB = 'https://finnhub.io/api/v1/';
 async function fetchFinnhub(sym, key) {
   var [quote, profile, metricData] = await Promise.all([
     (async function() {
@@ -275,7 +319,6 @@ function renderCard(d) {
     '<div class="section-title">公司简介</div>' +
     '<div class="summary"><strong>行业：</strong>' + (d.industry || 'N/A') + '<br><strong>交易所：</strong>' + (d.exchange || 'N/A') + '</div></div>';
 }
-
 function renderTable(d1, d2) {
   var rows = [
     ['指标', d1.symbol + ' (' + d1.name + ')', d2.symbol + ' (' + d2.name + ')', '对比'],
@@ -312,7 +355,7 @@ async function compare() {
     return;
   }
   if (!key && (!isAShare(s1) || !isAShare(s2))) {
-    result.innerHTML = '<div class="error">美股需要 Finnhub API Key<br><br>免费获取：<a href="https://finnhub.io/register" target="_blank" style="color:#00d4ff">finnhub.io/register</a> → 注册 → 复制 API Key → 粘贴到上方输入框<br><br>只查询A股不需要 Key</div>';
+    result.innerHTML = '<div class="error">美股需要 Finnhub API Key<br><br>免费获取：<a href="https://finnhub.io/register" target="_blank" style="color:#00d4ff">finnhub.io/register</a> 注册后复制 Key 粘贴到上方输入框<br><br>只查询A股不需要 Key</div>';
     result.style.display = 'block';
     return;
   }
@@ -335,8 +378,11 @@ async function compare() {
   }
 }
 
-// 绑定保存按钮事件（兼容PWA离线场景）
+// 绑定按钮事件
 document.getElementById('saveKeyBtn').addEventListener('click', saveKey);
+document.getElementById('apiKey').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') saveKey();
+});
 
 // ===== PWA Service Worker =====
 if ('serviceWorker' in navigator) {
