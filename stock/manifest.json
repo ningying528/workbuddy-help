@@ -1,0 +1,19 @@
+{
+  "name": "股票分析对比工具",
+  "short_name": "股票对比",
+  "description": "任意股票代码输入，九大维度深度分析比较",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0a0a1a",
+  "theme_color": "#0a0a1a",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
