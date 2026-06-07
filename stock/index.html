@@ -100,22 +100,61 @@ function installPWA() {
   }
 }
 
-// ===== Finnhub API =====
-var BASE = 'https://finnhub.io/api/v1/';
+// ===== 股票数据 API（美股 Finnhub + A股 新浪财经） =====
+var FINNHUB = 'https://finnhub.io/api/v1/';
+var CORS_PROXY = 'https://api.allorigins.win/raw?url=';
 
-async function fh(url) {
-  var r = await fetch(url, {signal: AbortSignal.timeout(12000)});
-  if (!r.ok) throw new Error('API 请求失败 (' + r.status + ')');
-  return r.json();
+function isAShare(sym) {
+  return /^\d{6}$/.test(sym) || /\.(SZ|SS)$/i.test(sym);
 }
 
-async function fetchStock(sym, key) {
+function getSinaCode(sym) {
+  sym = sym.replace(/\.(SZ|SS)$/i, '');
+  if (sym.length !== 6) return sym;
+  var first = sym.charAt(0);
+  if (first === '6') return 'sh' + sym;
+  return 'sz' + sym;
+}
+
+async function fetchSina(scode) {
+  var url = CORS_PROXY + encodeURIComponent('https://hq.sinajs.cn/list=' + scode);
+  var r = await fetch(url, {signal: AbortSignal.timeout(10000)});
+  if (!r.ok) throw new Error('新浪API请求失败');
+  var text = await r.text();
+  // 解析新浪格式: var hq_str_xxx="名称,今开,昨收,当前价,最高,最低,..."
+  var match = text.match(/"([^"]+)"/);
+  if (!match) throw new Error('解析新浪数据失败');
+  var fields = match[1].split(',');
+  // 新浪返回GBK编码，名称可能乱码，但数值正确
+  var name = fields[0];
+  // 尝试修复GBK乱码名称
+  try {
+    var bytes = new Uint8Array(name.split('').map(function(c) { return c.charCodeAt(0) & 0xff; }));
+    name = new TextDecoder('gbk').decode(bytes);
+  } catch(e) {}
+  return {
+    name: name || scode,
+    price: parseFloat(fields[3]) || 0,
+    prevClose: parseFloat(fields[2]) || 0,
+    open: parseFloat(fields[1]) || 0,
+    high: parseFloat(fields[4]) || 0,
+    low: parseFloat(fields[5]) || 0,
+    exchange: (scode.charAt(0)==='s'&&scode.charAt(1)==='h') ? '上交所' : '深交所',
+    currency: 'CNY'
+  };
+}
+
+async function fetchFinnhub(sym, key) {
   var [quote, profile, metricData] = await Promise.all([
-    fh(BASE + 'quote?symbol=' + sym + '&token=' + key),
-    fh(BASE + 'stock/profile2?symbol=' + sym + '&token=' + key).catch(function(){return {};}),
-    fh(BASE + 'stock/metric?symbol=' + sym + '&metric=all&token=' + key).catch(function(){return {};})
+    (async function() {
+      var r = await fetch(FINNHUB + 'quote?symbol=' + sym + '&token=' + key, {signal: AbortSignal.timeout(12000)});
+      if (!r.ok) throw new Error('API请求失败 (' + r.status + ')');
+      return r.json();
+    })(),
+    fetch(FINNHUB + 'stock/profile2?symbol=' + sym + '&token=' + key, {signal: AbortSignal.timeout(8000)}).then(function(r){return r.json();}).catch(function(){return {};}),
+    fetch(FINNHUB + 'stock/metric?symbol=' + sym + '&metric=all&token=' + key, {signal: AbortSignal.timeout(8000)}).then(function(r){return r.json();}).catch(function(){return {};})
   ]);
-  if (!quote || quote.c === undefined || quote.c === null) throw new Error('找不到 ' + sym);
+  if (!quote || quote.c == null) throw new Error('找不到 ' + sym);
   var m = metricData.metric || {}, p = profile || {};
   return {
     symbol: sym,
@@ -140,8 +179,31 @@ async function fetchStock(sym, key) {
     beta: m.beta || null,
     industry: p.finnhubIndustry || '',
     exchange: p.exchange || '',
-    currency: p.currency || 'USD'
+    currency: p.currency || 'USD',
+    isAShare: false
   };
+}
+
+async function fetchStock(sym, key) {
+  if (isAShare(sym)) {
+    var scode = getSinaCode(sym);
+    var sdata = await fetchSina(scode);
+    return {
+      symbol: sym,
+      name: sdata.name || sym,
+      price: sdata.price,
+      prevClose: sdata.prevClose,
+      change: sdata.price - sdata.prevClose,
+      changePct: sdata.prevClose ? (sdata.price - sdata.prevClose) / sdata.prevClose : 0,
+      marketCap: null, pe: null, forwardPe: null, peg: null,
+      profitMargin: null, revenueGrowth: null, roe: null, grossMargin: null,
+      debtToEquity: null, currentRatio: null, eps: null,
+      week52High: sdata.high, week52Low: sdata.low, beta: null,
+      industry: '', exchange: sdata.exchange, currency: 'CNY',
+      isAShare: true
+    };
+  }
+  return fetchFinnhub(sym, key);
 }
 
 // ===== 格式化函数 =====
@@ -219,8 +281,8 @@ async function compare() {
     result.style.display = 'block';
     return;
   }
-  if (!key) {
-    result.innerHTML = '<div class="error">请先输入 Finnhub API Key<br><br>免费获取：<a href="https://finnhub.io/register" target="_blank" style="color:#00d4ff">finnhub.io/register</a> → 注册 → 复制 API Key → 粘贴到上方输入框</div>';
+  if (!key && (!isAShare(s1) || !isAShare(s2))) {
+    result.innerHTML = '<div class="error">美股需要 Finnhub API Key<br><br>免费获取：<a href="https://finnhub.io/register" target="_blank" style="color:#00d4ff">finnhub.io/register</a> → 注册 → 复制 API Key → 粘贴到上方输入框<br><br>只查询A股不需要 Key</div>';
     result.style.display = 'block';
     return;
   }
