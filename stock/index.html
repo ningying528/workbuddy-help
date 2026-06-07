@@ -100,77 +100,78 @@ function installPWA() {
   }
 }
 
-// ===== 股票数据 API（美股 Finnhub + A股 新浪财经） =====
+// ===== 股票数据 API（美股 Finnhub + A股 东方财富） =====
 var FINNHUB = 'https://finnhub.io/api/v1/';
-var CORS_PROXY = 'https://api.allorigins.win/raw?url=';
 
-function isAShare(sym) {
-  return /^\d{6}$/.test(sym) || /\.(SZ|SS)$/i.test(sym);
-}
-
-function getSinaCode(sym) {
+function getEastmoneySecid(sym) {
   sym = sym.replace(/\.(SZ|SS)$/i, '');
-  if (sym.length !== 6) return sym;
-  var first = sym.charAt(0);
-  if (first === '6') return 'sh' + sym;
-  return 'sz' + sym;
+  if (sym.length !== 6) return '0.' + sym;
+  return (sym.charAt(0) === '6' ? '1.' : '0.') + sym;
 }
 
-function fetchSina(scode) {
-  // 用 JSONP 方式绕过 CORS，手机浏览器也能用
+function fetchEastmoney(secid) {
   return new Promise(function(resolve, reject) {
+    var cbName = 'emcb_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+    window[cbName] = function(data) {
+      try { delete window[cbName]; } catch(e) {}
+      var s = document.querySelector('script[src*="' + cbName + '"]');
+      if (s && s.parentNode) s.parentNode.removeChild(s);
+      if (data && data.data) {
+        var d = data.data;
+        resolve({
+          name: d.f58 || secid,
+          price: (d.f43 || 0) / 100,
+          prevClose: (d.f60 || 0) / 100,
+          open: (d.f46 || 0) / 100,
+          high: (d.f44 || 0) / 100,
+          low: (d.f45 || 0) / 100,
+          change: (d.f169 || 0) / 100,
+          changePct: (d.f170 || 0),
+          exchange: secid.startsWith('1.') ? '上交所' : '深交所',
+          currency: 'CNY'
+        });
+      } else {
+        reject(new Error('东方财富数据为空'));
+      }
+    };
     var script = document.createElement('script');
-    script.src = 'https://hq.sinajs.cn/list=' + scode;
-    script.charset = 'gbk';
-    var varName = 'hq_str_' + scode;
-    var done = false;
-
-    script.onload = function() {
-      if (done) return;
-      done = true;
-      var text = window[varName] || '';
-      document.body.removeChild(script);
-      if (!text) { reject(new Error('新浪数据为空')); return; }
-      var m = text.match(/^"?(.*)"?$/);
-      var fields = (m ? m[1] : text).split(',');
-      // fields: 名称,今开,昨收,当前价,最高,最低,买一,卖一,成交量,成交额,...
-      var name = fields[0] || scode;
-      // 修复 GBK 乱码
-      try {
-        var raw = unescape(encodeURIComponent(name)); // 尝试转码
-        if (raw && raw !== name) name = raw;
-      } catch(e) {}
-      resolve({
-        name: name,
-        price: parseFloat(fields[3]) || 0,
-        prevClose: parseFloat(fields[2]) || 0,
-        open: parseFloat(fields[1]) || 0,
-        high: parseFloat(fields[4]) || 0,
-        low: parseFloat(fields[5]) || 0,
-        exchange: (scode === 'sh' + scode.slice(2)) ? '上交所' : '深交所',
-        currency: 'CNY'
-      });
-    };
-
+    script.src = 'https://push2.eastmoney.com/api/qt/stock/get?secid=' + secid +
+                 '&fields=f43,f44,f45,f46,f57,f58,f60,f169,f170&cb=' + cbName;
     script.onerror = function() {
-      if (done) return;
-      done = true;
-      document.body.removeChild(script);
-      reject(new Error('新浪API网络错误'));
-    };
-
-    // 超时处理
-    setTimeout(function() {
-      if (done) return;
-      done = true;
+      try { delete window[cbName]; } catch(e) {}
       try { document.body.removeChild(script); } catch(e) {}
-      reject(new Error('新浪API超时'));
+      reject(new Error('东方财富API网络错误'));
+    };
+    setTimeout(function() {
+      if (window[cbName]) {
+        try { delete window[cbName]; } catch(e) {}
+        try { document.body.removeChild(script); } catch(e) {}
+        reject(new Error('东方财富API超时'));
+      }
     }, 10000);
-
     document.body.appendChild(script);
   });
 }
 
+async function fetchStock(sym, key) {
+  if (/^\d{6}$/.test(sym) || /\.(SZ|SS)$/i.test(sym)) {
+    var secid = getEastmoneySecid(sym);
+    var edata = await fetchEastmoney(secid);
+    return {
+      symbol: sym,
+      name: edata.name || sym,
+      price: edata.price,
+      prevClose: edata.prevClose,
+      change: edata.change,
+      changePct: edata.changePct,
+      marketCap: null, pe: null, forwardPe: null, peg: null,
+      profitMargin: null, revenueGrowth: null, roe: null, grossMargin: null,
+      debtToEquity: null, currentRatio: null, eps: null,
+      week52High: edata.high, week52Low: edata.low, beta: null,
+      industry: '', exchange: edata.exchange, currency: 'CNY',
+      isAShare: true
+    };
+  }
 async function fetchFinnhub(sym, key) {
   var [quote, profile, metricData] = await Promise.all([
     (async function() {
@@ -213,20 +214,20 @@ async function fetchFinnhub(sym, key) {
 
 async function fetchStock(sym, key) {
   if (isAShare(sym)) {
-    var scode = getSinaCode(sym);
-    var sdata = await fetchSina(scode);
+    var secid = getEastmoneySecid(sym);
+    var edata = await fetchEastmoney(secid);
     return {
       symbol: sym,
       name: sdata.name || sym,
-      price: sdata.price,
-      prevClose: sdata.prevClose,
-      change: sdata.price - sdata.prevClose,
-      changePct: sdata.prevClose ? (sdata.price - sdata.prevClose) / sdata.prevClose : 0,
+      price: edata.price,
+      prevClose: edata.prevClose,
+      change: edata.price - edata.prevClose,
+      changePct: edata.prevClose ? (edata.price - edata.prevClose) / edata.prevClose : 0,
       marketCap: null, pe: null, forwardPe: null, peg: null,
       profitMargin: null, revenueGrowth: null, roe: null, grossMargin: null,
       debtToEquity: null, currentRatio: null, eps: null,
-      week52High: sdata.high, week52Low: sdata.low, beta: null,
-      industry: '', exchange: sdata.exchange, currency: 'CNY',
+      week52High: edata.high, week52Low: edata.low, beta: null,
+      industry: '', exchange: edata.exchange, currency: 'CNY',
       isAShare: true
     };
   }
