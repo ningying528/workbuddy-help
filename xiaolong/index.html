@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小龙3D查看器 - 双语学中文动画</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#1a1a2e;color:#fff;min-height:100vh}
+.header{text-align:center;padding:20px;background:linear-gradient(135deg,#16213e,#0f3460);border-bottom:3px solid #e94560}
+.header h1{font-size:28px;color:#e94560;margin-bottom:8px}
+.header p{font-size:18px;color:#aaa}
+.container{max-width:800px;margin:0 auto;padding:20px}
+.section{background:#16213e;border-radius:16px;padding:20px;margin-bottom:20px;border:1px solid #0f3460}
+.section h2{font-size:24px;color:#e94560;margin-bottom:15px}
+.section p{font-size:20px;line-height:1.8;color:#ddd}
+.model-container{width:100%;height:500px;border-radius:12px;overflow:hidden;background:#0a0a1a;position:relative}
+model-viewer{width:100%;height:100%}
+.loading-msg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:22px;color:#e94560;text-align:center}
+.video-container{width:100%;border-radius:12px;overflow:hidden;background:#000}
+video{width:100%;display:block}
+.info-card{background:#0f3460;border-radius:12px;padding:16px;margin:12px 0;border-left:4px solid #e94560}
+.info-card h3{font-size:20px;color:#e94560;margin-bottom:8px}
+.info-card p{font-size:18px;color:#ccc;line-height:1.6}
+.tag{display:inline-block;background:#e94560;color:#fff;padding:4px 12px;border-radius:20px;font-size:16px;margin:4px}
+.tag.blue{background:#0f3460;border:1px solid #e94560}
+.tag.green{background:#2d6a4f}
+.note{background:#2d1b69;border:1px solid #7b2ff7;border-radius:12px;padding:16px;margin:12px 0}
+.note h3{font-size:20px;color:#b794f6;margin-bottom:8px}
+.characters{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-top:12px}
+.char-card{background:#0f3460;border-radius:12px;padding:16px;text-align:center;border:2px solid transparent;transition:border-color 0.3s}
+.char-card:hover{border-color:#e94560}
+.char-card .emoji{font-size:48px;margin-bottom:8px}
+.char-card .name{font-size:20px;color:#e94560;font-weight:bold}
+.char-card .desc{font-size:16px;color:#aaa;margin-top:4px}
+.error-box{background:#3d1010;border:1px solid #e94560;border-radius:12px;padding:20px;text-align:center;margin:12px 0}
+.error-box p{color:#e94560;font-size:20px}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>🐉 双语学中文动画</h1>
+<p>Learn Chinese with Xiaolong</p>
+</div>
+<div class="container">
+
+<div class="section">
+<h2>🎬 开场动画 — 小龙飞出云朵城堡</h2>
+<p style="margin-bottom:12px;color:#aaa">AI生成的3D动画演示片段（无声，约5秒）</p>
+<div class="video-container" id="video-area">
+<div class="error-box" id="video-fallback"><p>⏳ 正在加载视频...</p></div>
+</div>
+<div class="note">
+<h3>💡 关于视频</h3>
+<p>• AI文生视频目前不生成声音，配音需后期添加</p>
+<p>• 单次生成约4-8秒，完整10分钟需要多个片段拼接</p>
+<p>• 后续可用剪映App拼接+配音+字幕</p>
+</div>
+</div>
+
+<div class="section">
+<h2>🐉 小龙3D模型 — 可360°旋转查看</h2>
+<p style="margin-bottom:12px;color:#aaa">用手指拖动旋转，双指缩放，查看小龙的3D造型</p>
+<div class="model-container" id="model-area">
+<div class="loading-msg" id="model-loading">⏳ 正在加载3D模型...</div>
+</div>
+<div class="note">
+<h3>💡 如何查看3D模型</h3>
+<p>• <strong>旋转</strong>：单指拖动</p>
+<p>• <strong>缩放</strong>：双指捏合/分开</p>
+<p>• <strong>平移</strong>：双指同时拖动</p>
+<p>• 模型会自动旋转展示</p>
+</div>
+</div>
+
+<div class="section">
+<h2>🎨 小龙角色参考图</h2>
+<div style="width:100%;border-radius:12px;overflow:hidden;background:#0a0a1a;text-align:center;min-height:300px" id="img-area">
+<div class="loading-msg">⏳ 加载中...</div>
+</div>
+</div>
+
+<div class="section">
+<h2>👥 主要角色</h2>
+<div class="characters">
+<div class="char-card"><div class="emoji">🐉</div><div class="name">小龙 Xiaolong</div><div class="desc">双语小老师<br>会中英文</div></div>
+<div class="char-card"><div class="emoji">👧</div><div class="name">可可 Coco</div><div class="desc">10岁华裔女孩<br>好奇爱问</div></div>
+<div class="char-card"><div class="emoji">💃</div><div class="name">娜娜 Nana</div><div class="desc">8岁爱唱歌<br>记性超好</div></div>
+<div class="char-card"><div class="emoji">👵</div><div class="name">奶奶 Nainai</div><div class="desc">温暖智慧<br>文化传承</div></div>
+</div>
+</div>
+
+<div class="section">
+<h2>📺 第1集 — 认识b p m f</h2>
+<div class="info-card">
+<h3>📖 内容安排</h3>
+<p><span class="tag">歌曲</span> 开场歌：小龙教你学拼音 (1分钟)</p>
+<p><span class="tag">故事</span> 泡泡公园奇遇 (3分钟)</p>
+<p><span class="tag">学习</span> b p m f发音和联想记忆 (4分钟)</p>
+<p><span class="tag">练习</span> 跟读游戏 (1.5分钟)</p>
+<p><span class="tag">儿歌</span> b p m f复习歌 (0.5分钟)</p>
+</div>
+<div class="info-card">
+<h3>🧠 联想记忆法</h3>
+<p>🎤 <strong>b</strong> — 像泡泡 (bao) 圆圆的</p>
+<p>🧗 <strong>p</strong> — 像爬山 (pa) 一半</p>
+<p>🏔️ <strong>m</strong> — 像两座山 (ma) 并排</p>
+<p>🦯 <strong>f</strong> — 像拐杖 (fu) 一根</p>
+</div>
+</div>
+
+<div class="section">
+<h2>⚙️ 技术说明</h2>
+<div class="info-card">
+<h3>当前AI能力</h3>
+<p>✅ 文生视频：4-8秒/段，无声</p>
+<p>✅ 文生图：角色设计、场景概念图</p>
+<p>✅ 文生3D模型：GLB格式，可旋转查看</p>
+<p>❌ 一键生成10分钟完整动画：暂不支持</p>
+<p>❌ 自动配音/音乐：需后期添加</p>
+</div>
+<div class="info-card">
+<h3>制作方案</h3>
+<p><span class="tag green">推荐</span> Canva动画/Powtoon — 拖拽式，可加配音</p>
+<p><span class="tag blue">快速</span> PPT动画+录屏 — 最简单</p>
+<p><span class="tag blue">专业</span> AI视频片段+剪映拼接+配音</p>
+</div>
+</div>
+
+<div style="text-align:center;padding:20px;color:#666;font-size:16px">双语学中文动画项目 · AI辅助制作 · 2026</div>
+</div>
+
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
+<script>
+var D={
+v:'aHR0cHM6Ly92Y2ctcHJvZC0xMjU4MzQ0Njk5LmNvcy5hcC1ndWFuZ3pob3UudGVuY2VudGNvcy5jbi90ZXh0X3RvX3ZpZGVvL3Jlc3VsdHMvMTM3OTQzMTgyMi83YmExNzMzMS0wNGZlLTRjNGQtOTIwMC1lYWU3OWU4OTQ5YmFfMTc4MDk4MTEwMi5tcDQ/cS1zaWduLWFsZ29yaXRobT1zaGExJnEtYWs9QUtJRDhQY1BCNzB4MklicjQ5QTF2bmtkU0JjVEo2bE1yTGdwJnEtc2lnbi10aW1lPTE3ODA5ODE1MDglM0IxNzgxMDY3OTA3JnEta2V5LXRpbWU9MTc4MDk4MTUwOCUzQjE3ODEwNjc5MDcmcS1oZWFkZXItbGlzdD1ob3N0JnEtdXJsLXBhcmFtLWxpc3Q9JnEtc2lnbmF0dXJlPWVlMjRkOGExMWQ3MTIzYmJhMjhjNDk1ZWMwODExMDQyNjg2MTM2ZTM=',
+g:'aHR0cHM6Ly9odW55dWFuLXByb2QtMTI1ODM0NDY5OS5jb3MuYXAtZ3Vhbmd6aG91LnRlbmNlbnRjb3MuY24vM2Qvb3V0cHV0LzEzNzk0MzE4MjIvMTg4NDVmNGUtMTU4MS00NGQ4LWE4ZmYtYjJiMDk2YTY4MjQ3XzAuZ2xiP3Etc2lnbi1hbGdvcml0aG09c2hhMSZxLWFrPUFLSURwUm92bGlVMUlKNWN0dWZCU1ZJcThBd1Rsblo1TU44ZCZxLXNpZ24tdGltZT0xNzgwOTgxOTk3JTNCMTc4MTA2ODM5NyZxLWtleS10aW1lPTE3ODA5ODE5OTclM0IxNzgxMDY4Mzk3JnEtaGVhZGVyLWxpc3Q9aG9zdCZxLXVybC1wYXJhbS1saXN0PSZxLXNpZ25hdHVyZT00MTA1YjAwNWI1ODNiYWMwY2Q3N2RlNDhhZmJlNTJkMmU1ZTgzMWE0',
+i:'aHR0cHM6Ly9haWFydC0xMjU4MzQ0Njk5LmNvcy5hcC1ndWFuZ3pob3UubXlxY2xvdWQuY29tL3RleHRfdG9faW1nX3Byby8xMzc5NDMxODIyLzEzNzk0MzE4MjItMTc4MTAxMzQxMy0xMWMwOGI3Yi02NDBiLTExZjEtYTYzMS01MjU0MDAxOGE5MTAtMC8wP3Etc2lnbi1hbGdvcml0aG09c2hhMSZxLWFrPUFLSURwUm92bGlVMUlKNWN0dWZCU1ZJcThBd1Rsblo1TU44ZCZxLXNpZ24tdGltZT0xNzgxMDEzNDI4JTNCMTc4MTAxNzAyOCZxLWtleS10aW1lPTE3ODEwMTM0MjglM0IxNzgxMDE3MDI4JnEtaGVhZGVyLWxpc3Q9aG9zdCZxLXVybC1wYXJhbS1saXN0PSZxLXNpZ25hdHVyZT1mMjczYWE4ZmJlY2RjMjE1OGJlMWJjOTI0ZTMwMjJjNjdiYWVlMjEw'
+};
+function b64d(s){try{return atob(s)}catch(e){return''}}
+
+// Video
+(function(){
+var a=document.getElementById('video-area');
+var v=document.createElement('video');
+v.controls=true;v.autoplay=false;v.muted=true;v.playsInline=true;v.style.width='100%';v.style.display='block';
+var s=document.createElement('source');
+s.src=b64d(D.v);s.type='video/mp4';
+v.appendChild(s);
+v.onerror=function(){a.innerHTML='<div class="error-box"><p>⚠️ 视频加载失败</p><p style="font-size:16px;color:#aaa">请用手机4G/5G网络访问</p></div>'};
+a.innerHTML='';a.appendChild(v);
+})();
+
+// 3D Model
+(function(){
+var a=document.getElementById('model-area');
+var mv=document.createElement('model-viewer');
+mv.src=b64d(D.g);mv.alt='小龙3D模型';
+mv.setAttribute('auto-rotate','');mv.setAttribute('camera-controls','');
+mv.setAttribute('shadow-intensity','1');mv.setAttribute('exposure','1.2');
+mv.setAttribute('environment-image','neutral');
+mv.style.background='#0a0a1a';mv.style.width='100%';mv.style.height='100%';
+var l=document.getElementById('model-loading');
+mv.addEventListener('load',function(){if(l)l.style.display='none'});
+mv.addEventListener('error',function(){if(l)l.innerHTML='⚠️ 3D模型加载失败<br><span style="font-size:16px;color:#aaa">请用手机4G/5G网络访问</span>'});
+a.appendChild(mv);
+})();
+
+// Image
+(function(){
+var a=document.getElementById('img-area');
+var img=document.createElement('img');
+img.src=b64d(D.i);img.alt='小龙角色参考图';
+img.style.maxWidth='100%';img.style.display='block';img.style.margin='0 auto';
+img.onerror=function(){a.innerHTML='<div class="error-box"><p>⚠️ 图片加载失败</p><p style="font-size:16px;color:#aaa">请用手机4G/5G网络访问</p></div>'};
+img.onload=function(){a.innerHTML='';a.appendChild(img)};
+})();
+</script>
+</body>
+</html>
